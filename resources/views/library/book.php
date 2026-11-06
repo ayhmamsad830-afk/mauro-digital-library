@@ -25,6 +25,7 @@ $rightsLabels = ['owned' => __('book.rights_owned'), 'licensed' => __('book.righ
                 <?php if (($book['visibility'] ?? 'public') === 'members'): ?><span class="badge badge--accent"><?= e(__('book.members_only')) ?></span><?php endif; ?>
             </div>
             <h1 class="book-hero__title display" lang="<?= e($book['language']) ?>" dir="auto"><?= e($book['title']) ?></h1>
+            <?php if (!empty($book['title_en']) && $book['language'] !== 'en'): ?><p class="book-hero__subtitle"><span lang="en" dir="ltr"><?= e($book['title_en']) ?></span></p><?php endif; ?>
             <p class="book-hero__authors">
                 <?= e(__('book.by')) ?>
                 <?php foreach ($book['authors'] as $i => $a): ?><?= $i ? e(locale() === 'ar' ? '، ' : ', ') : '' ?><a href="<?= e(route('books.index', [], ['author' => $a['slug']])) ?>"><?= e($a['name']) ?></a><?php endforeach; ?>
@@ -52,9 +53,11 @@ $rightsLabels = ['owned' => __('book.rights_owned'), 'licensed' => __('book.righ
             <dl class="book-facts">
                 <?php if ($book['publisher']): ?><div><dt><?= e(__('book.publisher')) ?></dt><dd dir="auto"><?= e($book['publisher']) ?></dd></div><?php endif; ?>
                 <?php if ($book['publication_year']): ?><div><dt><?= e(__('book.year')) ?></dt><dd><?= e($book['publication_year']) ?></dd></div><?php endif; ?>
+                <?php if (!empty($book['edition'])): ?><div><dt><?= e(__('book.edition')) ?></dt><dd dir="auto"><?= e($book['edition']) ?></dd></div><?php endif; ?>
                 <?php if ($book['page_count']): ?><div><dt><?= e(__('book.pages')) ?></dt><dd><?= e(format_number((int) $book['page_count'])) ?></dd></div><?php endif; ?>
                 <div><dt><?= e(__('book.language')) ?></dt><dd><?= e(language_name($book['language'])) ?></dd></div>
                 <?php if (!empty($book['rights_status'])): ?><div><dt><?= e(__('book.rights')) ?></dt><dd><?= e($rightsLabels[$book['rights_status']] ?? '') ?></dd></div><?php endif; ?>
+                <?php if (!empty($book['isbn'])): ?><div class="book-facts__isbn"><dt><?= e(__('book.isbn')) ?></dt><dd class="ltr"><?= e($book['isbn']) ?></dd></div><?php endif; ?>
             </dl>
         </div>
     </div>
@@ -65,7 +68,8 @@ $rightsLabels = ['owned' => __('book.rights_owned'), 'licensed' => __('book.righ
     <div class="book-body">
         <section class="book-body__main" aria-labelledby="about-title">
             <h2 id="about-title" class="book-section-title"><?= e(__('book.about')) ?></h2>
-            <div class="prose" lang="<?= e($book['language']) ?>" dir="auto"><p><?= nl2br(e($book['description'])) ?></p></div>
+            <?php $useEn = locale() === 'en' && !empty($book['description_en']); ?>
+            <div class="prose book-description" lang="<?= e($useEn ? 'en' : $book['language']) ?>" dir="auto"><?php foreach (preg_split('/\R{2,}/u', trim($useEn ? $book['description_en'] : $book['description'])) as $para): ?><p><?= nl2br(e($para)) ?></p><?php endforeach; ?></div>
 
             <section class="reviews" id="reviews" aria-labelledby="reviews-title">
                 <div class="section-head">

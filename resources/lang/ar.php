@@ -55,6 +55,12 @@ return [
     // --- Phase 2 ---------------------------------------------------------
     'common.view_all' => 'عرض الكل',
     'common.loading' => 'جارٍ التحميل…',
+    'admin.title_en' => 'العنوان بالإنجليزية',
+    'admin.title_en_help' => 'اختياري. يظهر تحت العنوان الأصلي.',
+    'admin.description_en' => 'الوصف بالإنجليزية',
+    'admin.description_en_help' => 'اختياري. يُعرض في الواجهة الإنجليزية بدل الوصف الأصلي.',
+    'book.edition' => 'الطبعة',
+    'book.isbn' => 'الرقم الدولي (ISBN)',
     'carousel.prev' => 'الكتب السابقة',
     'carousel.next' => 'الكتب التالية',
     'upload.in_progress' => 'جارٍ رفع الملف، يُرجى إبقاء الصفحة مفتوحة…',

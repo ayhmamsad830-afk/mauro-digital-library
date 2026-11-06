@@ -15,6 +15,12 @@ final class SchemaParityTest extends TestCase
     {
         $out = [];
         foreach (Migrator::splitStatements($sql) as $stmt) {
+            // Later migrations add columns with "ALTER TABLE t ADD COLUMN c TYPE".
+            if (preg_match('/^ALTER TABLE\s+(\w+)\s+ADD COLUMN\s+([a-z_][a-z0-9_]*)\s+/is', $stmt, $a)) {
+                $out[strtolower($a[1])][] = strtolower($a[2]);
+                sort($out[strtolower($a[1])]);
+                continue;
+            }
             if (!preg_match('/^CREATE TABLE\s+(\w+)\s*\((.*)\)[^)]*$/is', $stmt, $m)) {
                 continue;
             }

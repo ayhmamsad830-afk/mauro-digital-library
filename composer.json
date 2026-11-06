@@ -1,4 +1,5 @@
 {
+    "$schema": "https://json.schemastore.org/composer",
     "name": "digital-library/website",
     "description": "Bilingual (AR/EN) digital library website with a protected server-rendered page-image reader.",
     "type": "project",

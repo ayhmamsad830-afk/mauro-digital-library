@@ -19,6 +19,8 @@ $field = static fn (array $d) => \App\Core\View::partial('admin/_field', $d);
                 'control' => '<input class="input" id="f-title" name="title" maxlength="255" required dir="auto" value="' . e($v('title')) . '"' . $inv('title') . '>']) ?>
             <?= $field(['name' => 'slug', 'label' => 'Slug', 'help' => __('admin.slug_help_auto'),
                 'control' => '<input class="input ltr" id="f-slug" name="slug" maxlength="191" pattern="[a-z0-9-]+" value="' . e($v('slug')) . '"' . $inv('slug') . '>']) ?>
+            <?= $field(['name' => 'title_en', 'label' => __('admin.title_en'), 'help' => __('admin.title_en_help'),
+                'control' => '<input class="input" id="f-title_en" name="title_en" maxlength="255" dir="ltr" lang="en" value="' . e($v('title_en')) . '"' . $inv('title_en') . '>']) ?>
         </div>
         <?php
         $langOpts = '';
@@ -31,9 +33,13 @@ $field = static fn (array $d) => \App\Core\View::partial('admin/_field', $d);
             <?= $field(['name' => 'visibility', 'label' => __('admin.visibility'), 'required' => true, 'control' => '<select class="select" id="f-visibility" name="visibility"' . $inv('visibility') . '>' . $visOpts . '</select>']) ?>
             <?= $field(['name' => 'publisher', 'label' => __('book.publisher'), 'control' => '<input class="input" id="f-publisher" name="publisher" maxlength="255" dir="auto" value="' . e($v('publisher')) . '"' . $inv('publisher') . '>']) ?>
             <?= $field(['name' => 'publication_year', 'label' => __('book.year'), 'control' => '<input class="input ltr" id="f-publication_year" name="publication_year" inputmode="numeric" maxlength="4" value="' . e((string) $v('publication_year')) . '"' . $inv('publication_year') . '>']) ?>
+            <?= $field(['name' => 'edition', 'label' => __('book.edition'), 'control' => '<input class="input" id="f-edition" name="edition" maxlength="100" dir="auto" value="' . e($v('edition')) . '"' . $inv('edition') . '>']) ?>
+            <?= $field(['name' => 'isbn', 'label' => 'ISBN', 'control' => '<input class="input ltr" id="f-isbn" name="isbn" maxlength="20" inputmode="numeric" value="' . e($v('isbn')) . '"' . $inv('isbn') . '>']) ?>
         </div>
         <?= $field(['name' => 'description', 'label' => __('admin.description'), 'help' => __('admin.description_help'),
             'control' => '<textarea class="textarea" id="f-description" name="description" rows="6" maxlength="20000" dir="auto"' . $inv('description') . '>' . e($v('description')) . '</textarea>']) ?>
+        <?= $field(['name' => 'description_en', 'label' => __('admin.description_en'), 'help' => __('admin.description_en_help'),
+            'control' => '<textarea class="textarea" id="f-description_en" name="description_en" rows="5" maxlength="20000" dir="ltr" lang="en"' . $inv('description_en') . '>' . e($v('description_en')) . '</textarea>']) ?>
         <label class="check"><input type="checkbox" name="is_featured" value="1"<?= (int) $v('is_featured', 0) ? ' checked' : '' ?>> <?= e(__('admin.featured')) ?></label>
     </fieldset>
 

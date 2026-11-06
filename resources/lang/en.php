@@ -55,6 +55,12 @@ return [
     // --- Phase 2 ---------------------------------------------------------
     'common.view_all' => 'View all',
     'common.loading' => 'Loading…',
+    'admin.title_en' => 'English title',
+    'admin.title_en_help' => 'Optional. Shown under the original title.',
+    'admin.description_en' => 'English description',
+    'admin.description_en_help' => 'Optional. Shown on the English interface instead of the original description.',
+    'book.edition' => 'Edition',
+    'book.isbn' => 'ISBN',
     'carousel.prev' => 'Previous books',
     'carousel.next' => 'Next books',
     'upload.in_progress' => 'Uploading — please keep this page open…',

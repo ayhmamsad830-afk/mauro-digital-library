@@ -16,19 +16,20 @@ final class SearchIndexer
 {
     public static function textFor(int $bookId): string
     {
-        $book = Database::first('SELECT title, publisher, description FROM books WHERE id = :id', ['id' => $bookId]);
+        $book = Database::first('SELECT title, title_en, publisher, description, description_en FROM books WHERE id = :id', ['id' => $bookId]);
         if (!$book) {
             return '';
         }
         $authors = Database::query('SELECT a.name FROM book_authors ba JOIN authors a ON a.id = ba.author_id WHERE ba.book_id = :id', ['id' => $bookId])->fetchAll(\PDO::FETCH_COLUMN);
         $cats = Database::all('SELECT c.name_ar, c.name_en FROM book_categories bc JOIN categories c ON c.id = bc.category_id WHERE bc.book_id = :id', ['id' => $bookId]);
 
-        $parts = [$book['title'], implode(' ', $authors)];
+        $parts = [$book['title'], (string) ($book['title_en'] ?? ''), implode(' ', $authors)];
         foreach ($cats as $c) {
             $parts[] = $c['name_ar'] . ' ' . ($c['name_en'] ?? '');
         }
         $parts[] = (string) ($book['publisher'] ?? '');
         $parts[] = (string) ($book['description'] ?? '');
+        $parts[] = (string) ($book['description_en'] ?? '');
         return ArabicNormalizer::normalize(implode(' ', $parts));
     }
 
