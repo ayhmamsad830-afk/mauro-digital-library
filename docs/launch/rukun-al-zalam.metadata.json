@@ -1,0 +1,41 @@
+{
+    "title": "رُكون الظلام",
+    "title_en": "Sitting in the Darkness",
+    "slug": "rukun-al-zalam",
+    "language": "ar",
+    "publisher": "صفقات كتابية للنشر والتوزيع",
+    "edition": "الطبعة الأولى",
+    "isbn": "978-633-8272-72-2",
+    "publication_year": 2025,
+    "page_count": 164,
+    "visibility": "public",
+    "is_featured": 1,
+    "rights_status": "owned",
+    "rights_holder": "مُعِين خيري أبوعائشة",
+    "description": "«أُدعى ديجور… اسمحوا لي أن أحكي لكم قصتي.»\n\nوُلد ديجور مختلفًا منذ لحظته الأولى؛ لم يصرخ كباقي الأطفال، وبعد حادثٍ في طفولته المبكرة صار عاجزًا عن الإحساس بالمشاعر، وإن ظلّ يفهم معناها ويدرك أثرها في الآخرين. عقلٌ يسبق عمره، وقلبٌ صامت، ووالدان كانا له كلَّ شيء.\n\nحين تنقلب حياته رأسًا على عقب، يجد نفسه وحيدًا في عالمٍ لا يشبهه: بيتٌ لا يرحم، ثم ميتمٌ يُخفي أكثر مما يُظهر، وفتاةٌ عنيدة تُدعى «إيبو» ترفض أن تبتعد عنه. هناك، بعقلٍ باردٍ لا يعرف الخوف، يبدأ ديجور بمراقبة كل شيء، وتدوين كل احتمال، والتخطيط لما لا يتوقعه أحد.\n\n«رُكون الظلام» رواية نفسية يرويها بطلها بصوته، عن الاختلاف والفقد والوحدة، وعن السؤال الذي يطارده: ماذا يبقى من الإنسان حين يُنتزع منه الإحساس؟ هذا هو الجزء الأول من السلسلة.\n\nتنبيه للمحتوى: تتناول الرواية الفقد والإساءة وأفكار إيذاء النفس.",
+    "description_en": "“My name is Dijour… allow me to tell you my story.”\n\nDijour was different from his very first breath: he did not cry like other newborns, and after an accident in early childhood he lost the ability to feel emotions — though he still understands what they mean and how they touch other people. A mind far ahead of its years, a silent heart, and two parents who were his whole world.\n\nWhen his life is turned upside down, he finds himself alone in a world that does not resemble him: a home without mercy, then an orphanage that hides more than it shows, and a stubborn girl named Ibo who refuses to leave him be. There, with a cold mind that knows no fear, Dijour begins to watch everything, note every possibility, and plan what no one expects.\n\nSitting in the Darkness is a first-person psychological novel about being different, about loss and loneliness, and about the question that haunts its narrator: what remains of a person when feeling is taken away? This is Part One of the series, written in Arabic.\n\nContent note: the novel deals with loss, abuse and thoughts of self-harm.",
+    "authors_in_order": [
+        {
+            "name": "مُعِين خيري أبوعائشة",
+            "slug": "moein-khairy-abu-aisha"
+        },
+        {
+            "name": "محمد سليمان اليونسي",
+            "slug": "mohammed-suleiman-al-younsi"
+        }
+    ],
+    "categories": [
+        {
+            "name_ar": "روايات",
+            "name_en": "Novels",
+            "slug": "novels",
+            "description_ar": "روايات عربية وأعمال سردية طويلة.",
+            "description_en": "Arabic novels and long-form fiction."
+        }
+    ],
+    "original_pdf": {
+        "file_name": "رُكون الظلام.pdf",
+        "bytes": 1194924,
+        "sha256": "29f235d1aaed2ec7cd9fa14e736d3b3808011cd6411836f2c909319ff4d5d472"
+    }
+}

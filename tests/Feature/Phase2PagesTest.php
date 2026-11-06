@@ -111,7 +111,8 @@ final class Phase2PagesTest extends TestCase
 
     public function testWithoutDemoModeNoFictionalDataIsReachable(): void
     {
-        HttpServer::withEnv(['APP_ENV' => 'local', 'APP_DEMO_UI' => 'false'], function (): void {
+        // No database configured (independent of the developer's .env): pages must show empty states.
+        HttpServer::withEnv(['APP_ENV' => 'local', 'APP_DEMO_UI' => 'false', 'DB_DRIVER' => 'mysql', 'DB_USERNAME' => ''], function (): void {
             $home = HttpServer::request('GET', '/');
             $this->assertSame(200, $home['status']);
             $this->assertNotContains('demo-banner', $home['body']);

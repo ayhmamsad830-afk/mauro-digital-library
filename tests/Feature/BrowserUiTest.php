@@ -22,9 +22,7 @@ final class BrowserUiTest extends TestCase
         $node = ProcessRunner::which('node');
         $hasPlaywright = $node && ProcessRunner::run([$node, '-e', "require.resolve('playwright')"], 15)['exit'] === 0;
         if (!$hasPlaywright) {
-            echo "\n  [skip] BrowserUiTest: node/playwright not available\n";
-            $this->assertTrue(true);
-            return;
+            $this->markSkipped('node/playwright not available');
         }
         $base = HttpServer::withEnv(['APP_ENV' => 'local', 'APP_DEMO_UI' => 'true'], static fn () => HttpServer::base());
         $res = ProcessRunner::run([$node, BASE_PATH . '/tests/browser/ui-check.js', $base], 400);

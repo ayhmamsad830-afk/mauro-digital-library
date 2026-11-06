@@ -126,7 +126,7 @@ php bin/console render:work --max=50    # or let the cron worker render them
 
 Restoring overwrites data: never run it against production without a fresh backup and explicit approval. A backup that has never been restored is not proven — test a restore monthly.
 
-> Status in this build: the files backup and the verification are tested; the **MySQL dump is BLOCKED** (no MySQL server/credentials available) and must be verified on the real host.
+> Status in this build: the files backup and its verification are tested with both GNU tar and Windows tar; the **MySQL dump is BLOCKED** (no working MySQL credentials) and must be verified on staging before launch. Launch steps: `docs/LAUNCH_RUNBOOK.md`.
 
 ## 9. Production checklist
 

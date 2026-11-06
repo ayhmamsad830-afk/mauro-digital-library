@@ -151,7 +151,9 @@ final class PdfPipelineTest extends TestCase
         $this->assertFalse(str_contains($row['storage_path'], 'Secret'), 'original name never used on disk');
         $abs = PrivateStorage::path($row['storage_path']);
         $this->assertTrue(is_file($abs));
-        $this->assertSame('640', sprintf('%o', fileperms($abs) & 0777));
+        if (PHP_OS_FAMILY !== 'Windows') { // NTFS has no POSIX mode bits; chmod() is a no-op there
+            $this->assertSame('640', sprintf('%o', fileperms($abs) & 0777));
+        }
         $this->assertFalse(str_starts_with(realpath($abs), realpath(BASE_PATH . '/public')), 'outside the web root');
         $this->assertSame(['valid', 'pending', 3, 1], [$row['validation_status'], $row['render_status'], (int) $row['page_count'], (int) $row['version_number']]);
         $this->assertSame('queued', Database::scalar('SELECT status FROM book_render_jobs WHERE book_file_id = :f', ['f' => $fileId]));

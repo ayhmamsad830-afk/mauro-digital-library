@@ -1,11 +1,14 @@
 # MySQL verification (Phase 3 acceptance)
 
-**Status (2026-11-06, final delivery): NOT VERIFIED — externally blocked.** No MySQL server or
-credentials are available in the build environment (`db:check` → `SQLSTATE[HY000] [2002] Connection refused`).
-No migration (0001–0009) has been applied anywhere. The 32 MySQL integration tests are reported as
-**SKIPPED (BLOCKED)** by the test runner, never as passed. The same contract tests pass on the
-SQLite harness, which verifies the query logic but not MySQL-specific behaviour (InnoDB, utf8mb4
-collation, native prepares, `mysqldump`).
+**Status (2026-11-06, launch preparation): NOT VERIFIED — blocked on credentials.** A MySQL 26.7 server
+(Windows service `MySQL267`) runs on the development machine on **port 3308** (not 3306), but the `DB_USERNAME`
+in the local `.env` is rejected (`1045 Access denied`). No migration (0001–0010) has been applied to MySQL.
+The 32 MySQL integration tests are reported as **SKIPPED (BLOCKED)** by the test runner, never as passed.
+The same contract tests pass on the SQLite harness, which verifies the query logic but not MySQL-specific
+behaviour (InnoDB, utf8mb4 collation, native prepares, `mysqldump`).
+
+To unblock locally: create the test database and a user limited to it (`database/setup/mysql_create_databases.sql`),
+then set `DB_TEST_PORT=3308`, `DB_TEST_USERNAME`, `DB_TEST_PASSWORD` in `.env` and run `php bin/console db:check --test`.
 
 ## Databases
 

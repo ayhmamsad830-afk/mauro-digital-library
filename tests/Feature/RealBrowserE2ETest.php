@@ -31,9 +31,7 @@ final class RealBrowserE2ETest extends TestCase
     {
         $node = ProcessRunner::which('node');
         if (!$node || ProcessRunner::run([$node, '-e', "require.resolve('playwright')"], 15)['exit'] !== 0 || !ProcessRunner::which('pdftoppm')) {
-            echo "\n  [skip] RealBrowserE2ETest: node/playwright/poppler not available\n";
-            $this->assertTrue(true);
-            return;
+            $this->markSkipped('node/playwright/poppler not available');
         }
         $dir = BASE_PATH . '/storage/cache/e2e-' . bin2hex(random_bytes(5));
         $db = "$dir/e2e.sqlite";
