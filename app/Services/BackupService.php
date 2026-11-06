@@ -84,7 +84,8 @@ final class BackupService
         $out = self::dir() . "/files-$stamp.tar.gz";
         $tar = ProcessRunner::which('tar');
         if ($tar !== null) {
-            $res = ProcessRunner::run(array_merge([$tar, '-czf', $out, '-C', $root], $dirs), 3600);
+            // Archive name relative to its directory: GNU tar reads "C:/…" as a remote host.
+            $res = ProcessRunner::run(array_merge([$tar, '-czf', basename($out), '-C', $root], $dirs), 3600, dirname($out));
             if ($res['exit'] !== 0) {
                 @unlink($out);
                 throw new RuntimeException('tar failed: ' . mb_substr(trim($res['stderr']), 0, 300));
@@ -126,8 +127,8 @@ final class BackupService
             if ($tar === null) {
                 return ['ok' => true, 'detail' => 'checksum ok (tar not available to list)'];
             }
-            $res = ProcessRunner::run([$tar, '-tzf', $path], 600);
-            $n = $res['exit'] === 0 ? count(array_filter(explode("\n", $res['stdout']), static fn ($l) => $l !== '' && !str_ends_with($l, '/'))) : 0;
+            $res = ProcessRunner::run([$tar, '-tzf', basename($path)], 600, dirname($path));
+            $n = $res['exit'] === 0 ? count(array_filter(preg_split('/\R/', $res['stdout']) ?: [], static fn ($l) => trim($l) !== '' && !str_ends_with(rtrim($l), '/'))) : 0;
             return $res['exit'] === 0 ? ['ok' => true, 'detail' => "$n files"] : ['ok' => false, 'detail' => 'corrupt archive'];
         }
         return ['ok' => false, 'detail' => 'unknown backup type'];

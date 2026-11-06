@@ -44,11 +44,16 @@ final class BackupTest extends TestCase
         $this->assertSame($this->root . '/backups/files-20261106-000000.tar.gz', $archive);
         $this->assertTrue(is_file("$archive.sha256"));
         $this->assertSame(['ok' => true, 'detail' => '2 files'], BackupService::verify($archive));
-        $list = (string) shell_exec('tar -tzf ' . escapeshellarg($archive));
+        $tar = \App\Services\ProcessRunner::which('tar');
+        $this->assertTrue($tar !== null, 'tar is required to list the archive');
+        // Relative archive name: GNU tar (e.g. Git for Windows) reads "C:/…" as a remote host.
+        $list = \App\Services\ProcessRunner::run([$tar, '-tzf', basename($archive)], 60, dirname($archive))['stdout'];
         $this->assertContains('private/original-pdf/a.pdf', $list);
         $this->assertContains('private/covers/c.webp', $list);
         $this->assertNotContains('rendered-pages', $list, 'rendered pages are regenerated, not backed up');
-        $this->assertSame('640', sprintf('%o', fileperms($archive) & 0777));
+        if (PHP_OS_FAMILY !== 'Windows') { // NTFS has no POSIX mode bits; chmod() is a no-op there
+            $this->assertSame('640', sprintf('%o', fileperms($archive) & 0777));
+        }
 
         file_put_contents($archive, 'x', FILE_APPEND);
         $this->assertSame(['ok' => false, 'detail' => 'checksum mismatch'], BackupService::verify($archive));

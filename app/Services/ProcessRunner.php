@@ -98,13 +98,32 @@ final class ProcessRunner
         if ($binary === '') {
             return null;
         }
-        if (str_contains($binary, '/')) {
-            return is_file($binary) && is_executable($binary) ? $binary : null;
+        // Windows: "tar" is tar.exe — try the PATHEXT extensions when none is given.
+        $names = [$binary];
+        if (PHP_OS_FAMILY === 'Windows' && pathinfo($binary, PATHINFO_EXTENSION) === '') {
+            foreach (explode(';', (string) (getenv('PATHEXT') ?: '.EXE;.BAT;.CMD')) as $ext) {
+                if ($ext !== '') {
+                    $names[] = $binary . strtolower($ext);
+                }
+            }
+        }
+        if (str_contains($binary, '/') || str_contains($binary, '\\')) {
+            foreach ($names as $name) {
+                if (is_file($name) && is_executable($name)) {
+                    return $name;
+                }
+            }
+            return null;
         }
         foreach (explode(PATH_SEPARATOR, (string) getenv('PATH')) as $dir) {
-            $candidate = rtrim($dir, '/') . '/' . $binary;
-            if ($dir !== '' && is_file($candidate) && is_executable($candidate)) {
-                return $candidate;
+            if ($dir === '') {
+                continue;
+            }
+            foreach ($names as $name) {
+                $candidate = rtrim($dir, '/\\') . '/' . $name;
+                if (is_file($candidate) && is_executable($candidate)) {
+                    return $candidate;
+                }
             }
         }
         return null;
