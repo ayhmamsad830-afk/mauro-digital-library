@@ -12,7 +12,8 @@
             <li>
                 <a class="author-card card" href="<?= e(route('books.index', [], ['author' => $a['slug']])) ?>">
                     <?php if (!empty($a['photo_url'])): ?><img class="avatar avatar--img" src="<?= e($a['photo_url']) ?>" alt="" width="48" height="48" loading="lazy"><?php else: ?><span class="avatar" aria-hidden="true"><?= e(mb_substr($a['name'], 0, 1)) ?></span><?php endif; ?>
-                    <span><strong><?= e($a['name']) ?></strong><br><span class="muted small"><?= e(__('category.books_count', ['count' => (int) $a['books_count']])) ?></span></span>
+                    <span class="author-card__text"><strong class="author-card__name" dir="auto"><?= e($a['name']) ?></strong><span class="author-card__count"><?= e(__('category.books_count', ['count' => (int) $a['books_count']])) ?></span></span>
+                    <span class="author-card__arrow"><?= icon('arrow-next', 'icon--dir icon--sm') ?></span>
                 </a>
             </li>
             <?php endforeach; ?>
