@@ -20,8 +20,12 @@ final class BookValidator
         $e = [];
         $d = [
             'title' => Input::str($in, 'title', 255),
+            'title_en' => Input::nullable($in, 'title_en', 255),
             'slug' => strtolower(Input::str($in, 'slug', 191)),
             'description' => Input::nullable($in, 'description', 20000),
+            'description_en' => Input::nullable($in, 'description_en', 20000),
+            'edition' => Input::nullable($in, 'edition', 100),
+            'isbn' => Input::nullable($in, 'isbn', 20),
             'language' => Input::str($in, 'language', 10),
             'publisher' => Input::nullable($in, 'publisher', 255),
             'publication_year' => Input::str($in, 'publication_year', 4),
@@ -49,9 +53,16 @@ final class BookValidator
             $e['slug'] = __('validation.slug_taken');
         }
 
-        foreach (['description' => 20000, 'publisher' => 255, 'license_name' => 255, 'rights_holder' => 255, 'rights_source' => 2000] as $f => $max) {
+        foreach (['title_en' => 255, 'description_en' => 20000, 'edition' => 100, 'description' => 20000, 'publisher' => 255, 'license_name' => 255, 'rights_holder' => 255, 'rights_source' => 2000] as $f => $max) {
             if ($d[$f] !== null && mb_strlen($d[$f]) > $max) {
                 $e[$f] = __('validation.max', ['max' => $max]);
+            }
+        }
+        // ISBN as printed: digits, hyphens/spaces and a final X; must hold 10 or 13 digits.
+        if ($d['isbn'] !== null) {
+            $digits = strtoupper(preg_replace('/[\s-]/', '', $d['isbn']));
+            if (!preg_match('/^(\d{9}[\dX]|\d{13})$/', $digits) || !preg_match('/^[0-9Xx\- ]+$/', $d['isbn'])) {
+                $e['isbn'] = __('validation.invalid');
             }
         }
         if (!in_array($d['language'], self::LANGUAGES, true)) {

@@ -16,7 +16,7 @@ final class Book
 {
     public const STATUSES = ['draft', 'published', 'archived'];
 
-    private const WRITABLE = ['title', 'slug', 'description', 'language', 'publisher', 'publication_year', 'visibility',
+    private const WRITABLE = ['title', 'title_en', 'slug', 'description', 'description_en', 'language', 'publisher', 'edition', 'isbn', 'publication_year', 'visibility',
         'is_featured', 'rights_status', 'license_name', 'rights_holder', 'rights_source'];
 
     public static function find(int $id): ?array

@@ -151,7 +151,7 @@ final class HostCapabilityService
         try {
             file_put_contents($pdf, self::samplePdf());
             $info = ProcessRunner::run([$pdfinfo, $pdf], 15);
-            if ($info['exit'] !== 0 || !preg_match('/^Pages:\s+1$/m', $info['stdout'])) {
+            if ($info['exit'] !== 0 || !preg_match('/^Pages:\s+1\s*$/m', $info['stdout'])) {
                 return $this->item('Rendering', 'PDF → image round-trip', self::FAIL, 'pdfinfo failed: ' . trim($info['stderr']));
             }
             $start = microtime(true);

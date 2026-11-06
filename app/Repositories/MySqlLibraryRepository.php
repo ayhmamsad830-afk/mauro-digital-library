@@ -47,7 +47,7 @@ final class MySqlLibraryRepository implements LibraryRepository
         'title' => 'b.title ASC, b.id ASC',
     ];
 
-    private const BOOK_COLUMNS = 'b.id, b.slug, b.title, b.description, b.cover_path, b.language, b.publisher,
+    private const BOOK_COLUMNS = 'b.id, b.slug, b.title, b.title_en, b.description, b.description_en, b.cover_path, b.language, b.publisher, b.edition, b.isbn,
         b.publication_year, b.page_count, b.visibility, b.is_featured, b.current_file_id, b.rights_status,
         b.license_name, b.reads_count, b.rating_avg, b.rating_count, b.published_at';
 
@@ -340,9 +340,13 @@ final class MySqlLibraryRepository implements LibraryRepository
                 'id' => $id,
                 'slug' => $r['slug'],
                 'title' => $r['title'],
+                'title_en' => $r['title_en'] ?? null,
                 'description' => (string) ($r['description'] ?? ''),
+                'description_en' => (string) ($r['description_en'] ?? ''),
                 'language' => $r['language'],
                 'publisher' => $r['publisher'],
+                'edition' => $r['edition'] ?? null,
+                'isbn' => $r['isbn'] ?? null,
                 'publication_year' => $r['publication_year'] !== null ? (int) $r['publication_year'] : null,
                 'page_count' => $r['page_count'] !== null ? (int) $r['page_count'] : null,
                 'visibility' => $r['visibility'],
