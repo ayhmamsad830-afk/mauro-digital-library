@@ -55,6 +55,8 @@ return [
     // --- Phase 2 ---------------------------------------------------------
     'common.view_all' => 'View all',
     'common.loading' => 'Loading…',
+    'carousel.prev' => 'Previous books',
+    'carousel.next' => 'Next books',
     'upload.in_progress' => 'Uploading — please keep this page open…',
     'common.retry' => 'Try again',
     'common.close' => 'Close',

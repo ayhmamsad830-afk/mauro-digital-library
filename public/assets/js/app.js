@@ -138,4 +138,38 @@
         box.appendChild(label); box.appendChild(meta); box.appendChild(bar);
         form.appendChild(box);
     }
+
+    /* ---------------- Book carousels ----------------
+       Previous/next page by one full view; the track snaps to whole cards.
+       Works in RTL (scrollLeft runs negative there) and hides the controls
+       when every card already fits. Touch, trackpad and keyboard focus keep
+       working natively because the track is an ordinary scroll container. */
+    document.querySelectorAll('[data-rail]').forEach(function (rail) {
+        var track = rail.querySelector('[data-rail-track]');
+        var prev = rail.querySelector('[data-rail-prev]');
+        var next = rail.querySelector('[data-rail-next]');
+        if (!track || !prev || !next) return;
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        function isRtl() { return getComputedStyle(track).direction === 'rtl'; }
+        function step() {
+            var gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+            return track.clientWidth + gap;
+        }
+        function go(dir) {
+            track.scrollBy({ left: (isRtl() ? -1 : 1) * dir * step(), behavior: reduce ? 'auto' : 'smooth' });
+        }
+        function update() {
+            var max = track.scrollWidth - track.clientWidth;
+            var pos = Math.abs(track.scrollLeft);
+            var fits = max <= 2;
+            prev.hidden = next.hidden = fits;
+            prev.disabled = pos <= 2;
+            next.disabled = pos >= max - 2;
+        }
+        prev.addEventListener('click', function () { go(-1); });
+        next.addEventListener('click', function () { go(1); });
+        track.addEventListener('scroll', update, { passive: true });
+        window.addEventListener('resize', update);
+        update();
+    });
 })();
