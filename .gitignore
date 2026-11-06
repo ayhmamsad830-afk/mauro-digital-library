@@ -1,0 +1,22 @@
+/vendor/
+/.env
+/.env.*
+!/.env.example
+/storage/private/**
+!/storage/private/**/
+!/storage/private/**/.gitkeep
+/storage/logs/*
+!/storage/logs/.gitkeep
+/storage/backups/*
+!/storage/backups/.gitkeep
+/storage/cache/*
+!/storage/cache/.gitkeep
+/storage/sessions/*
+!/storage/sessions/.gitkeep
+/.phpunit.cache/
+.DS_Store
+Thumbs.db
+
+# Local dev databases (SQLite harness)
+/storage/*.sqlite
+/storage/*.sqlite-*

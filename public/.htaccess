@@ -1,0 +1,26 @@
+# Apache configuration for the public document root.
+Options -Indexes -MultiViews
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Block hidden files/directories (.env, .git, .htaccess …)
+    RewriteRule (^|/)\. - [F,L]
+
+    # Serve existing files directly; everything else goes to the front controller.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+<FilesMatch "\.(env|ini|log|sql|sh|bak|pdf|lock|md|json|yml|yaml|dist)$">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    <FilesMatch "\.(css|js|svg|png|jpg|jpeg|webp|woff2)$">
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+</IfModule>

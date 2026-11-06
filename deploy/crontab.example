@@ -1,0 +1,7 @@
+# Install with: crontab -e   (as the PHP/web user; adjust paths)
+# PDF render queue (protected reader)
+* * * * *   cd /var/www/digital-library && php bin/console render:work --max=5 >> storage/logs/cron.log 2>&1
+# Expire reader sessions, purge rate-limit rows and stale temp files
+15 * * * *  cd /var/www/digital-library && php bin/console reader:cleanup >> storage/logs/cron.log 2>&1
+# Nightly backup (database + original PDFs/covers), keep 14 days locally — copy OFF the server afterwards
+30 2 * * *  cd /var/www/digital-library && php bin/console backup:run --keep=14 >> storage/logs/backup.log 2>&1

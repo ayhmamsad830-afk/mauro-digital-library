@@ -1,0 +1,17 @@
+# Safety net for Apache hosts where the WHOLE project ended up in the web root.
+# The correct setup points the document root at public/ (docs/DEPLOYMENT.md);
+# this file only makes the mistake harmless: nothing outside public/ is served.
+Options -Indexes
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule (^|/)\. - [F,L]
+    RewriteRule ^(app|bin|config|database|deploy|docs|resources|routes|storage|tests|vendor)(/|$) - [F,L]
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+<IfModule !mod_rewrite.c>
+    Require all denied
+</IfModule>
+<FilesMatch "^(\.env.*|composer\.(json|lock)|README\.md)$">
+    Require all denied
+</FilesMatch>

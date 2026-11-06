@@ -1,0 +1,319 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/*
+ * Digital Library command-line tool.
+ *
+ *   php bin/console env:check        Verify hosting capabilities (PHP, storage, Poppler, GD, config)
+ *   php bin/console db:check         Test the MySQL connection
+ *   php bin/console migrate          Apply pending migrations
+ *   php bin/console migrate:status   List applied / pending migrations
+ *   php bin/console key:generate     Create APP_KEY in .env if it is empty
+ *   php bin/console routes           List registered routes
+ *   php bin/console search:reindex   Rebuild books.search_text (Arabic-normalised)
+ *   php bin/console user:promote <email>   Grant admin role to an existing (Google) account
+ *   php bin/console db:seed-dev --yes      Load FICTIONAL sample books into an empty DEV database
+ *   php bin/console dev:sqlite <file>      Create a local SQLite harness DB (dev/test only)
+ *   php bin/console backup:run [--db-only|--files-only] [--keep=14]   Backup DB + private files to storage/backups
+ *   php bin/console backup:verify <file>   Check a backup archive (checksum + completeness)
+ *   php bin/console render:rebuild [--all] [--book=ID]   Re-queue rendering of current versions with missing pages
+ */
+
+use App\Core\Config;
+use App\Core\Database;
+use App\Core\Kernel;
+use App\Core\Migrator;
+use App\Services\HostCapabilityService;
+
+if (PHP_SAPI !== 'cli') {
+    http_response_code(404);
+    exit;
+}
+
+require dirname(__DIR__) . '/app/bootstrap.php';
+
+restore_exception_handler();
+
+$command = $argv[1] ?? 'help';
+$args = array_slice($argv, 2);
+
+$line = static fn (string $text = '') => fwrite(STDOUT, $text . PHP_EOL);
+$err = static fn (string $text) => fwrite(STDERR, $text . PHP_EOL);
+
+try {
+    switch ($command) {
+        case 'env:check':
+            $results = (new HostCapabilityService())->run();
+            $fail = 0;
+            $group = '';
+            foreach ($results as $r) {
+                if ($r['group'] !== $group) {
+                    $group = $r['group'];
+                    $line();
+                    $line("== $group");
+                }
+                $mark = ['ok' => '[ OK ]', 'warn' => '[WARN]', 'fail' => '[FAIL]'][$r['status']];
+                $fail += $r['status'] === 'fail' ? 1 : 0;
+                $line(sprintf('%s %-32s %s', $mark, $r['check'], $r['detail']));
+            }
+            $line();
+            $line($fail === 0 ? 'Result: host meets the mandatory requirements.' : "Result: $fail mandatory check(s) failed.");
+            exit($fail === 0 ? 0 : 1);
+
+        case 'db:check':
+            $c = Config::get('database');
+            if (in_array('--test', $args, true)) {
+                // Non-destructive connectivity check of the TEST database settings.
+                $c = array_merge($c, array_filter([
+                    'host' => env('DB_TEST_HOST'), 'port' => env('DB_TEST_PORT'), 'database' => env('DB_TEST_DATABASE'),
+                    'username' => env('DB_TEST_USERNAME'), 'password' => env('DB_TEST_PASSWORD'), 'socket' => env('DB_TEST_SOCKET'),
+                ], static fn ($v) => $v !== null && $v !== ''));
+                $c['driver'] = 'mysql';
+                Config::set('database', $c);
+                Database::setConnection(null);
+            }
+            $line(sprintf('Connecting to mysql://%s@%s:%s/%s …', $c['username'] ?: '(no user)', $c['socket'] ?: $c['host'], $c['port'], $c['database']));
+            $res = Database::check();
+            if ($res['ok']) {
+                $line('OK  server ' . $res['server_version'] . ' — ' . $res['message']);
+                exit(0);
+            }
+            $err('FAIL ' . $res['message']);
+            exit(1);
+
+        case 'migrate':
+            // Safety: migrations target the configured DEVELOPMENT database. Production
+            // requires an explicit flag so a wrong .env cannot alter a live schema.
+            if (Config::get('app.env') === 'production' && !in_array('--production', $args, true)) {
+                $err('APP_ENV=production: refusing to migrate without --production.');
+                exit(1);
+            }
+            if (Config::get('database.driver') !== 'mysql') {
+                $err('migrate targets MySQL only. The SQLite harness uses: php bin/console dev:sqlite <file>');
+                exit(1);
+            }
+            $line('Target: ' . Config::get('database.host') . ':' . Config::get('database.port') . '/' . Config::get('database.database'));
+            $migrator = new Migrator(Database::connection(), BASE_PATH . '/database/migrations');
+            $migrator->ensureTable();
+            $done = $migrator->migrate(static fn (string $m) => fwrite(STDOUT, "Migrated: $m" . PHP_EOL));
+            $line($done === [] ? 'Nothing to migrate.' : count($done) . ' migration(s) applied.');
+            exit(0);
+
+        case 'migrate:status':
+            $migrator = new Migrator(Database::connection(), BASE_PATH . '/database/migrations');
+            $applied = $migrator->applied();
+            foreach ($migrator->files() as $file) {
+                $line((in_array($file, $applied, true) ? '[applied] ' : '[pending] ') . $file);
+            }
+            exit(0);
+
+        case 'key:generate':
+            $envFile = BASE_PATH . '/.env';
+            if (!is_file($envFile)) {
+                $err('.env not found. Copy .env.example to .env first.');
+                exit(1);
+            }
+            $env = (string) file_get_contents($envFile);
+            $force = in_array('--force', $args, true);
+            if (preg_match('/^APP_KEY=(.+)$/m', $env) && !$force) {
+                $err('APP_KEY already set. Rotating it invalidates reader tokens; use --force to override.');
+                exit(1);
+            }
+            $key = 'base64:' . base64_encode(random_bytes(32));
+            $env = preg_match('/^APP_KEY=.*$/m', $env)
+                ? preg_replace('/^APP_KEY=.*$/m', 'APP_KEY=' . $key, $env)
+                : $env . PHP_EOL . 'APP_KEY=' . $key . PHP_EOL;
+            file_put_contents($envFile, $env, LOCK_EX);
+            $line('APP_KEY generated.');
+            exit(0);
+
+        case 'search:reindex':
+            $line(\App\Services\SearchIndexer::reindexAll() . ' book(s) reindexed.');
+            exit(0);
+
+        case 'user:promote':
+            $email = $args[0] ?? '';
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $err('Usage: php bin/console user:promote <email>  (the user must have signed in with Google first)');
+                exit(1);
+            }
+            $n = Database::query("UPDATE users SET role = 'admin' WHERE email = :e AND status = 'active'", ['e' => $email])->rowCount();
+            $n ? $line("Granted admin to $email.") : $err("No active user with email $email.");
+            exit($n ? 0 : 1);
+
+        case 'db:seed-dev':
+            if (!in_array('--yes', $args, true)) {
+                $err('Loads FICTIONAL sample books into an EMPTY development database. Re-run with --yes to confirm.');
+                exit(1);
+            }
+            $r = \App\Services\DevFixtures::seed();
+            $line(sprintf('Seeded %d books, %d categories, %d authors (fictional, marked "%s").', $r['books'], $r['categories'], $r['authors'], \App\Services\DevFixtures::MARKER));
+            exit(0);
+
+        case 'dev:sqlite':
+            if (Config::get('app.env') === 'production') {
+                $err('The SQLite harness is not available in production.');
+                exit(1);
+            }
+            $file = $args[0] ?? '';
+            if ($file === '' || file_exists($file)) {
+                $err('Usage: php bin/console dev:sqlite <new-file.sqlite>  (file must not exist)');
+                exit(1);
+            }
+            $pdo = Database::connectSqlite($file);
+            $pdo->exec((string) file_get_contents(BASE_PATH . '/database/sqlite/schema.sql'));
+            $line("Created $file. Set DB_DRIVER=sqlite and DB_SQLITE_PATH=$file (non-production only).");
+            exit(0);
+
+        case 'render:work':
+            // Cron: * * * * * php bin/console render:work --max=5
+            $max = 1;
+            foreach ($args as $arg) {
+                if (preg_match('/^--max=(\d+)$/', $arg, $m)) {
+                    $max = max(1, (int) $m[1]);
+                }
+            }
+            $worker = gethostname() . ':' . getmypid();
+            $reclaimed = \App\Services\Pdf\RenderService::reclaimStale();
+            if ($reclaimed) {
+                $line("Re-queued $reclaimed stale job(s).");
+            }
+            $service = new \App\Services\Pdf\RenderService();
+            $done = 0;
+            while ($done < $max && ($job = \App\Services\Pdf\RenderService::claimNext($worker)) !== null) {
+                $t = microtime(true);
+                $r = $service->process($job);
+                $line(sprintf('Job #%d: %s (%.1fs)', $job, $r['ok'] ? "ready, {$r['pages']} pages" : 'FAILED — ' . $r['error'], microtime(true) - $t));
+                $done++;
+            }
+            if ($done === 0) {
+                $line('No queued render jobs.');
+            }
+            exit(0);
+
+        case 'backup:run':
+            $keep = 14;
+            $doDb = !in_array('--files-only', $args, true);
+            $doFiles = !in_array('--db-only', $args, true);
+            foreach ($args as $arg) {
+                if (preg_match('/^--keep=(\d+)$/', $arg, $m)) {
+                    $keep = max(1, (int) $m[1]);
+                }
+            }
+            $stamp = gmdate('Ymd-His');
+            $failed = 0;
+            if ($doDb) {
+                try {
+                    $line('Database: ' . \App\Services\BackupService::database($stamp));
+                } catch (Throwable $e) {
+                    $err('Database backup FAILED: ' . $e->getMessage());
+                    $failed++;
+                }
+            }
+            if ($doFiles) {
+                try {
+                    $f = \App\Services\BackupService::files($stamp);
+                    $line('Files: ' . $f . ' (' . \App\Services\BackupService::verify($f)['detail'] . ')');
+                } catch (Throwable $e) {
+                    $err('Files backup FAILED: ' . $e->getMessage());
+                    $failed++;
+                }
+            }
+            foreach (\App\Services\BackupService::prune($keep) as $old) {
+                $line("Pruned (older than $keep days): $old");
+            }
+            $line($failed ? "Backup finished with $failed failure(s). Copy successful archives OFF the server." : 'Backup complete. Copy the archives OFF the server.');
+            exit($failed ? 1 : 0);
+
+        case 'render:rebuild':
+            $book = null;
+            foreach ($args as $arg) {
+                if (preg_match('/^--book=(\d+)$/', $arg, $m)) {
+                    $book = (int) $m[1];
+                }
+            }
+            $ids = \App\Services\Pdf\RenderService::queueRebuild(in_array('--all', $args, true), $book);
+            $line(count($ids) . ' file version(s) queued' . ($ids ? ': ' . implode(', ', $ids) : '') . '. The render:work cron (or "Process now") will render them.');
+            $missing = Database::all('SELECT b.id, f.storage_path FROM books b JOIN book_files f ON f.id = b.current_file_id WHERE b.deleted_at IS NULL');
+            foreach ($missing as $mrow) {
+                if (!is_file(\App\Services\Storage\PrivateStorage::path((string) $mrow['storage_path']))) {
+                    $err('Book #' . $mrow['id'] . ': original PDF missing from storage — restore it or re-upload.');
+                }
+            }
+            exit(0);
+
+        case 'backup:verify':
+            $file = $args[0] ?? '';
+            $v = \App\Services\BackupService::verify($file);
+            $line(($v['ok'] ? 'OK: ' : 'INVALID: ') . $v['detail']);
+            exit($v['ok'] ? 0 : 1);
+
+        case 'reader:cleanup':
+            // Cron: 15 * * * * php bin/console reader:cleanup
+            $now = gmdate('Y-m-d H:i:s');
+            $ended = Database::query('UPDATE reading_sessions SET ended_at = expires_at WHERE ended_at IS NULL AND expires_at < :n', ['n' => $now])->rowCount();
+            $limits = Database::query('DELETE FROM rate_limits WHERE reset_at < :n', ['n' => $now])->rowCount();
+            $tmp = 0;
+            foreach (glob(\App\Services\Storage\PrivateStorage::root() . '/private/temp/*') ?: [] as $dir) {
+                if (filemtime($dir) < time() - 6 * 3600) {
+                    is_dir($dir) ? \App\Services\Storage\PrivateStorage::deleteDir('private/temp/' . basename($dir)) : @unlink($dir);
+                    $tmp++;
+                }
+            }
+            $line("Closed $ended expired reading session(s), purged $limits rate-limit row(s), removed $tmp stale temp item(s).");
+            exit(0);
+
+        case 'brand:favicon':
+            // Square favicons from the official logo: the COMPLETE image is fitted
+            // inside a transparent square canvas (letterboxed) — never cropped or distorted.
+            $src = (string) Config::get('app.public_path', BASE_PATH . '/public') . '/assets/images/brand/logo.png';
+            $img = @imagecreatefrompng($src);
+            if (!$img) {
+                $err('Official logo not found at public/assets/images/brand/logo.png');
+                exit(1);
+            }
+            [$w, $h] = [imagesx($img), imagesy($img)];
+            foreach (['favicon-32.png' => 32, 'favicon-192.png' => 192, 'apple-touch-icon.png' => 180, 'favicon-512.png' => 512] as $name => $size) {
+                $canvas = imagecreatetruecolor($size, $size);
+                imagesavealpha($canvas, true);
+                imagefill($canvas, 0, 0, imagecolorallocatealpha($canvas, 0, 0, 0, 127));
+                $scale = min($size / $w, $size / $h);
+                [$dw, $dh] = [max(1, (int) round($w * $scale)), max(1, (int) round($h * $scale))];
+                imagecopyresampled($canvas, $img, (int) (($size - $dw) / 2), (int) (($size - $dh) / 2), 0, 0, $dw, $dh, $w, $h);
+                imagepng($canvas, dirname($src) . '/' . $name, 9);
+                imagedestroy($canvas);
+                $line("Wrote assets/images/brand/$name ({$size}×{$size}, image {$dw}×{$dh} letterboxed)");
+            }
+            exit(0);
+
+        case 'routes':
+            foreach (Kernel::router()->routes() as $route) {
+                $handler = $route->handler();
+                $line(sprintf('%-10s %-45s %s', implode('|', $route->methods()), $route->path(),
+                    is_array($handler) ? $handler[0] . '@' . $handler[1] : 'closure'));
+            }
+            exit(0);
+
+        default:
+            $line('Usage: php bin/console <command>');
+            $line('  env:check        Verify hosting capabilities');
+            $line('  db:check         Test the database connection');
+            $line('  migrate          Apply pending migrations');
+            $line('  migrate:status   Show migration status');
+            $line('  key:generate     Generate APP_KEY in .env (if empty)');
+            $line('  routes           List routes');
+            $line('  search:reindex   Rebuild the Arabic-normalised search index');
+            $line('  user:promote <email>   Grant admin role');
+            $line('  db:seed-dev --yes      Fictional sample data into an empty DEV database');
+            $line('  dev:sqlite <file>      Local SQLite harness (dev/test only)');
+            $line('  render:work [--max=N]  Process queued PDF render jobs (cron)');
+            $line('  reader:cleanup         Expire reading sessions, purge limits and temp files (cron)');
+            $line('  brand:favicon          Square favicons from the official logo (letterboxed, uncropped)');
+            exit($command === 'help' ? 0 : 1);
+    }
+} catch (Throwable $e) {
+    $err(get_class($e) . ': ' . $e->getMessage());
+    exit(1);
+}
