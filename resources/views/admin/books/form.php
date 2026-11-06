@@ -50,6 +50,11 @@ $field = static fn (array $d) => \App\Core\View::partial('admin/_field', $d);
                 <span class="label" id="authors-label"><?= e(__('admin.authors')) ?><span class="req" aria-hidden="true">*</span></span>
                 <?php if ($authors): ?>
                 <div class="checklist" role="group" aria-labelledby="authors-label">
+                    <?php
+                    // Selected authors first, in saved order: checkbox order is the order that gets stored.
+                    $rank = array_flip($selAuthors);
+                    usort($authors, static fn ($x, $y) => ($rank[$x['id']] ?? PHP_INT_MAX) <=> ($rank[$y['id']] ?? PHP_INT_MAX));
+                    ?>
                     <?php foreach ($authors as $a): ?>
                         <label class="check"><input type="checkbox" name="author_ids[]" value="<?= e($a['id']) ?>"<?= in_array($a['id'], $selAuthors, true) ? ' checked' : '' ?>> <span dir="auto"><?= e($a['name']) ?></span></label>
                     <?php endforeach; ?>

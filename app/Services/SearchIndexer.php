@@ -20,7 +20,7 @@ final class SearchIndexer
         if (!$book) {
             return '';
         }
-        $authors = Database::query('SELECT a.name FROM book_authors ba JOIN authors a ON a.id = ba.author_id WHERE ba.book_id = :id', ['id' => $bookId])->fetchAll(\PDO::FETCH_COLUMN);
+        $authors = Database::query('SELECT a.name FROM book_authors ba JOIN authors a ON a.id = ba.author_id WHERE ba.book_id = :id ORDER BY ba.author_order', ['id' => $bookId])->fetchAll(\PDO::FETCH_COLUMN);
         $cats = Database::all('SELECT c.name_ar, c.name_en FROM book_categories bc JOIN categories c ON c.id = bc.category_id WHERE bc.book_id = :id', ['id' => $bookId]);
 
         $parts = [$book['title'], (string) ($book['title_en'] ?? ''), implode(' ', $authors)];

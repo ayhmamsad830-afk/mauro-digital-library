@@ -58,4 +58,17 @@ final class HelpersTest extends TestCase
         sort($en);
         $this->assertSame($ar, $en, 'Translation files must define the same keys');
     }
+
+    public function testCoAuthorsAreJoinedInStoredOrderPerLocale(): void
+    {
+        $book = ['authors' => [['name' => 'مُعِين خيري أبوعائشة'], ['name' => 'محمد سليمان اليونسي']]];
+        Translator::setLocale('ar');
+        $this->assertSame('مُعِين خيري أبوعائشة، محمد سليمان اليونسي', book_authors($book));
+        Translator::setLocale('en');
+        $this->assertSame('مُعِين خيري أبوعائشة and محمد سليمان اليونسي', book_authors($book));
+        $this->assertSame('A, B, and C', book_authors(['authors' => [['name' => 'A'], ['name' => 'B'], ['name' => 'C']]]));
+        $this->assertSame('Solo', book_authors(['authors' => [['name' => 'Solo']]]));
+        $this->assertSame('', book_authors([]));
+        Translator::setLocale('ar');
+    }
 }

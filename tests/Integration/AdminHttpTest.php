@@ -45,7 +45,7 @@ final class AdminHttpTest extends TestCase
         TestDatabase::release();
     }
 
-    private function send(string $method, string $uri, array $post = [], ?int $userId = null, bool $withToken = true): Response
+    private function send(string $method, string $uri, array $post = [], ?int $userId = null, bool $withToken = true, string $locale = 'en'): Response
     {
         if ($userId !== null) {
             $_SESSION['user_id'] = $userId;
@@ -60,7 +60,56 @@ final class AdminHttpTest extends TestCase
         if (!in_array($method, ['GET', 'POST'], true)) {
             $post['_method'] = $method;
         }
-        return (new Kernel())->handle(new Request($query, $post, $server, ['dl_locale' => 'en']));
+        return (new Kernel())->handle(new Request($query, $post, $server, ['dl_locale' => $locale]));
+    }
+
+    /** Co-authored book: stored order survives the admin form, every display and search. */
+    public function testCoAuthorsKeepTheirOrderEverywhere(): void
+    {
+        $admin = $this->ids['u_admin'];
+        $salma = $this->ids['a_salma'];   // "سلمى الحداد" — sorts AFTER "Nora Castell" alphabetically
+        $nora = $this->ids['a_nora'];
+
+        // Admin create with the second-alphabetical author first.
+        $this->send('POST', '/admin/books', [
+            'title' => 'كتاب مشترك', 'slug' => 'co-authored', 'language' => 'ar', 'visibility' => 'public',
+            'author_ids' => [(string) $salma, (string) $nora], 'category_ids' => [(string) $this->ids['c_lit']],
+        ], $admin);
+        $id = (int) Database::scalar("SELECT id FROM books WHERE slug = 'co-authored'");
+        $order = static fn () => array_map('intval', Database::query('SELECT author_id FROM book_authors WHERE book_id = :id ORDER BY author_order', ['id' => $id])->fetchAll(\PDO::FETCH_COLUMN));
+        $this->assertSame([$salma, $nora], $order(), 'both authors stored, in submitted order');
+
+        // The edit form lists the selected authors first, in saved order, so re-saving keeps it.
+        $form = $this->send('GET', "/admin/books/$id", [], $admin)->body();
+        $posS = strpos($form, 'name="author_ids[]" value="' . $salma . '" checked');
+        $posN = strpos($form, 'name="author_ids[]" value="' . $nora . '" checked');
+        $this->assertTrue($posS !== false && $posN !== false, 'both authors checked in the form');
+        $this->assertTrue($posS < $posN, 'first author rendered first even though it sorts later by name');
+        $this->send('PUT', "/admin/books/$id", [
+            'title' => 'كتاب مشترك', 'slug' => 'co-authored', 'language' => 'ar', 'visibility' => 'public',
+            'author_ids' => [(string) $salma, (string) $nora], 'category_ids' => [(string) $this->ids['c_lit']],
+        ], $admin);
+        $this->assertSame([$salma, $nora], $order(), 'editing never drops or reorders an author');
+        $this->assertSame(2, (int) Database::scalar('SELECT COUNT(*) FROM book_authors WHERE book_id = :id', ['id' => $id]));
+
+        // Public pages: give an existing published book a second author (order 2).
+        $b1 = $this->ids['b1'];
+        Database::query('INSERT INTO book_authors (book_id, author_id, author_order) VALUES (:b, :a, 2)', ['b' => $b1, 'a' => $nora]);
+        \App\Services\SearchIndexer::reindexBook($b1);
+        $pair = static fn (string $sep) => '#سلمى الحداد(</a>)?</bdi>' . preg_quote($sep, '#') . '<bdi>(<a [^>]+>)?Nora Castell#u';
+
+        $ar = $this->send('GET', '/books/gardens-river', [], null, true, 'ar')->body();
+        $this->assertTrue(preg_match($pair('، '), $ar) === 1, 'Arabic detail: «أ، ب»');
+        $en = $this->send('GET', '/books/gardens-river')->body();
+        $this->assertTrue(preg_match($pair(' and '), $en) === 1, 'English detail: "A and B"');
+        foreach (['/', '/books', '/categories/literature'] as $path) {
+            $this->assertTrue(preg_match($pair(' and '), $this->send('GET', $path)->body()) === 1, "card on $path");
+            $this->assertTrue(preg_match($pair('، '), $this->send('GET', $path, [], null, true, 'ar')->body()) === 1, "Arabic card on $path");
+        }
+        foreach (['Nora Castell', 'سلمى الحداد', 'Castell'] as $q) {
+            $this->assertContains('حدائق النهر الهادئ', $this->send('GET', '/books?q=' . rawurlencode($q))->body(), "search by author \"$q\"");
+        }
+        $this->assertContains('حدائق النهر الهادئ', $this->send('GET', '/books?author=nora-castell')->body(), 'author filter');
     }
 
     public function testGuestIsRedirectedToLogin(): void

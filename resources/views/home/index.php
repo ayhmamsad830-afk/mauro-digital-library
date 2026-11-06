@@ -53,7 +53,7 @@ if ($featured) {
                 <h2 id="featured-title" class="showcase__title display" lang="<?= e($featured['language']) ?>" dir="auto">
                     <a href="<?= e($featuredUrl) ?>"><?= e($featured['title']) ?></a>
                 </h2>
-                <p class="showcase__author" dir="auto"><?= e(book_authors($featured)) ?></p>
+                <p class="showcase__author"><?= component('author-names', ['authors' => $featured['authors'] ?? []]) ?></p>
                 <?php if (($featured['rating_count'] ?? 0) > 0): ?><div class="showcase__rating"><?= component('rating', ['avg' => $featured['rating_avg'], 'count' => $featured['rating_count']]) ?></div><?php endif; ?>
                 <?php if (!empty($featured['description'])): ?><p class="showcase__desc" lang="<?= e($featured['language']) ?>" dir="auto"><?= e($featured['description']) ?></p><?php endif; ?>
                 <div class="btn-group">

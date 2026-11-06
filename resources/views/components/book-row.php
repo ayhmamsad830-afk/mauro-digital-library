@@ -6,7 +6,7 @@ $url = route('books.show', ['slug' => $book['slug']]);
     <?= component('cover', ['book' => $book]) ?>
     <div class="stack">
         <p class="book-row__title" lang="<?= e($book['language']) ?>" dir="auto"><a href="<?= e($url) ?>"><?= e($book['title']) ?></a></p>
-        <p class="muted small"><?= e(book_authors($book)) ?></p>
+        <p class="muted small"><?= component('author-names', ['authors' => $book['authors'] ?? []]) ?></p>
         <?php if (isset($percent)): ?>
             <progress class="progress" max="100" value="<?= e((int) $percent) ?>" aria-label="<?= e(__('account.progress_label', ['percent' => (int) $percent])) ?>"></progress>
             <p class="xsmall muted"><?= e(__('account.page_of', ['page' => (int) ($page ?? 1), 'total' => (int) ($book['page_count'] ?? 0)])) ?> · <?= e((int) $percent) ?>%</p>

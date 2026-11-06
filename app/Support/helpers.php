@@ -261,10 +261,26 @@ if (!function_exists('component')) {
 }
 
 if (!function_exists('book_authors')) {
-    /** Comma-separated author names for a book array. */
+    /** Author names for a book array, in stored order, joined for the locale ("A، B" / "A and B"). */
     function book_authors(array $book): string
     {
-        return implode(locale() === 'ar' ? '، ' : ', ', array_column($book['authors'] ?? [], 'name'));
+        $names = array_column($book['authors'] ?? [], 'name');
+        $out = '';
+        foreach ($names as $i => $name) {
+            $out .= ($i > 0 ? author_separator($i, count($names)) : '') . $name;
+        }
+        return $out;
+    }
+}
+
+if (!function_exists('author_separator')) {
+    /** Separator placed before author #$i (0-based) of $count: Arabic comma, or English ", " / " and ". */
+    function author_separator(int $i, int $count): string
+    {
+        if (locale() === 'ar') {
+            return '، ';
+        }
+        return $i === $count - 1 ? ($count > 2 ? ', and ' : ' and ') : ', ';
     }
 }
 

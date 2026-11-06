@@ -19,7 +19,7 @@ $category = $book['categories'][0] ?? null;
         <h3 class="book-card__title" lang="<?= e($book['language']) ?>" dir="auto">
             <a class="book-card__link" href="<?= e($url) ?>"><?= e($book['title']) ?></a>
         </h3>
-        <p class="book-card__author" dir="auto"><?= e(book_authors($book)) ?></p>
+        <p class="book-card__author"><?= component('author-names', ['authors' => $book['authors'] ?? []]) ?></p>
         <div class="book-card__foot">
             <?= component('rating', ['avg' => $book['rating_avg'] ?? 0, 'count' => $book['rating_count'] ?? 0]) ?>
             <a class="book-card__read" href="<?= e(route('reader.show', ['slug' => $book['slug']])) ?>" aria-label="<?= e(__('book.read_now') . ': ' . $book['title']) ?>"><?= e(__('book.read_now')) ?><?= icon('chevron-next', 'icon--dir icon--sm') ?></a>

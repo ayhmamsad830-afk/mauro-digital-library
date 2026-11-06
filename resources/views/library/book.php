@@ -28,7 +28,7 @@ $rightsLabels = ['owned' => __('book.rights_owned'), 'licensed' => __('book.righ
             <?php if (!empty($book['title_en']) && $book['language'] !== 'en'): ?><p class="book-hero__subtitle"><span lang="en" dir="ltr"><?= e($book['title_en']) ?></span></p><?php endif; ?>
             <p class="book-hero__authors">
                 <?= e(__('book.by')) ?>
-                <?php foreach ($book['authors'] as $i => $a): ?><?= $i ? e(locale() === 'ar' ? '، ' : ', ') : '' ?><a href="<?= e(route('books.index', [], ['author' => $a['slug']])) ?>"><?= e($a['name']) ?></a><?php endforeach; ?>
+                <?= component('author-names', ['authors' => $book['authors'], 'links' => true]) ?>
             </p>
             <?php if ($book['rating_count'] > 0): ?>
                 <p class="cluster book-hero__rating"><a href="#reviews" class="book-hero__rating-link"><?= component('rating', ['avg' => $book['rating_avg'], 'count' => $book['rating_count']]) ?></a></p>

@@ -244,7 +244,7 @@ html[lang="ar"] .book-card__title { line-height: 1.55; min-height: calc(2 * 1.55
 .book-card__link:hover { color: var(--c-primary); }
 .book-card__link:focus-visible { outline: none; }
 .book-card:has(.book-card__link:focus-visible) { outline: 2px solid var(--c-focus); outline-offset: 3px; }
-.book-card__author { margin: 0; font-size: var(--fs-sm); color: var(--c-muted); line-height: 1.5; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.book-card__author { margin: 0; font-size: var(--fs-sm); color: var(--c-muted); line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
 .book-card__foot {
     display: flex; align-items: center; justify-content: space-between; gap: .5rem;
     margin-top: auto; padding-top: .7rem; border-top: 1px solid color-mix(in srgb, var(--c-border) 70%, transparent);
