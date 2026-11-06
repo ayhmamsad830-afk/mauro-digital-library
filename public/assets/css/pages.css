@@ -254,21 +254,6 @@ html[lang="ar"] .section-head__title { font-weight: 600; line-height: 1.45; }
 .select-box .select--box:focus { box-shadow: none; }
 .select-box:focus-within { box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-primary) 22%, transparent); }
 
-.book-grid--boxed { gap: var(--sp-4) .9rem; grid-template-columns: repeat(auto-fill, minmax(min(46%, 150px), 1fr)); }
-.book-card--boxed { padding: .7rem .7rem .8rem; border: 1px solid var(--c-border-strong); border-radius: 6px; background: var(--c-surface); gap: .6rem; transition: box-shadow .25s var(--ease), border-color var(--dur), transform .25s var(--ease); }
-.book-card--boxed:hover { box-shadow: var(--shadow); border-color: var(--c-muted); transform: translateY(-2px); }
-.book-card--boxed:hover .book-card__cover { transform: none; }
-.book-card--boxed .cover { border-radius: 4px; box-shadow: 0 1px 2px rgb(0 0 0 / 15%), 0 8px 18px -10px rgb(0 0 0 / 40%); }
-.book-card--boxed .cover::after { background: linear-gradient(90deg, rgb(0 0 0 / 14%), transparent 5%); }
-[dir="rtl"] .book-card--boxed .cover::after { background: linear-gradient(270deg, rgb(0 0 0 / 14%), transparent 5%); }
-.book-card--boxed .book-card__body { gap: .15rem; }
-.book-card--boxed .book-card__title { font-family: var(--font-sans); font-weight: 700; font-size: .95rem; line-height: 1.4; min-height: calc(2 * 1.4em); }
-html[lang="ar"] .book-card--boxed .book-card__title { line-height: 1.55; min-height: calc(2 * 1.55em); }
-.book-card--boxed .book-card__author { font-size: var(--fs-xs); color: var(--c-accent-text); }
-.book-card__by { color: var(--c-muted); }
-.book-card--boxed .book-card__foot { border-top: 0; padding-top: .1rem; }
-.book-card--boxed .book-card__category { color: var(--c-muted); font-weight: 500; }
-.book-card__cta { position: relative; z-index: 2; width: 100%; margin-top: .55rem; border-radius: 4px; min-height: 40px; }
 @media (max-width: 900px) {
     .catalog { grid-template-columns: minmax(0, 1fr); }
     .drawer--filters .drawer__panel.filters { background: var(--c-surface); padding: var(--sp-4) var(--sp-4) 0; }
@@ -449,7 +434,6 @@ html[lang="ar"] .book-facts dt { text-transform: none; letter-spacing: 0; font-s
     box-shadow: 0 1px 0 rgb(210 166 108 / 10%) inset, 0 30px 60px -30px rgb(0 0 0 / 70%);
 }
 :root[data-theme="dark"] .book-stage { background: transparent; border-bottom: 0; }
-:root[data-theme="dark"] .book-card--boxed { background: color-mix(in srgb, var(--c-surface-2) 70%, var(--c-surface)); border-color: var(--c-border); }
 :root[data-theme="dark"] .filter-group { background: var(--c-surface); border-color: var(--c-border-strong); }
 :root[data-theme="dark"] .filter-group__head { background: color-mix(in srgb, var(--c-accent) 14%, var(--c-surface-2)); }
 :root[data-theme="dark"] .select--box, :root[data-theme="dark"] .select-box { border-color: var(--c-border-strong); }
@@ -472,7 +456,6 @@ html[lang="ar"] .book-facts dt { text-transform: none; letter-spacing: 0; font-s
         box-shadow: 0 1px 0 rgb(210 166 108 / 10%) inset, 0 30px 60px -30px rgb(0 0 0 / 70%);
     }
     :root:not([data-theme="light"]) .book-stage { background: transparent; border-bottom: 0; }
-    :root:not([data-theme="light"]) .book-card--boxed { background: color-mix(in srgb, var(--c-surface-2) 70%, var(--c-surface)); border-color: var(--c-border); }
     :root:not([data-theme="light"]) .filter-group { background: var(--c-surface); border-color: var(--c-border-strong); }
     :root:not([data-theme="light"]) .filter-group__head { background: color-mix(in srgb, var(--c-accent) 14%, var(--c-surface-2)); }
     :root:not([data-theme="light"]) .select--box, :root:not([data-theme="light"]) .select-box { border-color: var(--c-border-strong); }
@@ -490,7 +473,6 @@ html[lang="ar"] .book-facts dt { text-transform: none; letter-spacing: 0; font-s
 }
 
 /* Books inside a shelf panel: six across on desktop, no orphan rows */
-.shelf .book-grid:not(.book-grid--rail) { grid-template-columns: repeat(auto-fill, minmax(min(42%, 148px), 1fr)); }
 
 /* ==========================================================================
    Editorial consistency for secondary pages (categories, authors, account,
