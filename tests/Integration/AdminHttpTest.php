@@ -116,7 +116,7 @@ final class AdminHttpTest extends TestCase
     {
         $r = $this->send('GET', '/admin/books');
         $this->assertSame(302, $r->status());
-        $this->assertSame('/login?redirect=%2Fadmin%2Fbooks', $r->getHeader('Location'));
+        $this->assertSame('/admin/login?redirect=%2Fadmin%2Fbooks', $r->getHeader('Location'));
     }
 
     public function testMemberIsForbidden(): void

@@ -125,7 +125,7 @@ final class Phase2PagesTest extends TestCase
             // Phase 3: the real admin exists but requires an authenticated admin.
             $admin = HttpServer::request('GET', '/admin');
             $this->assertSame(302, $admin['status']);
-            $this->assertSame('/login?redirect=%2Fadmin', $admin['headers']['location']);
+            $this->assertSame('/admin/login?redirect=%2Fadmin', $admin['headers']['location']);
             $acc = HttpServer::request('GET', '/account');
             $this->assertSame(302, $acc['status']);
             $this->assertSame('/login?redirect=%2Faccount', $acc['headers']['location']);

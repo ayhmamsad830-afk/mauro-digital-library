@@ -96,6 +96,26 @@ php bin/console user:promote <owner-google-email>     # refuses unknown or suspe
 
 `admin@mauro.local` exists only in the local development SQLite file; it is never migrated and cannot sign in.
 
+## 3b. Administrator username/password sign-in (`/admin/login`)
+
+Independent of Google. Accounts are created and reset **only from a shell on the server** — there is no public
+registration and no automatic promotion. Passwords are typed at a hidden prompt, stored only as Argon2id hashes
+(bcrypt where Argon2id is unavailable) and never accepted from arguments, files, pipes or `.env`.
+
+```bash
+# after `php bin/console migrate --production` (migration 0011 adds the columns)
+php bin/console admin:create --name="Moein khairy" --username=moein.khairy
+#   → shows the target database, asks you to type its name, then a temporary password twice (hidden)
+# sign in at https://<domain>/admin/login → you must choose a new private password immediately
+php bin/console admin:reset-password moein.khairy     # lost password: new temporary password, forced change
+```
+
+Protections: CSRF + Origin checks, 5 attempts per username and 20 per IP per 15 minutes (HTTP 429), generic
+“username or password is incorrect” messages (no account probing), session id regenerated at sign-in, Secure +
+HttpOnly + SameSite=Lax cookies on HTTPS (`SESSION_SECURE_COOKIE=true`), absolute 8-hour admin session
+(`ADMIN_SESSION_MAX`), audit log entries `admin.login`, `admin.login_failed`, `admin.password_changed`,
+`admin.password_reset`, `admin.logout`. Members, suspended and demoted accounts cannot use it.
+
 ## 4. Publish the first book — «رُكون الظلام»
 
 Re-create it through the admin panel on production (the same validated pipeline as locally), using the

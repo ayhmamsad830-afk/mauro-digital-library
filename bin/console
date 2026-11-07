@@ -19,6 +19,8 @@ declare(strict_types=1);
  *   php bin/console backup:run [--db-only|--files-only] [--keep=14]   Backup DB + private files to storage/backups
  *   php bin/console backup:verify <file>   Check a backup archive (checksum + completeness)
  *   php bin/console render:rebuild [--all] [--book=ID]   Re-queue rendering of current versions with missing pages
+ *   php bin/console admin:create [--name="…"] [--username=…]   Create an administrator (password typed at a hidden prompt)
+ *   php bin/console admin:reset-password <username>      Set a temporary administrator password (hidden prompt)
  */
 
 use App\Core\Config;
@@ -142,6 +144,85 @@ try {
             $n = Database::query("UPDATE users SET role = 'admin' WHERE email = :e AND status = 'active'", ['e' => $email])->rowCount();
             $n ? $line("Granted admin to $email.") : $err("No active user with email $email.");
             exit($n ? 0 : 1);
+
+        case 'admin:create':
+        case 'admin:reset-password':
+            // Operator-only: needs shell access to the server and an interactive terminal.
+            $opt = static function (string $name) use ($args): ?string {
+                foreach ($args as $a) {
+                    if (str_starts_with($a, "--$name=")) {
+                        return substr($a, strlen("--$name="));
+                    }
+                }
+                return null;
+            };
+            if (!\App\Support\HiddenInput::interactive()) {
+                $err('Refusing: run this command in an interactive terminal (PowerShell, cmd or an SSH session) — passwords are never accepted from pipes, files or arguments.');
+                exit(1);
+            }
+            if (Config::get('ui.demo')) {
+                $err('Refusing: APP_DEMO_UI is on (demo environment).');
+                exit(1);
+            }
+            $driver = (string) Config::get('database.driver');
+            $dbName = $driver === 'sqlite' ? basename((string) Config::get('database.sqlite_path')) : (string) Config::get('database.database');
+            $target = $driver === 'sqlite'
+                ? 'sqlite:' . (string) Config::get('database.sqlite_path')
+                : sprintf('mysql://%s:%s/%s', Config::get('database.host'), Config::get('database.port'), $dbName);
+            if ($dbName === '' || preg_match('/test|demo|fixture/i', $dbName)) {
+                $err("Refusing: \"$dbName\" looks like a test/demo database.");
+                exit(1);
+            }
+            $fixtures = (int) Database::scalar('SELECT COUNT(*) FROM books WHERE rights_source = :m', ['m' => \App\Services\DevFixtures::MARKER]);
+            if ($fixtures > 0) {
+                $err("Refusing: this database contains $fixtures fictional DEV FIXTURE books — it is not the real library.");
+                exit(1);
+            }
+            $line('Target database : ' . $target);
+            $line('Environment     : ' . Config::get('app.env'));
+            $line('Users           : ' . (int) Database::scalar('SELECT COUNT(*) FROM users') . '   Published books: ' . (int) Database::scalar("SELECT COUNT(*) FROM books WHERE status = 'published' AND deleted_at IS NULL"));
+            if (\App\Support\HiddenInput::line("Type the database name ($dbName) to confirm") !== $dbName) {
+                $err('Not confirmed. Nothing was changed.');
+                exit(1);
+            }
+            $ask = static function (string $username) use ($err): string {
+                $min = \App\Services\AdminPasswordAuth::MIN_LENGTH;
+                $first = \App\Support\HiddenInput::ask("Temporary password (min $min characters, input hidden)");
+                if ($e = \App\Services\AdminPasswordAuth::policyError($first, $username)) {
+                    $err(__($e, ['min' => $min]));
+                    exit(1);
+                }
+                $second = \App\Support\HiddenInput::ask('Repeat the temporary password');
+                if (!hash_equals($first, $second)) {
+                    $err('The two passwords do not match. Nothing was changed.');
+                    exit(1);
+                }
+                return $first;
+            };
+            if ($command === 'admin:create') {
+                $name = $opt('name') ?? \App\Support\HiddenInput::line('Display name');
+                $username = \App\Services\AdminPasswordAuth::normalizeUsername($opt('username') ?? \App\Support\HiddenInput::line('Username'));
+                if (!\App\Services\AdminPasswordAuth::validUsername($username)) {
+                    $err('Invalid username: 3–64 characters, a–z, 0–9, dot, dash or underscore.');
+                    exit(1);
+                }
+                if ((int) Database::scalar('SELECT COUNT(*) FROM users WHERE username = :u', ['u' => $username]) > 0) {
+                    $err("The username \"$username\" already exists. Use: php bin/console admin:reset-password $username");
+                    exit(1);
+                }
+                $id = \App\Services\AdminPasswordAuth::createAdmin($name, $username, $ask($username));
+                $line("Administrator created: \"$name\" (username: $username, id: $id, role: admin).");
+                $line('Sign in at ' . rtrim((string) Config::get('app.url'), '/') . '/admin/login — you will be asked to choose a new private password.');
+            } else {
+                $username = \App\Services\AdminPasswordAuth::normalizeUsername($args[0] ?? '');
+                if ($username === '' || str_starts_with($username, '--')) {
+                    $err('Usage: php bin/console admin:reset-password <username>');
+                    exit(1);
+                }
+                \App\Services\AdminPasswordAuth::resetPassword($username, $ask($username));
+                $line("Temporary password set for \"$username\". It must be changed at the next sign-in.");
+            }
+            exit(0);
 
         case 'db:seed-dev':
             if (!in_array('--yes', $args, true)) {
@@ -306,6 +387,8 @@ try {
             $line('  routes           List routes');
             $line('  search:reindex   Rebuild the Arabic-normalised search index');
             $line('  user:promote <email>   Grant admin role');
+            $line('  admin:create     Create an administrator (interactive, hidden password)');
+            $line('  admin:reset-password <username>   Temporary admin password (interactive)');
             $line('  db:seed-dev --yes      Fictional sample data into an empty DEV database');
             $line('  dev:sqlite <file>      Local SQLite harness (dev/test only)');
             $line('  render:work [--max=N]  Process queued PDF render jobs (cron)');

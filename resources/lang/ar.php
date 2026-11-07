@@ -74,7 +74,7 @@ return [
     'admin_auth.current_temporary' => 'كلمة المرور المؤقتة',
     'admin_auth.new_password' => 'كلمة المرور الجديدة',
     'admin_auth.confirm_password' => 'تأكيد كلمة المرور الجديدة',
-    'admin_auth.policy_help' => ':min أحرف على الأقل. عبارة من عدة كلمات أسهل للتذكّر.',
+    'admin_auth.policy_help' => 'لا تقل عن :min حرفًا. عبارة من عدة كلمات أسهل للتذكّر.',
     'admin_auth.change_submit' => 'حفظ كلمة المرور الجديدة',
     'admin_auth.changed' => 'تم تغيير كلمة المرور.',
     'admin_auth.sign_out' => 'تسجيل الخروج',

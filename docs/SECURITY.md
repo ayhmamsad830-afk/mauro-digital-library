@@ -22,6 +22,7 @@ What protects what, and which automated test proves it. Honest limits are at the
 | Broken access control / IDOR | `AuthMiddleware` + `AdminMiddleware`; every member query scoped by `user_id`; bookmarks deleted only by owner | `MemberFeaturesTest`, `AdminHttpTest`, `AdminCompletionTest` |
 | Privilege escalation | admins cannot change their own role/status; last active admin protected | `AdminCompletionTest::testRoleChangesAndGuardRails` |
 | Google token forgery / replay | RS256 only, JWKS signature, `iss`/`aud`/`exp`/`iat`, per-session nonce consumed on use, `email_verified`, no account merge by e-mail | `GoogleSignInTest` |
+| Admin password guessing / credential stuffing | `/admin/login`: Argon2id hashes, per-username + per-IP limits (429), generic errors, dummy-hash timing for unknown users, CLI-only account creation/reset, forced change of temporary passwords, 8 h absolute session, audit log | `AdminPasswordLoginTest` |
 | Malicious uploads | PDF: size, magic bytes, finfo, `pdfinfo`, encryption refused, page limit; images: finfo + getimagesize + dimension limits + **GD re-encode** (payloads dropped) | `PdfPipelineTest`, `AdminCompletionTest::testImageUploadRejections` |
 | Open redirects | `safe_redirect_path()` (same-origin path only) | `HardeningTest::testRedirectTargetsAreSameOriginOnly`, `MemberFeaturesTest` |
 | Brute force / abuse | DB-backed rate limits: Google sign-in, search, reviews, progress, reader, admin uploads | `HardeningTest`, `GoogleSignInTest`, `MemberFeaturesTest` |
