@@ -49,7 +49,7 @@ $field = static fn (array $d) => \App\Core\View::partial('admin/_field', $d);
             <div class="field">
                 <span class="label" id="authors-label"><?= e(__('admin.authors')) ?><span class="req" aria-hidden="true">*</span></span>
                 <?php if ($authors): ?>
-                <div class="checklist" role="group" aria-labelledby="authors-label">
+                <div class="checklist" role="group" aria-labelledby="authors-label" aria-describedby="authors-order-help" data-ordered-checklist>
                     <?php
                     // Selected authors first, in saved order: checkbox order is the order that gets stored.
                     $rank = array_flip($selAuthors);
@@ -60,6 +60,7 @@ $field = static fn (array $d) => \App\Core\View::partial('admin/_field', $d);
                     <?php endforeach; ?>
                 </div>
                 <?php else: ?><p class="help"><?= e(__('admin.no_authors_yet')) ?> <a href="<?= e(route('admin.authors.create')) ?>"><?= e(__('admin.add_author')) ?></a></p><?php endif; ?>
+                <?php if ($authors): ?><p class="help" id="authors-order-help"><?= e(__('admin.authors_order_help')) ?></p><?php endif; ?>
                 <?php if ($err = field_error('author_ids')): ?><p class="error-text"><?= icon('alert', 'icon--sm') ?><?= e($err) ?></p><?php endif; ?>
             </div>
             <div class="field">

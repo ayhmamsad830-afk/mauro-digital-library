@@ -76,7 +76,10 @@ $items = $preview ? [
                     <?= component('lang-switch') ?>
                     <?= component('theme-toggle') ?>
                     <a class="btn btn--ghost btn--sm hide-sm" href="<?= e(route('home')) ?>"><?= e(__('admin.view_site')) ?></a>
-                    <?php if (!empty($adminUser)): ?><span class="avatar avatar--sm" title="<?= e($adminUser['name']) ?>" aria-label="<?= e($adminUser['name']) ?>"><?= e(mb_substr((string) $adminUser['name'], 0, 1)) ?></span><?php endif; ?>
+                    <?php if (!empty($adminUser)): ?><span class="avatar avatar--sm" title="<?= e($adminUser['name']) ?>" aria-label="<?= e($adminUser['name']) ?>"><?= e(mb_substr((string) $adminUser['name'], 0, 1)) ?></span>
+                        <a class="btn btn--ghost btn--icon btn--sm" href="<?= e(route('admin.password')) ?>" title="<?= e(__('admin_auth.change_title')) ?>" aria-label="<?= e(__('admin_auth.change_title')) ?>"><?= icon('lock') ?></a>
+                        <form class="inline-form" method="post" action="<?= e(route('logout')) ?>"><?= csrf_field() ?><button class="btn btn--ghost btn--icon btn--sm" type="submit" title="<?= e(__('admin_auth.sign_out')) ?>" aria-label="<?= e(__('admin_auth.sign_out')) ?>"><?= icon('logout') ?></button></form>
+                    <?php endif; ?>
                 </div>
             </header>
             <main id="main" class="admin-content" tabindex="-1">

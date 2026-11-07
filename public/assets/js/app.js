@@ -192,4 +192,29 @@
     document.addEventListener('submit', function (event) {
         event.target.querySelectorAll('[data-password-toggle][aria-pressed="true"]').forEach(function (b) { b.click(); });
     }, true);
+
+    /* ---------------- Ordered checklist (book authors) ----------------
+       The order of checked boxes in the DOM is the order the server stores, so a newly
+       ticked author moves to the end of the ticked group and every ticked one shows its rank. */
+    function renumber(list) {
+        var n = 0;
+        list.querySelectorAll('label.check').forEach(function (label) {
+            var box = label.querySelector('input[type=checkbox]');
+            if (box && box.checked) { label.setAttribute('data-order', String(++n)); } else { label.removeAttribute('data-order'); }
+        });
+    }
+    document.querySelectorAll('[data-ordered-checklist]').forEach(renumber);
+    document.addEventListener('change', function (event) {
+        var box = event.target;
+        var list = box.closest && box.closest('[data-ordered-checklist]');
+        if (!list || box.type !== 'checkbox') return;
+        var label = box.closest('label.check');
+        var checked = Array.prototype.filter.call(list.querySelectorAll('label.check'), function (l) {
+            return l !== label && l.querySelector('input').checked;
+        });
+        var anchor = checked.length ? checked[checked.length - 1] : null;
+        if (anchor) { anchor.after(label); } else { list.prepend(label); }
+        renumber(list);
+        box.focus();
+    });
 })();

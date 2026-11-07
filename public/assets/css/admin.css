@@ -185,3 +185,8 @@ html[lang="ar"] .admin-sidebar__label { text-transform: none; letter-spacing: 0;
 .admin-grid--even > section:last-child { grid-column: auto; }
 @media (max-width: 900px) { .admin-grid--even { grid-template-columns: minmax(0, 1fr); } }
 .admin-section + .admin-grid, .stat-grid + .admin-section { margin-top: var(--sp-5); }
+
+/* Top bar: change-password + sign-out controls; keep it within narrow phones. */
+.admin-topbar__title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admin-topbar .site-tools { flex: none; }
+@media (max-width: 480px) { .admin-topbar .avatar { display: none; } }

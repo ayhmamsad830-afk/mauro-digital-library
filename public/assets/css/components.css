@@ -462,3 +462,7 @@ html[lang="ar"] .table th { text-transform: none; letter-spacing: 0; font-size: 
 .toast { pointer-events: auto; background: var(--c-ink, #242923); color: #f1ebdf; padding: .75rem 1.15rem; border-radius: var(--radius); box-shadow: var(--shadow-lg); font-size: var(--fs-sm); animation: rise-in .25s var(--ease); max-width: 32rem; border-inline-start: 3px solid var(--c-accent); }
 .btn .icon.is-on { fill: currentColor; }
 .avatar--img { object-fit: cover; padding: 0; }
+
+/* Ordered checklist: rank of each ticked author (1, 2, …). */
+[data-ordered-checklist] label.check[data-order]::after { content: attr(data-order); margin-inline-start: auto; min-width: 1.5rem; height: 1.5rem; border-radius: 999px; display: inline-grid; place-items: center; font-size: var(--fs-xs); font-weight: 700; background: var(--c-primary); color: var(--c-on-primary); }
+[data-ordered-checklist] label.check { display: flex; align-items: center; gap: .5rem; }
