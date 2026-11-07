@@ -7,8 +7,39 @@ The 32 MySQL integration tests are reported as **SKIPPED (BLOCKED)** by the test
 The same contract tests pass on the SQLite harness, which verifies the query logic but not MySQL-specific
 behaviour (InnoDB, utf8mb4 collation, native prepares, `mysqldump`).
 
-To unblock locally: create the test database and a user limited to it (`database/setup/mysql_create_databases.sql`),
-then set `DB_TEST_PORT=3308`, `DB_TEST_USERNAME`, `DB_TEST_PASSWORD` in `.env` and run `php bin/console db:check --test`.
+### Unblock on the development machine (owner, ~5 minutes)
+
+Passwords are typed only at the MySQL prompt and in `.env` — never in chat, Git or the command line.
+
+1. Open **PowerShell** and log in with the MySQL administrator account you created when installing MySQL
+   (usually `root`; `-p` makes MySQL ask for the password without echoing it):
+   ```powershell
+   & "C:\Program Files\MySQL\MySQL Server 26.7\bin\mysql.exe" -h 127.0.0.1 -P 3308 -u root -p
+   ```
+2. At the `mysql>` prompt run (choose a new strong password for `mauro_test`):
+   ```sql
+   CREATE DATABASE IF NOT EXISTS mauro_library_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   CREATE USER IF NOT EXISTS 'mauro_test'@'localhost' IDENTIFIED BY '<new strong password>';
+   GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, REFERENCES, DROP, TRIGGER, SHOW VIEW
+       ON mauro_library_test.* TO 'mauro_test'@'localhost';
+   EXIT;
+   ```
+   This user can reach `mauro_library_test` and nothing else.
+3. In the project's `.env` (ignored by Git) add:
+   ```
+   DB_TEST_HOST=127.0.0.1
+   DB_TEST_PORT=3308
+   DB_TEST_DATABASE=mauro_library_test
+   DB_TEST_USERNAME=mauro_test
+   DB_TEST_PASSWORD=<the password from step 2>
+   ```
+4. Check (non-destructive): `php bin/console db:check --test` → `OK server 26.7.0 …`.
+
+Also fix the development entry while there: `DB_PORT=3308` (the server does not listen on 3306), and either valid
+`DB_USERNAME`/`DB_PASSWORD` for `mauro_library_dev` or an empty `DB_USERNAME` (the local site uses SQLite anyway).
+
+If the administrator password is lost, do **not** reset it as part of this project — that is a server-level
+change outside MAURO; use MySQL's documented `--init-file` recovery procedure deliberately, or reinstall.
 
 ## Databases
 

@@ -1,4 +1,4 @@
-# MAURO — production readiness (2026-11-06)
+# MAURO — production readiness (updated 2026-11-07)
 
 Verdict: **ready to deploy once the BLOCKED items below are unblocked by the owner.** Nothing has been deployed.
 Launch procedure: `docs/LAUNCH_RUNBOOK.md`.
@@ -10,7 +10,7 @@ Launch procedure: `docs/LAUNCH_RUNBOOK.md`.
 | 1 | Local application works | ✅ | `http://127.0.0.1:8000` 200; book page, catalogue, search, reader |
 | 2 | Production configuration complete | ✅ | `.env.production.example`, `deploy/*`, `docs/LAUNCH_RUNBOOK.md` |
 | 3 | Database migrations verified | ⚠️ partial | 0001–0010 verified on the SQLite mirror (`SchemaParityTest`, `MigrationsTest`); **MySQL BLOCKED** |
-| 4 | MySQL integration tests have results | ⛔ BLOCKED | 32 tests skipped: MySQL runs on port 3308 but the local credentials are rejected |
+| 4 | MySQL integration tests have results | ⛔ BLOCKED | 32 tests skipped: MySQL 26.7.0 runs on port 3308 but no valid credentials are configured; owner steps in `docs/MYSQL_VERIFICATION.md` |
 | 5 | qpdf-dependent test has results | ✅ | `PdfPipelineTest::testCorruptAndEncryptedPdfsAreRejected` passes with qpdf 12.4.2 |
 | 6 | OpenSSL-dependent tests have results | ✅ | `GoogleSignInTest` 9/9 (needs `OPENSSL_CONF` on Windows for test key generation only) |
 | 7 | tar-dependent tests have results | ✅ | `BackupTest` 3/3 with GNU tar and Windows bsdtar |

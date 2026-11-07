@@ -51,6 +51,8 @@ PHP values from `deploy/php-production.ini`; HTTPS with `certbot --nginx -d <dom
 CREATE DATABASE mauro_library CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER 'mauro_app'@'localhost' IDENTIFIED BY '<strong random password>';
 GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, REFERENCES, DROP ON mauro_library.* TO 'mauro_app'@'localhost';
+-- mysqldump (backup:run) also reads triggers/views of this database:
+GRANT TRIGGER, SHOW VIEW ON mauro_library.* TO 'mauro_app'@'localhost';
 -- staging rehearsal database (same server is fine)
 CREATE DATABASE mauro_library_staging CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 GRANT ALL ON mauro_library_staging.* TO 'mauro_app'@'localhost';
@@ -76,6 +78,13 @@ Owner actions in Google Cloud Console (nothing here can be done without the owne
 3. *Authorized JavaScript origins*: `https://<domain>` (plus `https://staging.<domain>` if used).
    No redirect URI is needed (ID-token flow posts to `POST /api/auth/google`).
 4. Copy the **Client ID** into `GOOGLE_CLIENT_ID` in the server `.env`. The client **secret is not used** — do not store it anywhere.
+5. Leave `GOOGLE_ALLOWED_HD` **empty** to accept any verified Google account (personal Gmail included). Set it only to
+   restrict sign-in to a Google Workspace domain (e.g. `example.org`).
+6. Publishing status: while the consent screen is in *Testing*, only listed test users can sign in — add the owner's
+   e-mail as a test user, or *Publish app* before opening sign-in to the public (basic scopes need no Google review).
+
+The server verifies every ID token itself: RS256 signature against Google's JWKS, `iss` = accounts.google.com,
+`aud` = `GOOGLE_CLIENT_ID`, `exp`/`iat`/`nbf` (60 s leeway), the per-session nonce, and `email_verified`.
 
 First admin (there is no automatic promotion and no development login in production):
 
@@ -133,3 +142,20 @@ Browser: home, catalogue, book page (both authors, AR and EN), reader page 1 →
 - Roll back code: `git checkout <previous tag>` → reload PHP-FPM. Migrations are additive, so older code keeps working
   with the newer schema; if not, restore the pre-deploy dump (§2.6).
 - Never deploy without a verified backup from the same day.
+
+## 8. Go / no-go checklist (all must be ✅ before the public announcement)
+
+| # | Check | How |
+|---|---|---|
+| 1 | Host meets §0 (PHP 8.3+, `proc_open`, Poppler, GD WebP, MySQL 8+/MariaDB 10.6+, cron, HTTPS, ≥ 2 GB free) | `php bin/console env:check` → no FAIL |
+| 2 | 32 MySQL integration tests pass on a `*_test` database | `php tests/run.php MySql` (staging) |
+| 3 | Migrations rehearsed on staging, then applied to production with approval | `migrate:status` all applied |
+| 4 | Fresh DB + files backup taken and verified | `backup:run`, `backup:verify` |
+| 5 | Restore rehearsed into an empty staging DB | DEPLOYMENT §8 |
+| 6 | `.env`: production, debug off, HTTPS URL, secure cookies, demo off, unique APP_KEY | `env:check` |
+| 7 | `/.env`, `/storage/`, `/app/` return 403/404 | §6 curl checks |
+| 8 | Google sign-in works on the real domain; owner promoted with `user:promote` | sign in, open `/admin` |
+| 9 | A normal member gets 403 on `/admin` | second Google account |
+| 10 | «رُكون الظلام»: SHA-256 matches, `/admin/files` Ready 164 pages, both authors in order, published | §4 |
+| 11 | Reader as guest: page 1 → 164, watermark visible, no PDF request in DevTools | browser |
+| 12 | Cron running (render, cleanup, nightly backup) and backups copied off-server | `storage/logs/cron.log` |
