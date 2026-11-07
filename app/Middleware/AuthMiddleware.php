@@ -18,7 +18,9 @@ final class AuthMiddleware implements Middleware
             if ($request->wantsJson()) {
                 throw new HttpException(401, __('errors.401.message'));
             }
-            return Response::redirect('/login?' . http_build_query(['redirect' => safe_redirect_path($request->uri())]));
+            // Administration has its own username/password sign-in page; members use Google (/login).
+            $login = ($request->path() === '/admin' || str_starts_with($request->path(), '/admin/')) ? '/admin/login' : '/login';
+            return Response::redirect($login . '?' . http_build_query(['redirect' => safe_redirect_path($request->uri())]));
         }
         return $next($request);
     }

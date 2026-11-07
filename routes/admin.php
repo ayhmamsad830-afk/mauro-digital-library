@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 /** @var \App\Core\Router $router */
 
+use App\Controllers\Admin\AdminAuthController;
 use App\Controllers\Admin\AuthorController;
 use App\Controllers\Admin\BookController;
 use App\Controllers\Admin\BookFileController;
@@ -19,10 +20,17 @@ use App\Controllers\Admin\UserController;
 use App\Middleware\AdminMiddleware;
 use App\Middleware\AuthMiddleware;
 
+// Administrator username/password sign-in (public page; CSRF + Origin enforced globally on POST).
+$router->get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
+$router->post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
+
 // Every admin route: signed-in (AuthMiddleware) AND role=admin re-checked from the DB (AdminMiddleware).
 // CSRF is enforced globally for POST/PUT/PATCH/DELETE.
 $router->group(['prefix' => '/admin', 'middleware' => [AuthMiddleware::class, AdminMiddleware::class]], function ($r): void {
     $r->get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
+    // Change password (forced after a temporary password; AdminMiddleware allows only this until done).
+    $r->get('/password', [AdminAuthController::class, 'showPassword'])->name('admin.password');
+    $r->post('/password', [AdminAuthController::class, 'changePassword'])->name('admin.password.update');
 
     $r->get('/books', [BookController::class, 'index'])->name('admin.books.index');
     $r->get('/books/create', [BookController::class, 'create'])->name('admin.books.create');

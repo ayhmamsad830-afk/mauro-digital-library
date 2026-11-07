@@ -172,4 +172,24 @@
         window.addEventListener('resize', update);
         update();
     });
+
+    /* ---------------- Show / hide password (admin sign-in) ---------------- */
+    document.addEventListener('click', function (event) {
+        var btn = event.target.closest('[data-password-toggle]');
+        if (!btn) return;
+        var input = document.getElementById(btn.getAttribute('data-password-toggle'));
+        if (!input) return;
+        var show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.setAttribute('aria-pressed', String(show));
+        var label = btn.getAttribute(show ? 'data-label-hide' : 'data-label-show');
+        btn.title = label;
+        var sr = btn.querySelector('[data-password-toggle-label]');
+        if (sr) sr.textContent = label;
+        input.focus();
+    });
+    // Never leave a revealed password visible when the form is submitted.
+    document.addEventListener('submit', function (event) {
+        event.target.querySelectorAll('[data-password-toggle][aria-pressed="true"]').forEach(function (b) { b.click(); });
+    }, true);
 })();

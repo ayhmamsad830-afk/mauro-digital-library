@@ -22,5 +22,11 @@ return [
         'reader_thumbs' => ['max' => (int) env('READER_THUMBS_PER_MINUTE', 600), 'window' => 60],
         'reader_sessions' => ['max' => (int) env('READER_SESSIONS_PER_10MIN', 60), 'window' => 600],
         'admin_upload' => ['max' => 10, 'window' => 600],
+        // Administrator username/password sign-in (brute-force protection).
+        'admin_login_user' => ['max' => 5, 'window' => 900],
+        'admin_login_ip' => ['max' => 20, 'window' => 900],
     ],
+
+    // Password-based administrator sessions end after this many seconds even if active.
+    'admin_session_max' => (int) env('ADMIN_SESSION_MAX', 28800),
 ];

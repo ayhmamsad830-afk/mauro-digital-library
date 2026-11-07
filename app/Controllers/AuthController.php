@@ -76,6 +76,10 @@ final class AuthController extends Controller
 
     public function logout(Request $request): Response
     {
+        $wasAdmin = Auth::isAdmin();
+        if ($wasAdmin) {
+            \App\Models\ActivityLog::record((int) Auth::id(), 'admin.logout', 'user', (int) Auth::id(), (string) Session::get('auth_method', 'google'), $request->ip());
+        }
         Auth::logout();
         Session::flash('notice', __('auth.signed_out'));
         return $this->redirect('/', 303);

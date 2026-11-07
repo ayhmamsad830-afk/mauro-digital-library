@@ -530,3 +530,18 @@ html[lang="ar"] .category-grid--lg .category-card__name { font-weight: 600; line
 /* Account sections and legal pages read as editorial panels */
 .account-section > .h3 { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-xl); }
 .prose h2 { font-weight: 600; }
+
+/* ---------------- Administrator sign-in / password change ---------------- */
+.auth__form { display: flex; flex-direction: column; gap: var(--sp-4); text-align: start; margin-top: var(--sp-2); }
+.auth__form .field + .field { margin-top: 0; }
+.auth__form .btn--block { margin-top: var(--sp-2); }
+.auth--admin .auth__mark { background: var(--c-ink); color: var(--c-accent); }
+.password-field { position: relative; }
+.password-field .input { width: 100%; padding-inline-end: 3rem; }
+.password-field__toggle { position: absolute; inset-block: 0; inset-inline-end: 0; width: 2.75rem; display: grid; place-items: center; background: none; border: 0; color: var(--c-muted); cursor: pointer; border-radius: 0 var(--radius) var(--radius) 0; }
+[dir="rtl"] .password-field__toggle { border-radius: var(--radius) 0 0 var(--radius); }
+.password-field__toggle:hover { color: var(--c-text); }
+.password-field__toggle:focus-visible { outline: 2px solid var(--c-focus); outline-offset: -2px; }
+.password-field__off { display: none; }
+.password-field__toggle[aria-pressed="true"] .password-field__on { display: none; }
+.password-field__toggle[aria-pressed="true"] .password-field__off { display: inline-flex; }

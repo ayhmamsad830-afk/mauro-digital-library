@@ -37,7 +37,7 @@ final class Auth
         if (!is_int($id) || $id < 1) {
             return null;
         }
-        $row = Database::first('SELECT id, name, email, avatar_url, role, status FROM users WHERE id = :id', ['id' => $id]);
+        $row = Database::first('SELECT id, name, email, avatar_url, role, status, password_must_change FROM users WHERE id = :id', ['id' => $id]);
         if (!$row || $row['status'] !== 'active') {
             // Deleted or suspended account: end the session immediately.
             Session::invalidate();
