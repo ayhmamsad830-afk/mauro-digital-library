@@ -35,7 +35,7 @@ final class MySqlLibraryTest extends TestCase
 
     public function testServerIsInnoDbUtf8mb4WithAllMigrations(): void
     {
-        $this->assertSame(8, (int) \App\Core\Database::scalar('SELECT COUNT(*) FROM migrations'));
+        $this->assertSame(11, (int) \App\Core\Database::scalar('SELECT COUNT(*) FROM migrations'));
         $engine = \App\Core\Database::scalar("SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'books'");
         $this->assertSame('InnoDB', $engine);
         $collation = \App\Core\Database::scalar("SELECT TABLE_COLLATION FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'books'");
