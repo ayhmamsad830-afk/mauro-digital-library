@@ -530,3 +530,46 @@ html[lang="ar"] .category-grid--lg .category-card__name { font-weight: 600; line
 /* Account sections and legal pages read as editorial panels */
 .account-section > .h3 { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-xl); }
 .prose h2 { font-weight: 600; }
+
+/* ==========================================================================
+   Starry-sky background — the site's main background in every theme.
+   Overrides the per-theme body gradients above and lets the full-width
+   bands show the sky instead of painting a solid colour over it.
+   ========================================================================== */
+:root[data-theme] body,
+:root:not([data-theme]) body {
+    background: #05070b url("../images/background/starry-sky.jpg") center / cover no-repeat fixed;
+}
+:root .page-head,
+:root .section--paper,
+:root .section--tint,
+:root .book-stage { background: transparent; }
+
+/* Light mode on the starry sky: text that sits directly on the sky turns
+   light, while light panels (cards, inputs, tables, filters…) keep the
+   normal light-theme text colours. */
+:root[data-theme="light"] :is(.site-main, .admin-content) {
+    --c-text: #f1ebdf; --c-muted: #c3c8bf; --c-accent-text: #ddb684;
+    --c-border: rgb(255 255 255 / 16%); --c-border-strong: rgb(255 255 255 / 34%);
+    --c-primary: #79c2b6; --c-primary-strong: #a2d8ce; --c-on-primary: #0d1916;
+    color: var(--c-text);
+}
+:root[data-theme="light"] :is(.site-main, .admin-content) :is(
+    .card, .book-card, .category-card, .filter-group, .table-wrap, .pagination a,
+    .input, .select, .textarea, .search-bar__input:not(.hero .search-bar__input),
+    .select-box, .chip, .empty-state, .alert, .rail__btn, .drawer__panel:not(.filters),
+    .auth__benefits, .debug, .account-tabs
+) {
+    --c-text: var(--charcoal); --c-muted: #5c635b; --c-accent-text: #87602f;
+    --c-border: #e2d8c6; --c-border-strong: #cbbda3;
+    --c-primary: var(--teal); --c-primary-strong: #124843; --c-on-primary: #ffffff;
+    color: var(--c-text);
+}
+@media (max-width: 900px) {
+    :root[data-theme="light"] .site-main .drawer--filters .drawer__panel.filters {
+        --c-text: var(--charcoal); --c-muted: #5c635b; --c-accent-text: #87602f;
+        --c-border: #e2d8c6; --c-border-strong: #cbbda3;
+        --c-primary: var(--teal); --c-primary-strong: #124843; --c-on-primary: #ffffff;
+        color: var(--c-text);
+    }
+}
