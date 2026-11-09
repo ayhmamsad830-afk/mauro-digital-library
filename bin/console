@@ -6,7 +6,7 @@ declare(strict_types=1);
 /*
  * Digital Library command-line tool.
  *
- *   php bin/console env:check        Verify hosting capabilities (PHP, storage, Poppler, GD, config)
+ *   php bin/console env:check        Verify hosting capabilities (PHP, storage, Poppler, GD, config, HTTPS to Google JWKS)
  *   php bin/console db:check         Test the MySQL connection
  *   php bin/console migrate          Apply pending migrations
  *   php bin/console migrate:status   List applied / pending migrations

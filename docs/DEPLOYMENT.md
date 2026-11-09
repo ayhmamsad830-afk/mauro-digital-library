@@ -133,7 +133,7 @@ Restoring overwrites data: never run it against production without a fresh backu
 1. `.env`: `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://<domain>`, `SESSION_SECURE_COOKIE=true`, unique `APP_KEY` (`php bin/console key:generate`), `APP_DEMO_UI=false`, MySQL credentials, `GOOGLE_CLIENT_ID`, `TRUSTED_PROXIES` if behind a proxy/CDN.
 2. Docroot = `public/` (or the split layout of §2). `.env`, `storage/`, `vendor/` not reachable: `curl -I https://<domain>/.env` → 403/404, `/storage/…` → 403/404, `/app/…` → 403/404.
 3. PHP values from `deploy/php-production.ini`; `proc_open` allowed; Poppler installed.
-4. `php bin/console env:check` → no `FAIL` (it checks PHP, limits, storage outside docroot, rendering round-trip, APP_KEY/DEBUG/URL, secure cookie, demo off, DB connection + pending migrations, mysqldump).
+4. `php bin/console env:check` → no `FAIL` (it checks PHP, limits, storage outside docroot, rendering round-trip, APP_KEY/DEBUG/URL, secure cookie, demo off, DB connection + pending migrations, mysqldump, live HTTPS fetch of Google's ID-token signing keys with certificate verification).
 5. `php bin/console migrate` then `php bin/console migrate:status` (all applied).
 6. Google Cloud: authorised JavaScript origin `https://<domain>`; sign in once, then `php bin/console user:promote <your-email>`.
 7. Cron from `deploy/crontab.example` installed; check `storage/logs/cron.log` after a few minutes.

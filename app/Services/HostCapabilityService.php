@@ -106,6 +106,7 @@ final class HostCapabilityService
             (string) Config::get('app.url'));
         $r[] = $this->item('Config', 'GOOGLE_CLIENT_ID', Config::get('google.client_id') ? self::OK : self::WARN,
             Config::get('google.client_id') ? 'set' : 'not configured — Google Sign-In unavailable');
+        array_push($r, ...$this->googleConnectivity((bool) Config::get('google.client_id')));
         $secure = Config::get('session.secure', 'auto');
         $r[] = $this->item('Config', 'SESSION_SECURE_COOKIE', $secure === true ? self::OK : ($prod ? self::WARN : self::OK),
             ($secure === 'auto' ? 'auto (Secure only on HTTPS requests)' : ($secure ? 'true' : 'false')) . ($prod && $secure !== true ? ' — set true in production' : ''));
@@ -140,6 +141,45 @@ final class HostCapabilityService
         $order = array_flip(array_values(array_unique(array_column($r, 'group'))));
         usort($r, static fn (array $a, array $b): int => $order[$a['group']] <=> $order[$b['group']]);
         return $r;
+    }
+
+    /**
+     * Live HTTPS request to Google's ID-token signing keys (JWKS) through the same
+     * code path Google Sign-In uses, with certificate verification ON. Mandatory
+     * (FAIL) only when Google Sign-In is configured. Prints no secrets: only the
+     * CA file path, HTTP status, curl error text and the number of keys.
+     *
+     * @return list<array{group:string,check:string,status:string,detail:string}>
+     */
+    private function googleConnectivity(bool $googleConfigured): array
+    {
+        $bad = $googleConfigured ? self::FAIL : self::WARN;
+        $ca = (string) ini_get('curl.cainfo');
+        $caDetail = $ca === '' ? 'curl.cainfo not set (system/default CA store)'
+            : (is_file($ca) ? "curl.cainfo = $ca" : "curl.cainfo = $ca — FILE NOT FOUND");
+        $out = [$this->item('Network', 'CA certificates', $ca !== '' && !is_file($ca) ? $bad : self::OK, $caDetail)];
+
+        if (!extension_loaded('curl')) {
+            $out[] = $this->item('Network', 'Google JWKS (HTTPS)', $bad, 'skipped — ext-curl missing');
+            return $out;
+        }
+        $res = \App\Services\Google\HttpJwksProvider::request();
+        if ($res['status'] === 200 && $res['keys'] !== null && $res['keys'] !== []) {
+            $out[] = $this->item('Network', 'Google JWKS (HTTPS)', self::OK, sprintf(
+                'reachable, TLS certificate verified, %d signing key(s) (HTTP 200, %d ms)', count($res['keys']), $res['ms']));
+            return $out;
+        }
+        if ($res['errno'] !== 0) {
+            $hint = in_array($res['errno'], [60, 77], true)
+                ? ' — PHP has no trusted CA bundle; set curl.cainfo (Windows dev: run via bin\\dev-php.ps1, see README)'
+                : '';
+            $detail = "curl {$res['errno']}: " . mb_substr($res['error'], 0, 140) . $hint;
+        } else {
+            $detail = "unexpected response (HTTP {$res['status']}, " . ($res['keys'] === null ? 'no key set' : '0 RSA keys') . ')';
+        }
+        $out[] = $this->item('Network', 'Google JWKS (HTTPS)', $bad,
+            $detail . ($googleConfigured ? ' — Google Sign-In will reject every login' : ''));
+        return $out;
     }
 
     /** Generate a 1-page PDF, rasterise it with Poppler, then encode it with GD. */

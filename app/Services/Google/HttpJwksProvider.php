@@ -25,6 +25,27 @@ final class HttpJwksProvider implements JwksProvider
             }
         }
 
+        $res = self::request();
+        if ($res['status'] !== 200 || $res['keys'] === null) {
+            // The curl error code/text helps diagnose TLS problems (e.g. 60 = no CA bundle); it holds no secrets.
+            throw new RuntimeException('Could not fetch Google signing keys.'
+                . ($res['errno'] !== 0 ? " (curl {$res['errno']}: {$res['error']})" : " (HTTP {$res['status']})"));
+        }
+
+        $maxAge = preg_match('/max-age=(\d+)/', $res['headers']['cache-control'] ?? '', $m) ? (int) $m[1] : 3600;
+        @file_put_contents($cache, json_encode(['expires' => time() + min($maxAge, 86400), 'keys' => $res['keys']]), LOCK_EX);
+        return $res['keys'];
+    }
+
+    /**
+     * One live HTTPS request to the JWKS endpoint with certificate verification
+     * ON, bypassing the cache. Used by keys() and by `env:check` so the check
+     * exercises exactly the sign-in code path.
+     *
+     * @return array{status:int, errno:int, error:string, keys:?array<string,array<string,string>>, headers:array<string,string>, ms:int}
+     */
+    public static function request(): array
+    {
         $ch = curl_init((string) Config::get('google.jwks_uri'));
         $headers = [];
         curl_setopt_array($ch, [
@@ -42,22 +63,24 @@ final class HttpJwksProvider implements JwksProvider
                 return strlen($line);
             },
         ]);
+        $start = hrtime(true);
         $body = curl_exec($ch);
+        $ms = (int) ((hrtime(true) - $start) / 1_000_000);
         $status = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+        $errno = curl_errno($ch);
+        $error = curl_error($ch);
         curl_close($ch);
-        $json = is_string($body) ? json_decode($body, true) : null;
-        if ($status !== 200 || !is_array($json['keys'] ?? null)) {
-            throw new RuntimeException('Could not fetch Google signing keys.');
-        }
 
-        $keys = [];
-        foreach ($json['keys'] as $k) {
-            if (isset($k['kid'], $k['n'], $k['e']) && ($k['kty'] ?? '') === 'RSA') {
-                $keys[(string) $k['kid']] = ['kty' => 'RSA', 'n' => (string) $k['n'], 'e' => (string) $k['e'], 'alg' => (string) ($k['alg'] ?? 'RS256')];
+        $keys = null;
+        $json = is_string($body) ? json_decode($body, true) : null;
+        if (is_array($json['keys'] ?? null)) {
+            $keys = [];
+            foreach ($json['keys'] as $k) {
+                if (isset($k['kid'], $k['n'], $k['e']) && ($k['kty'] ?? '') === 'RSA') {
+                    $keys[(string) $k['kid']] = ['kty' => 'RSA', 'n' => (string) $k['n'], 'e' => (string) $k['e'], 'alg' => (string) ($k['alg'] ?? 'RS256')];
+                }
             }
         }
-        $maxAge = preg_match('/max-age=(\d+)/', $headers['cache-control'] ?? '', $m) ? (int) $m[1] : 3600;
-        @file_put_contents($cache, json_encode(['expires' => time() + min($maxAge, 86400), 'keys' => $keys]), LOCK_EX);
-        return $keys;
+        return ['status' => $status, 'errno' => $errno, 'error' => $error, 'keys' => $keys, 'headers' => $headers, 'ms' => $ms];
     }
 }
