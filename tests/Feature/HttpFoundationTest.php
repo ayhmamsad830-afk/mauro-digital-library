@@ -83,7 +83,7 @@ final class HttpFoundationTest extends TestCase
         $this->assertContains('data-theme="dark"', $r['body']);
         $r = HttpServer::request('GET', '/', [], null, ['dl_theme' => '"><script>']);
         $this->assertNotContains('<script>"', $r['body']);
-        $this->assertNotContains('data-theme=', $r['body']);
+        $this->assertContains('data-theme="dark"', $r['body']);
     }
 
     public function testHeadRequestHasNoBody(): void

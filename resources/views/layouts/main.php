@@ -26,7 +26,7 @@ $title = isset($pageTitle) && $pageTitle !== '' ? $pageTitle . ' — ' . $appNam
     <?php endif; ?>
     <meta name="color-scheme" content="light dark">
     <meta name="csrf-token" content="<?= e(csrf_token()) ?>">
-    <meta name="theme-color" content="#f5f0e6" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#121715" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#121715" media="(prefers-color-scheme: dark)">
     <link rel="preload" href="<?= e(locale() === 'ar' ? '/assets/fonts/plex-arabic-400.woff2' : '/assets/fonts/inter-latin.woff2') ?>" as="font" type="font/woff2" crossorigin>
     <link rel="icon" href="<?= e(asset('assets/images/brand/favicon-32.png')) ?>" sizes="32x32" type="image/png">

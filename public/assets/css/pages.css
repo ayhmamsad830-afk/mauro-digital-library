@@ -210,7 +210,7 @@ html[lang="ar"] .section-head__title { font-weight: 600; line-height: 1.45; }
 }
 
 /* ---------- Catalogue: reference-style sidebar, toolbar and boxed cards ---------- */
-.page-head--catalog { background: var(--c-bg); padding-block: var(--sp-5) var(--sp-4); border-bottom: 0; }
+.page-head--catalog { background: transparent; padding-block: var(--sp-5) var(--sp-4); border-bottom: 0; }
 .page-head--catalog .page-head__title { font-size: var(--fs-xl); margin-top: .6rem; }
 .catalog { grid-template-columns: 250px minmax(0, 1fr); padding-top: var(--sp-3); }
 .drawer--filters .drawer__panel.filters { background: transparent; border: 0; box-shadow: none; padding: 0; gap: .9rem; }

@@ -162,7 +162,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: var(--c-bg);
+    background: var(--c-bg) url("../images/background/starry-sky.jpg") center / cover no-repeat fixed;
     color: var(--c-text);
     font-family: var(--font-body);
     font-size: var(--fs-base);

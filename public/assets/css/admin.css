@@ -5,7 +5,7 @@
 @media (max-width: 640px) { .hide-sm { display: none !important; } }
 .h4 { font-size: var(--fs-md); margin: 0; display: flex; align-items: center; gap: .45rem; }
 
-.admin-body { background: var(--c-bg); }
+.admin-body { background: var(--c-bg) url("../images/background/starry-sky.jpg") center / cover no-repeat fixed; }
 .admin { display: grid; grid-template-columns: 268px minmax(0, 1fr); min-height: 100vh; }
 .admin-sidebar-wrap { display: block; position: sticky; top: 0; height: 100vh; }
 .admin-sidebar-wrap .drawer__backdrop { display: none; }

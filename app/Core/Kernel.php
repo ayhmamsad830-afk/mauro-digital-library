@@ -57,7 +57,8 @@ final class Kernel
 
         // Request-derived values every layout needs; views never read superglobals.
         $theme = $request->cookie('dl_theme');
-        View::share('currentTheme', in_array($theme, ['light', 'dark'], true) ? $theme : null);
+        // Dark is the site's default; a saved light/dark choice still wins.
+        View::share('currentTheme', in_array($theme, ['light', 'dark'], true) ? $theme : 'dark');
         View::share('currentPath', $request->path());
         View::share('currentUri', safe_redirect_path($request->uri()));
         View::share('demoMode', (bool) Config::get('ui.demo', false));
