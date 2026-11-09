@@ -5,8 +5,7 @@
 (function () {
     try {
         var saved = localStorage.getItem('dl_theme');
-        if (saved === 'light' || saved === 'dark') {
-            document.documentElement.setAttribute('data-theme', saved);
-        }
-    } catch (e) { /* storage unavailable: server cookie / system preference applies */ }
+        // Dark is the default; only an explicit saved "light" switches it off.
+        document.documentElement.setAttribute('data-theme', saved === 'light' ? 'light' : 'dark');
+    } catch (e) { /* storage unavailable: server cookie / dark default applies */ }
 })();

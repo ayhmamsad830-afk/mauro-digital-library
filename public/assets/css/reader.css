@@ -13,7 +13,7 @@
 :root[data-theme="dark"] { --desk: #121715; --desk-edge: #0c100e; --bar: rgb(18 23 21 / 88%); --bezel: #050706; --bezel-edge: #2a332e; --track: #2b3530; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --desk: #121715; --desk-edge: #0c100e; --bar: rgb(18 23 21 / 88%); --bezel: #050706; --bezel-edge: #2a332e; --track: #2b3530; } }
 
-.reader-body { height: 100vh; height: 100dvh; overflow: hidden; background: var(--desk); }
+.reader-body { height: 100vh; height: 100dvh; overflow: hidden; background: var(--desk) url("../images/background/starry-sky.jpg") center / cover no-repeat fixed; }
 .reader {
     display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto;
     height: 100vh; height: 100dvh;
