@@ -81,6 +81,12 @@ final class AuthController extends Controller
             \App\Models\ActivityLog::record((int) Auth::id(), 'admin.logout', 'user', (int) Auth::id(), (string) Session::get('auth_method', 'google'), $request->ip());
         }
         Auth::logout();
+        // "Switch account": same full sign-out, then straight to the sign-in page
+        // (fixed internal route, never a caller-supplied URL) to pick another account.
+        if ((string) $request->input('switch', '') === '1') {
+            Session::flash('notice', __('auth.switch_notice'));
+            return $this->redirect(route('login'), 303);
+        }
         Session::flash('notice', __('auth.signed_out'));
         return $this->redirect('/', 303);
     }

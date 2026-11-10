@@ -234,6 +234,33 @@ final class GoogleSignInTest extends TestCase
         $this->assertFalse(isset($_SESSION['user_id']));
         $this->assertSame(401, $this->send('GET', '/account')->status(), 'account requires sign-in again (JSON client → 401)');
     }
+
+    public function testHeaderAccountMenuOffersSwitchAccountAndSignOut(): void
+    {
+        $guest = $this->send('GET', '/')->body();
+        $this->assertNotContains('data-account-menu', $guest, 'guests only see the sign-in button');
+
+        $_SESSION['user_id'] = $this->ids['u_member'];
+        $page = $this->send('GET', '/')->body();
+        $this->assertContains('data-account-menu', $page);
+        $this->assertContains('Switch account', $page);
+        $this->assertContains('Sign out', $page);
+        $this->assertSame(2, substr_count($page, 'name="switch" value="1"'), 'header menu + mobile drawer');
+        $this->assertSame(4, substr_count($page, 'action="/logout"'), 'switch + sign out, in header and drawer');
+        $this->assertSame(4, preg_match_all('#action="/logout"[^>]*>\s*<input type="hidden" name="_token" value="[^"]+"#', $page), 'every sign-out form carries the CSRF token');
+        $this->assertNotContains(route('admin.dashboard'), $page, 'members get no admin link');
+
+        // Switch account = full sign-out, then the sign-in page (never an external URL).
+        $this->assertSame(419, $this->send('POST', '/logout', ['switch' => '1'], false)->status(), 'needs CSRF');
+        $r = $this->send('POST', '/logout', ['switch' => '1']);
+        $this->assertSame(303, $r->status());
+        $this->assertSame(route('login'), $r->getHeader('Location'));
+        $this->assertFalse(isset($_SESSION['user_id']), 'signed out');
+
+        // Plain sign-out still goes home.
+        $_SESSION['user_id'] = $this->ids['u_member'];
+        $this->assertSame('/', $this->send('POST', '/logout')->getHeader('Location'));
+    }
 }
 
 final class TestJwks implements JwksProvider

@@ -474,3 +474,51 @@ html[lang="ar"] .table th { text-transform: none; letter-spacing: 0; font-size: 
 /* Ordered checklist: rank of each ticked author (1, 2, …). */
 [data-ordered-checklist] label.check[data-order]::after { content: attr(data-order); margin-inline-start: auto; min-width: 1.5rem; height: 1.5rem; border-radius: 999px; display: inline-grid; place-items: center; font-size: var(--fs-xs); font-weight: 700; background: var(--c-primary); color: var(--c-on-primary); }
 [data-ordered-checklist] label.check { display: flex; align-items: center; gap: .5rem; }
+
+/* ---------- Account menu (header drop-down + mobile drawer list) ----------
+   <details>-based: works without JS; app.js closes it on Escape / outside click. */
+.account-menu { position: relative; }
+.account-menu > summary { list-style: none; cursor: pointer; user-select: none; }
+.account-menu > summary::-webkit-details-marker { display: none; }
+.account-menu__toggle { gap: .45rem; }
+.account-menu__mini { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+.account-menu__chevron { transition: transform .2s var(--ease); opacity: .85; }
+.account-menu[open] .account-menu__chevron { transform: rotate(180deg); }
+.account-menu__panel {
+    position: absolute; z-index: 80; top: calc(100% + .6rem); inset-inline-end: 0;
+    width: min(300px, calc(100vw - 2rem));
+    padding: .5rem;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg), 0 0 0 1px rgb(255 255 255 / 3%) inset;
+    animation: rise-in .18s var(--ease);
+}
+:root[data-theme="dark"] .account-menu__panel { background: color-mix(in srgb, var(--c-surface) 94%, transparent); border-color: rgb(122 167 255 / 16%); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.account-menu__who { display: flex; align-items: center; gap: .75rem; padding: .6rem .6rem .8rem; margin-bottom: .35rem; border-bottom: 1px solid var(--c-border); }
+.account-menu__avatar { width: 40px; height: 40px; flex: none; border-radius: 50%; object-fit: cover; }
+.account-menu__avatar--initial { display: grid; place-items: center; font-weight: 700; font-size: 1.05rem; color: var(--c-on-primary); background: linear-gradient(135deg, var(--c-primary), var(--c-accent)); }
+.account-menu__id { display: grid; gap: .05rem; min-width: 0; line-height: 1.35; }
+.account-menu__label { font-size: var(--fs-xs); color: var(--c-muted); }
+.account-menu__name { font-weight: 700; color: var(--c-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-menu__email { font-size: var(--fs-xs); color: var(--c-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-menu__role { justify-self: start; margin-top: .25rem; }
+.account-menu__list, .account-menu__actions { display: grid; gap: .1rem; }
+.account-menu__actions { margin-top: .35rem; padding-top: .35rem; border-top: 1px solid var(--c-border); }
+.account-menu__form { margin: 0; }
+.account-menu__item {
+    display: flex; align-items: center; gap: .7rem; width: 100%; min-height: 42px; padding: .45rem .7rem;
+    border: 0; border-radius: 10px; background: none; font: inherit; font-size: .95rem; font-weight: 500;
+    color: var(--c-text); text-decoration: none; text-align: start; cursor: pointer;
+    transition: background-color var(--dur), color var(--dur);
+}
+.account-menu__item .icon { color: var(--c-muted); transition: color var(--dur); }
+.account-menu__item:hover, .account-menu__item:focus-visible { background: var(--c-primary-soft); color: var(--c-primary-strong); }
+.account-menu__item:hover .icon, .account-menu__item:focus-visible .icon { color: inherit; }
+.account-menu__item[aria-current="page"] { background: var(--c-primary-soft); color: var(--c-primary-strong); font-weight: 600; }
+.account-menu__item--danger:hover, .account-menu__item--danger:focus-visible { background: var(--c-danger-soft); color: var(--c-danger); }
+/* Mobile drawer: same content, inline instead of floating. */
+.account-menu--inline { border: 1px solid var(--c-border); border-radius: 14px; padding: .4rem; background: var(--c-surface-2); }
+@media (prefers-reduced-motion: reduce) { .account-menu__panel { animation: none; } .account-menu__chevron { transition: none; } }
+/* A Latin name/e-mail inside an Arabic page still lines up with the Arabic label. */
+html[dir="rtl"] :is(.account-menu__name, .account-menu__email) { text-align: right; }

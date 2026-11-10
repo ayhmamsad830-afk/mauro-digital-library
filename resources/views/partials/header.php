@@ -29,7 +29,11 @@ $isCurrent = static fn (string $url, bool $prefix): bool => is_current_path(pars
         <div class="site-tools">
             <span class="tool--desktop"><?= component('lang-switch') ?></span>
             <span class="tool--desktop"><?= component('theme-toggle') ?></span>
-            <a class="btn btn--primary btn--sm tool--desktop" href="<?= e($accountLink[0]) ?>"><?= icon('user', 'icon--sm') ?><?= e($accountLink[1]) ?></a>
+            <?php if ($user): ?>
+                <span class="tool--desktop"><?= component('account-menu', ['user' => $user, 'variant' => 'header']) ?></span>
+            <?php else: ?>
+                <a class="btn btn--primary btn--sm tool--desktop" href="<?= e($accountLink[0]) ?>"><?= icon('user', 'icon--sm') ?><?= e($accountLink[1]) ?></a>
+            <?php endif; ?>
             <button type="button" class="btn btn--ghost btn--icon menu-toggle" data-drawer-open="site-drawer"
                     aria-controls="site-drawer" aria-expanded="false" aria-label="<?= e(__('nav.open_menu')) ?>">
                 <?= icon('menu') ?>
@@ -53,6 +57,11 @@ $isCurrent = static fn (string $url, bool $prefix): bool => is_current_path(pars
         </nav>
         <p class="drawer__section-title"><?= e(__('nav.preferences')) ?></p>
         <div class="drawer__prefs"><?= component('lang-switch') ?><?= component('theme-toggle') ?></div>
-        <a class="btn btn--primary btn--block" href="<?= e($accountLink[0]) ?>"><?= icon('user', 'icon--sm') ?><?= e($accountLink[1]) ?></a>
+        <?php if ($user): ?>
+            <p class="drawer__section-title"><?= e(__('nav.account_menu')) ?></p>
+            <?= component('account-menu', ['user' => $user, 'variant' => 'drawer']) ?>
+        <?php else: ?>
+            <a class="btn btn--primary btn--block" href="<?= e($accountLink[0]) ?>"><?= icon('user', 'icon--sm') ?><?= e($accountLink[1]) ?></a>
+        <?php endif; ?>
     </div>
 </div>

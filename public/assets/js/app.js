@@ -85,6 +85,23 @@
         if (open && open.hasAttribute('data-drawer-mobile-only') && window.innerWidth > 860) closeDrawer(open);
     });
 
+    /* ---------------- Account menu (<details>) ----------------
+       Opens/closes natively; here: close on outside click or Escape (focus goes
+       back to the button), and only one menu open at a time. */
+    function closeAccountMenus(except, refocus) {
+        document.querySelectorAll('[data-account-menu][open]').forEach(function (menu) {
+            if (menu === except) return;
+            menu.removeAttribute('open');
+            if (refocus) { var s = menu.querySelector('summary'); if (s) s.focus(); }
+        });
+    }
+    document.addEventListener('click', function (event) {
+        closeAccountMenus(event.target.closest('[data-account-menu]'), false);
+    });
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && document.querySelector('[data-account-menu][open]')) closeAccountMenus(null, true);
+    });
+
     /* ---------------- Auto-submit selects (catalogue sort / per-page) ---------------- */
     document.addEventListener('change', function (event) {
         var el = event.target.closest('[data-autosubmit]');
