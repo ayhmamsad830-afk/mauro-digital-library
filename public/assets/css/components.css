@@ -134,6 +134,16 @@ legend { font-weight: 700; padding-inline: .45rem; }
    an unusual shape is contained (never cropped or stretched) on a neutral mat. */
 .cover:has(img) { background: var(--c-surface-2); }
 .cover img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; }
+.cover .cover__img { position: relative; z-index: 1; }
+/* Soft fill behind a cover that is not exactly 2:3 (same image, blurred and dimmed). */
+.cover .cover__fill {
+    /* oversized via inset (not transform) so the card hover zoom cannot shrink it */
+    position: absolute; inset: -14%; z-index: 0; width: 128%; height: 128%; max-width: none;
+    object-fit: cover;
+    filter: blur(16px) saturate(1.15) brightness(.7);
+    pointer-events: none;
+}
+:root[data-theme="light"] .cover .cover__fill { filter: blur(16px) saturate(1.1) brightness(.95); opacity: .85; }
 /* Generated fallback: a flat colour field with the title set cleanly. */
 .cover__art, .cover__frame { display: none; }
 .cover__text { position: absolute; inset: 12% 11% 11%; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }

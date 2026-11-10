@@ -316,7 +316,8 @@ html[lang="ar"] .section-head__title { font-weight: 600; line-height: 1.45; }
 .book-page { padding-block: 0; }
 .book-hero { display: grid; grid-template-columns: minmax(200px, 300px) minmax(0, 1fr); gap: clamp(1.75rem, 5vw, 4rem); margin-top: var(--sp-5); align-items: start; }
 .book-hero__cover { position: relative; }
-.book-hero__cover .cover { box-shadow: 0 0 0 1px rgb(36 41 35 / 6%), 0 2px 4px rgb(36 41 35 / 6%), 0 14px 28px -18px rgb(36 41 35 / 30%); }
+.book-hero__cover .cover { border-radius: 10px; box-shadow: 0 0 0 1px rgb(255 255 255 / 6%), 0 26px 50px -22px rgb(0 0 0 / 70%), 0 0 70px -24px var(--c-glow); }
+:root[data-theme="light"] .book-hero__cover .cover { box-shadow: 0 0 0 1px rgb(48 52 96 / 8%), 0 24px 46px -24px rgb(48 52 96 / 40%), 0 0 60px -24px var(--c-glow); }
 
 .book-hero__info { padding-top: .25rem; }
 .book-hero__info > * + * { margin-top: var(--sp-3); }
@@ -325,7 +326,7 @@ html[lang="ar"] .section-head__title { font-weight: 600; line-height: 1.45; }
 .book-hero__authors { color: var(--c-muted); font-size: 1.1rem; margin-top: var(--sp-2) !important; }
 .book-hero__subtitle { font-family: var(--font-display); font-style: italic; font-size: clamp(1.05rem, 1.8vw, 1.35rem); color: var(--c-muted); letter-spacing: .01em; margin: var(--sp-1) 0 0 !important; }
 .book-facts dd.ltr { white-space: nowrap; }
-.book-facts > .book-facts__isbn { grid-column: span 2; border-inline-start: 0; padding-inline-start: 0; }
+.book-facts > .book-facts__isbn { grid-column: span 2; }
 .book-description p + p { margin-top: var(--sp-3); }
 .book-hero__authors a { font-weight: 600; color: var(--c-text); text-decoration: underline; text-decoration-color: var(--c-accent); text-underline-offset: .3em; }
 .book-hero__authors a:hover { color: var(--c-primary); }
@@ -338,13 +339,19 @@ html[lang="ar"] .section-head__title { font-weight: 600; line-height: 1.45; }
 .book-hero__actions .btn--primary { min-width: 12rem; }
 .book-hero__note { display: flex; gap: .45rem; align-items: center; }
 .book-hero__note .icon { color: var(--c-primary); }
+/* Book facts: a tidy grid of equal tiles (no uneven hairlines when a row is short). */
 .book-facts {
     margin: var(--sp-6) 0 0 !important; padding: 0;
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr));
-    border-block: 1px solid var(--c-border);
+    display: grid; gap: .6rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr));
 }
-.book-facts > div { padding: .9rem 1.1rem; border-inline-start: 1px solid var(--c-border); min-width: 0; }
-.book-facts > div:first-child { border-inline-start: 0; padding-inline-start: 0; }
+.book-facts > div {
+    min-width: 0; padding: .75rem .95rem;
+    border: 1px solid var(--c-border); border-radius: 12px;
+    background: color-mix(in srgb, var(--c-surface) 55%, transparent);
+    transition: border-color var(--dur), background-color var(--dur);
+}
+.book-facts > div:hover { border-color: color-mix(in srgb, var(--c-primary) 35%, var(--c-border)); }
 .book-facts dt { font-size: var(--fs-xs); color: var(--c-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .07em; }
 html[lang="ar"] .book-facts dt { text-transform: none; letter-spacing: 0; font-size: var(--fs-sm); font-weight: 500; }
 .book-facts dd { margin: .2rem 0 0; font-weight: 600; overflow-wrap: anywhere; }
@@ -369,9 +376,10 @@ html[lang="ar"] .book-facts dt { text-transform: none; letter-spacing: 0; font-s
 }
 @media (max-width: 520px) {
     .book-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .book-facts > div { border-inline-start: 0; padding-inline: 0; border-top: 1px solid var(--c-border); }
-    .book-facts > div:nth-child(-n+2) { border-top: 0; }
-    .book-facts > div:nth-child(even) { padding-inline-start: 1rem; border-inline-start: 1px solid var(--c-border); }
+    /* Equal-width actions on phones: "Read now" and "Favorites" side by side, full width. */
+    .book-hero__actions { display: grid !important; grid-template-columns: minmax(0, 1fr); gap: .6rem; }
+    .book-hero__actions > .favorite-form { display: block; }
+    .book-hero__actions .btn { width: 100%; min-width: 0; }
 }
 
 /* ---------- Auth ---------- */
@@ -398,7 +406,18 @@ html[lang="ar"] .book-facts dt { text-transform: none; letter-spacing: 0; font-s
 .account-head .page-head__title { margin: 0; }
 .account-head .eyebrow { margin: 0; }
 .account-head p { margin: 0; }
-.account-tabs { margin-top: var(--sp-5); position: sticky; top: var(--header-h); background: var(--c-bg); z-index: 5; }
+/* Account sections: a floating pill bar (sticky under the header) instead of a solid strip. */
+.account-tabs {
+    margin-top: var(--sp-5); position: sticky; top: calc(var(--header-h) + .5rem); z-index: 5;
+    gap: .25rem; padding: .3rem; width: fit-content; max-width: 100%;
+    border: 1px solid var(--c-border); border-radius: 14px;
+    background: color-mix(in srgb, var(--c-surface) 82%, transparent);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-sm);
+}
+.account-tabs a { border-bottom: 0; margin-bottom: 0; padding: .5rem .95rem; border-radius: 10px; transition: color var(--dur), background-color var(--dur); }
+.account-tabs a:hover { border-bottom-color: transparent; background: color-mix(in srgb, var(--c-primary) 8%, transparent); }
+.account-tabs a[aria-current="page"], .account-tabs a[aria-current="true"] { background: var(--c-primary-soft); color: var(--c-primary-strong); }
 .account-grid { display: grid; gap: var(--sp-5); margin-top: var(--sp-5); }
 .account-section .book-row .cover { width: 64px; }
 .container > .alert { margin-top: var(--sp-5); }

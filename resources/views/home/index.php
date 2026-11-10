@@ -10,7 +10,6 @@
 // has opened yet carry no reading signal, so they are left out; with no reads at
 // all the section is hidden rather than showing an arbitrary order.
 $popular = array_values(array_filter($popular, static fn (array $b): bool => (int) ($b['reads_count'] ?? 0) > 0));
-$hasBooks = $latest !== [] || $popular !== [];
 // Real catalogue covers fanned behind the featured book (decorative, no extra query).
 $shelf = [];
 if ($featured) {
@@ -19,6 +18,14 @@ if ($featured) {
         if (count($shelf) === 2) { break; }
     }
     $shelf = array_values($shelf);
+}
+$hasBooks = $featured !== null || $latest !== [] || $popular !== [];
+// The featured book already has the hero: don't repeat it in the rails below.
+// A rail left with nothing new to show is hidden instead of showing a duplicate.
+if ($featured) {
+    $notFeatured = static fn (array $b): bool => $b['slug'] !== $featured['slug'];
+    $popular = array_values(array_filter($popular, $notFeatured));
+    $latest = array_values(array_filter($latest, $notFeatured));
 }
 ?>
 <section class="hero">
