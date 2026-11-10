@@ -122,8 +122,8 @@ async function newPage(browser, vp, cookies = []) {
         const persisted = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
         ok(persisted === after, `theme: persisted after reload (${persisted})`);
         const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-        // Cosmic palette: deep-space navy (dark) / bright cool white (light).
-        ok(after === 'dark' ? bg === 'rgb(6, 10, 23)' : bg === 'rgb(245, 247, 252)', `theme: body background matches (${bg})`);
+        // Cosmic palette: deep-space navy (dark) / Pearl Cosmic white (light).
+        ok(after === 'dark' ? bg === 'rgb(6, 10, 23)' : bg === 'rgb(248, 248, 252)', `theme: body background matches (${bg})`);
         await ctx.close();
     }
 
@@ -207,6 +207,49 @@ async function newPage(browser, vp, cookies = []) {
         }));
         ok(still.stars === 0 && still.reveal === 0 && !still.trail, `cosmic: reduced motion disables decorative effects (${JSON.stringify(still)})`);
         await rm.close();
+    }
+
+    // 7. Reader background shield: hidden tab obscures the page, return restores it (AR + EN, reduced motion)
+    for (const [lang, reduce] of [['ar', false], ['en', true]]) {
+        const ctx = await browser.newContext({ viewport: VIEWPORTS.desktop, reducedMotion: reduce ? 'reduce' : 'no-preference' });
+        await ctx.addCookies([{ name: 'dl_locale', value: lang, url: BASE }]);
+        const page = await ctx.newPage();
+        const errors = [];
+        page.on('pageerror', e => errors.push(String(e)));
+        await page.goto(BASE + '/read/gardens-of-the-quiet-river');
+        await page.waitForSelector('[data-page-img]:not(.is-loading)');
+        await page.click('[data-action="next"]');
+        await page.waitForTimeout(400);
+        const setHidden = hidden => page.evaluate(h => {
+            Object.defineProperty(document, 'hidden', { value: h, configurable: true });
+            Object.defineProperty(document, 'visibilityState', { value: h ? 'hidden' : 'visible', configurable: true });
+            document.dispatchEvent(new Event('visibilitychange'));
+        }, hidden);
+        await setHidden(true);
+        const hidden = await page.evaluate(() => ({
+            shielded: document.querySelector('[data-reader]').classList.contains('is-shielded'),
+            notice: !document.querySelector('[data-shield]').hidden,
+            text: document.querySelector('.reader-shield__title').textContent.trim(),
+            filter: getComputedStyle(document.querySelector('[data-stage]')).filter,
+        }));
+        ok(hidden.shielded && hidden.notice && /blur/.test(hidden.filter), `shield/${lang}: page obscured when hidden ${JSON.stringify(hidden)}`);
+        ok(lang === 'ar' ? /[؀-ۿ]/.test(hidden.text) : hidden.text === 'Reading paused', `shield/${lang}: notice in the page language (${hidden.text})`);
+        await setHidden(false);
+        const back = await page.evaluate(() => ({
+            shielded: document.querySelector('[data-reader]').classList.contains('is-shielded'),
+            page: document.querySelector('[data-page-input]').value,
+        }));
+        ok(!back.shielded && back.page === '2', `shield/${lang}: restored on return, still on page 2 ${JSON.stringify(back)}`);
+        // Focus loss (another window): notice appears; one click resumes reading.
+        await page.evaluate(() => { document.hasFocus = () => false; window.dispatchEvent(new Event('blur')); });
+        await page.waitForTimeout(500);
+        const blurred = await page.evaluate(() => document.querySelector('[data-reader]').classList.contains('is-shielded'));
+        await page.evaluate(() => { document.hasFocus = () => true; });
+        await page.click('[data-action="unshield"]');
+        const resumed = await page.evaluate(() => document.querySelector('[data-reader]').classList.contains('is-shielded'));
+        ok(blurred && !resumed, `shield/${lang}: focus loss shields, one click resumes (${blurred} → ${resumed})`);
+        ok(errors.length === 0, `shield/${lang}: JS errors ${errors.join(' | ')}`);
+        await ctx.close();
     }
 
     await browser.close();

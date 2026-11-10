@@ -38,12 +38,16 @@
             #060a17 url("../images/background/starry-sky.jpg") center / cover no-repeat;
     }
 }
-/* Light: a bright, clean sky; only faint blue/violet light and a few ink "stars". */
+/* Light — "Pearl Cosmic": a pearl-white sky with icy-blue daylight from the
+   top corner, an extremely faint lavender glow opposite, and a soft pearl sheen.
+   Gradients only (no image), so the light theme costs no extra download. */
 :root[data-theme="light"] .cosmos__sky {
     background:
-        radial-gradient(56rem 36rem at 10% 0%, rgb(79 140 255 / 11%), transparent 62%),
-        radial-gradient(46rem 32rem at 92% 22%, rgb(139 124 246 / 9%), transparent 62%),
-        linear-gradient(180deg, #f8faff 0%, #eef2fb 100%);
+        radial-gradient(70rem 42rem at 6% -8%, rgb(196 216 255 / 34%), transparent 62%),
+        radial-gradient(56rem 36rem at 96% 12%, rgb(224 212 255 / 24%), transparent 62%),
+        radial-gradient(44rem 26rem at 50% 38%, rgb(255 255 255 / 70%), transparent 70%),
+        radial-gradient(60rem 30rem at 50% 108%, rgb(206 222 255 / 20%), transparent 66%),
+        linear-gradient(180deg, #fbfbfe 0%, #f8f8fc 48%, #f3f4fa 100%);
 }
 
 /* ---------- 2. Twinkling stars ---------- */
@@ -57,7 +61,11 @@
 }
 .star--bright { box-shadow: 0 0 6px 1px rgb(150 190 255 / 55%); }
 @keyframes twinkle { from { opacity: var(--lo, .2); } to { opacity: var(--hi, .8); } }
-:root[data-theme="light"] .star { background: #3a4a7a; box-shadow: none; --hi: .28; --lo: .06; }
+/* Pearl: small, barely visible blue-grey stars; the bright ones get a lavender halo. */
+/* (Per-star opacity ranges are set inline by cosmic.js, so the whole layer is dimmed instead.) */
+:root[data-theme="light"] .cosmos__stars { opacity: .32; }
+:root[data-theme="light"] .star { background: #7d87bd; box-shadow: none; transform: scale(.85); }
+:root[data-theme="light"] .star--bright { box-shadow: 0 0 5px 1px rgb(160 150 235 / 45%); }
 
 /* ---------- 3. Shooting star ---------- */
 .shooting-star {

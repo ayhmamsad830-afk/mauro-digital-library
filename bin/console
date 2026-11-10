@@ -13,6 +13,7 @@ declare(strict_types=1);
  *   php bin/console key:generate     Create APP_KEY in .env if it is empty
  *   php bin/console routes           List registered routes
  *   php bin/console search:reindex   Rebuild books.search_text (Arabic-normalised)
+ *   php bin/console watermark:trace <code>   Identify the member / reading session behind a watermark code
  *   php bin/console user:promote <email>   Grant admin role to an existing (Google) account
  *   php bin/console db:seed-dev --yes      Load FICTIONAL sample books into an empty DEV database
  *   php bin/console dev:sqlite <file>      Create a local SQLite harness DB (dev/test only)
@@ -133,6 +134,23 @@ try {
 
         case 'search:reindex':
             $line(\App\Services\SearchIndexer::reindexAll() . ' book(s) reindexed.');
+            exit(0);
+
+        case 'watermark:trace':
+            // Operator-only: identify the reader behind a code read off a leaked page image.
+            $code = $args[0] ?? '';
+            if (!preg_match('/^[MR]-[0-9A-Fa-f]{8}$/', $code)) {
+                $err('Usage: php bin/console watermark:trace <M-XXXXXXXX | R-XXXXXXXX>');
+                exit(1);
+            }
+            $hits = \App\Services\Reader\WatermarkService::trace($code);
+            if ($hits === []) {
+                $err("No member or reading session matches $code.");
+                exit(1);
+            }
+            foreach ($hits as $hit) {
+                $line(json_encode($hit, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            }
             exit(0);
 
         case 'user:promote':
@@ -386,6 +404,7 @@ try {
             $line('  key:generate     Generate APP_KEY in .env (if empty)');
             $line('  routes           List routes');
             $line('  search:reindex   Rebuild the Arabic-normalised search index');
+            $line('  watermark:trace <code>  Identify the member / reading session behind a watermark code (M-… / R-…)');
             $line('  user:promote <email>   Grant admin role');
             $line('  admin:create     Create an administrator (interactive, hidden password)');
             $line('  admin:reset-password <username>   Temporary admin password (interactive)');

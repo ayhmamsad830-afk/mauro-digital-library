@@ -282,6 +282,7 @@
             case 'fullscreen': toggleFullscreen(); break;
             case 'thumbs': toggleThumbs(); break;
             case 'info': toggleInfo(); break;
+            case 'unshield': shield(false); stage.focus(); break;
             case 'bookmark':
                 if (M.bookmarkUrl) {
                     postJson(M.bookmarkUrl, { book_id: M.book.id, page: page }).then(function (d) {
@@ -355,6 +356,48 @@
     ['contextmenu', 'dragstart', 'selectstart', 'copy', 'cut'].forEach(function (type) {
         stage.addEventListener(type, function (e) { e.preventDefault(); });
         if (thumbs) thumbs.addEventListener(type, function (e) { e.preventDefault(); });
+    });
+
+    /* ---------------- Background shield (screenshot DETERRENCE, not prevention) ----------------
+     * What a web page can honestly do:
+     *  - When the tab is hidden (switching tabs/apps, minimising, the mobile app
+     *    switcher), the page is blurred and replaced by a short notice, so tab
+     *    previews and background captures show nothing readable. It is restored
+     *    as soon as the reader is visible again.
+     *  - When the window merely loses focus (another window, devtools, a capture
+     *    tool's overlay), the same notice appears after a short delay and goes
+     *    away on focus or with one click, so side-by-side reading is not blocked.
+     *  - The PrintScreen key, when the browser reports it, only shows a discreet
+     *    reminder that pages are watermarked.
+     * Browsers receive no event for operating-system screenshots or screen
+     * recording, so none of this can detect or block them. The watermark drawn
+     * into the page images on the server is the actual traceability measure.
+     */
+    var shieldEl = root.querySelector('[data-shield]');
+    var blurTimer = null;
+    var lastNotice = 0;
+    function shield(on) {
+        if (!shieldEl) return;
+        clearTimeout(blurTimer);
+        root.classList.toggle('is-shielded', on);
+        shieldEl.hidden = !on;
+        if (on) saveProgress(); // nothing is lost if the reader never comes back
+    }
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) { shield(true); }
+        else if (document.hasFocus()) { shield(false); }
+    });
+    window.addEventListener('pagehide', function () { shield(true); });
+    window.addEventListener('pageshow', function () { if (!document.hidden) shield(false); });
+    window.addEventListener('blur', function () {
+        clearTimeout(blurTimer);
+        blurTimer = setTimeout(function () { if (!document.hasFocus()) shield(true); }, 350);
+    });
+    window.addEventListener('focus', function () { if (!document.hidden) shield(false); });
+    document.addEventListener('keyup', function (e) {
+        if (e.key !== 'PrintScreen' || Date.now() - lastNotice < 10000) return;
+        lastNotice = Date.now();
+        toast(M.i18n.captureNotice);
     });
 
     /* ---------------- Start ---------------- */

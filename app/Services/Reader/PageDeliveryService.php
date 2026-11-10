@@ -16,7 +16,11 @@ use App\Services\Storage\PrivateStorage;
  */
 final class PageDeliveryService
 {
-    public static function render(int $fileId, int $page, string $variant, string $pseudonym): Response
+    /**
+     * @param int|null $userId member who owns the reading session (null = guest);
+     *                         drawn as a privacy-safe member code, never as a name or e-mail
+     */
+    public static function render(int $fileId, int $page, string $variant, string $pseudonym, ?int $userId = null): Response
     {
         $row = Database::first(
             'SELECT storage_path FROM book_page_renders WHERE book_file_id = :f AND variant = :v AND page_number = :n',
@@ -31,7 +35,7 @@ final class PageDeliveryService
             throw new HttpException(503, __('reader.load_error'));
         }
         imagepalettetotruecolor($img);
-        WatermarkService::apply($img, WatermarkService::label($pseudonym), $variant === 'thumb');
+        WatermarkService::apply($img, WatermarkService::label($pseudonym, null, $userId), $variant === 'thumb');
         ob_start();
         imagewebp($img, null, $variant === 'thumb' ? 70 : 80);
         $bytes = (string) ob_get_clean();

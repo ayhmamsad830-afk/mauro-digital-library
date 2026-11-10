@@ -104,7 +104,7 @@ final class ReaderSessionService
         $readable = self::readableBook($bookId);
 
         $row = Database::first(
-            'SELECT id, book_id, book_file_id, reader_pseudonym, expires_at, ended_at FROM reading_sessions WHERE id = :id',
+            'SELECT id, user_id, book_id, book_file_id, reader_pseudonym, expires_at, ended_at FROM reading_sessions WHERE id = :id',
             ['id' => $rs]
         );
         if (!$row || (int) $row['book_id'] !== $bookId) {

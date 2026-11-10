@@ -15,7 +15,10 @@ use App\Repositories\LibraryRepositoryFactory;
 use App\Repositories\MySqlLibraryRepository;
 use App\Services\Pdf\PdfUploadService;
 use App\Services\Pdf\RenderService;
+use App\Services\Auth;
+use App\Services\Reader\PageDeliveryService;
 use App\Services\Reader\ReaderTokenService;
+use App\Services\Reader\WatermarkService;
 use App\Services\Storage\PrivateStorage;
 use Tests\Support\LibraryFixtures;
 use Tests\Support\PdfFactory;
@@ -208,6 +211,121 @@ final class ProtectedReaderTest extends TestCase
         $p = Database::all('SELECT reader_pseudonym FROM reading_sessions WHERE id IN (:a, :b)', ['a' => $a['token']['rs'], 'b' => $b['token']['rs']]);
         $this->assertFalse($p[0]['reader_pseudonym'] === $p[1]['reader_pseudonym']);
         $this->assertTrue($this->diff($imgA, $imgB) > 0.001, 'different readers receive different pixels');
+    }
+
+    // ------------------------------------------------- personalised watermark
+
+    public function testWatermarkLabelCarriesPrivacySafeIdentity(): void
+    {
+        $member = $this->ids['u_member'];
+        $user = Database::first('SELECT name, email FROM users WHERE id = :id', ['id' => $member]);
+        $t = gmmktime(10, 30, 0, 11, 10, 2026);
+
+        $code = WatermarkService::memberCode($member);
+        $this->assertSame(1, preg_match('/^M-[0-9A-F]{8}$/', $code), "member code format: $code");
+        $this->assertSame($code, WatermarkService::memberCode($member), 'stable for the same member');
+        $this->assertFalse($code === WatermarkService::memberCode($this->ids['u_admin']), 'differs between members');
+
+        $label = WatermarkService::label('R-ABCDEF12', $t, $member);
+        $this->assertContains($code, $label);
+        $this->assertContains('R-ABCDEF12', $label);
+        $this->assertContains('2026-11-10 10:30 UTC', $label);
+        $this->assertNotContains(WatermarkService::GUEST, $label);
+        foreach ([(string) $user['email'], (string) $user['name'], (string) $member] as $private) {
+            if (strlen($private) > 2) {
+                $this->assertNotContains($private, $label, 'no personal data in the watermark');
+            }
+        }
+        $guest = WatermarkService::label('R-ABCDEF12', $t);
+        $this->assertContains(WatermarkService::GUEST, $guest);
+        $this->assertSame(0, preg_match('/M-[0-9A-F]{8}/', $guest));
+        // Script-neutral label: renders the same for Arabic and English books (GD cannot shape Arabic).
+        $this->assertSame(1, preg_match('/^[\x20-\x7E·]+$/u', $label));
+    }
+
+    public function testMemberPagesCarryTheirOwnWatermarkInThePixels(): void
+    {
+        $file = $this->files['b1'];
+        // Same page, same session reference, same minute: only the identity differs.
+        $guest = imagecreatefromstring(PageDeliveryService::render($file, 1, 'page', 'R-00000001')->body());
+        $memberA = imagecreatefromstring(PageDeliveryService::render($file, 1, 'page', 'R-00000001', $this->ids['u_member'])->body());
+        $memberB = imagecreatefromstring(PageDeliveryService::render($file, 1, 'page', 'R-00000001', $this->ids['u_admin'])->body());
+        $this->assertTrue($this->diff($guest, $memberA) > 0.001, 'member identity is drawn into the image');
+        $this->assertTrue($this->diff($memberA, $memberB) > 0.001, 'each member gets different pixels');
+
+        // Through the API, the session owner decides the identity.
+        $m = $this->startSession($this->ids['b1'], $this->ids['u_member']);
+        $this->assertSame($this->ids['u_member'], (int) Database::scalar('SELECT user_id FROM reading_sessions WHERE id = :id', ['id' => $m['token']['rs']]));
+        $r = $this->send('GET', $this->url($m, 1));
+        $this->assertSame(200, $r->status());
+        $this->assertTrue($this->diff($this->master($file, 1), imagecreatefromstring($r->body())) > 0.03);
+    }
+
+    public function testWatermarkCodesTraceBackToTheReader(): void
+    {
+        $m = $this->startSession($this->ids['b1'], $this->ids['u_member']);
+        $pseudonym = (string) Database::scalar('SELECT reader_pseudonym FROM reading_sessions WHERE id = :id', ['id' => $m['token']['rs']]);
+
+        $bySession = WatermarkService::trace($pseudonym);
+        $this->assertSame(1, count($bySession));
+        $this->assertSame($this->ids['u_member'], (int) $bySession[0]['user_id']);
+        $this->assertSame($this->ids['b1'], (int) $bySession[0]['book_id']);
+
+        $byMember = WatermarkService::trace(strtolower(WatermarkService::memberCode($this->ids['u_member'])));
+        $this->assertSame($this->ids['u_member'], (int) $byMember[0]['id']);
+
+        $this->assertSame([], WatermarkService::trace('M-00000000'));
+        $this->assertSame([], WatermarkService::trace("R-' OR 1=1 --"));
+    }
+
+    public function testSignInAndSignOutInvalidateOutstandingPageLinks(): void
+    {
+        // Guest reading, then signs in: the guest link dies and a NEW member session is used.
+        $guest = $this->startSession($this->ids['b1']);
+        $guestUrl = $this->url($guest, 1);
+        $this->assertSame(200, $this->send('GET', $guestUrl)->status());
+        Auth::login($this->ids['u_member']);
+        $this->assertSame(403, $this->send('GET', $guestUrl)->status(), 'pre-login link rejected after sign-in');
+        $member = $this->startSession($this->ids['b1']);
+        $this->assertFalse($guest['token']['rs'] === $member['token']['rs'], 'new reading session after sign-in');
+        $this->assertSame($this->ids['u_member'], (int) Database::scalar('SELECT user_id FROM reading_sessions WHERE id = :id', ['id' => $member['token']['rs']]));
+
+        // Signs out: every outstanding link stops working.
+        $memberUrl = $this->url($member, 1);
+        $this->assertSame(200, $this->send('GET', $memberUrl)->status());
+        Auth::logout();
+        $this->assertSame(403, $this->send('GET', $memberUrl)->status(), 'link rejected after sign-out');
+    }
+
+    public function testProtectedResponsesAreNeverCacheable(): void
+    {
+        $m = $this->startSession($this->ids['b1']);
+        $t = $m['token'];
+        foreach ([$this->url($m, 1), $this->url($m, 1, 'thumbUrl'), "/api/books/{$this->ids['b1']}/reader-manifest?rs={$t['rs']}&exp={$t['exp']}&sig={$t['sig']}"] as $u) {
+            $r = $this->send('GET', $u);
+            $this->assertSame(200, $r->status(), $u);
+            $cc = (string) $r->getHeader('Cache-Control');
+            // no-store forbids every cache (browser and shared) from keeping a copy.
+            $this->assertContains('no-store', $cc, "no-store on $u");
+            $this->assertNotContains('public', $cc, "never public on $u");
+            $this->assertNotContains('max-age=1', $cc);
+        }
+        // Errors on protected resources are not cacheable either.
+        $denied = $this->send('GET', "/api/books/{$this->ids['b1']}/pages/1");
+        $this->assertSame(403, $denied->status());
+        $this->assertNotContains('public', (string) $denied->getHeader('Cache-Control'));
+    }
+
+    public function testReaderShellHasBackgroundShieldInBothLanguages(): void
+    {
+        $en = $this->send('GET', '/read/gardens-river')->body();
+        $this->assertContains('data-shield', $en);
+        $this->assertContains('Reading paused', $en);
+        $this->assertNotContains(WatermarkService::GUEST, $en, 'identity codes live in the image pixels, not in the page');
+        $ar = require BASE_PATH . '/resources/lang/ar.php';
+        foreach (['reader.shield_title', 'reader.shield_text', 'reader.shield_resume', 'reader.capture_notice'] as $key) {
+            $this->assertTrue(isset($ar[$key]) && preg_match('/\p{Arabic}/u', $ar[$key]) === 1, "Arabic text for $key");
+        }
     }
 
     public function testThumbnailsAreWatermarkedToo(): void

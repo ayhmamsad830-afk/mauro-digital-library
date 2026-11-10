@@ -14,6 +14,7 @@ $manifest['i18n'] = [
     'copyBlocked' => __('reader.copy_blocked'),
     'thumbLabel' => __('reader.thumb_label'),
     'bookmarkSaved' => __('member.bookmark_added'),
+    'captureNotice' => __('reader.capture_notice'),
 ];
 ?>
 <div class="reader" data-reader data-manifest="<?= e(json_encode($manifest, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) ?>">
@@ -61,6 +62,17 @@ $manifest['i18n'] = [
                     <p><?= e(__('reader.load_error')) ?></p>
                     <button type="button" class="btn btn--secondary btn--sm" data-action="retry"><?= e(__('common.retry')) ?></button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Shown while the reader is in the background (tab hidden / window not focused).
+             Deterrence only: it cannot stop operating-system screenshots. -->
+        <div class="reader-shield" data-shield hidden role="status" aria-live="polite">
+            <div class="reader-shield__card">
+                <?= icon('shield', 'reader-shield__icon') ?>
+                <p class="reader-shield__title"><?= e(__('reader.shield_title')) ?></p>
+                <p class="reader-shield__text"><?= e(__('reader.shield_text')) ?></p>
+                <button type="button" class="btn btn--secondary btn--sm" data-action="unshield"><?= e(__('reader.shield_resume')) ?></button>
             </div>
         </div>
 

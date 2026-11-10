@@ -86,7 +86,8 @@ final class ReaderApiController extends Controller
         RateLimiter::enforce($bucket, "rs:$rs");
         RateLimiter::enforce($bucket, 'ip:' . $request->ip());
 
-        $response = PageDeliveryService::render($a['file']['id'], $page, $variant, (string) $a['session']['reader_pseudonym']);
+        $owner = $a['session']['user_id'] !== null ? (int) $a['session']['user_id'] : null;
+        $response = PageDeliveryService::render($a['file']['id'], $page, $variant, (string) $a['session']['reader_pseudonym'], $owner);
         if ($variant === 'page') {
             \App\Core\Database::query(
                 'UPDATE reading_sessions SET pages_viewed = pages_viewed + 1, last_activity_at = :t WHERE id = :id',

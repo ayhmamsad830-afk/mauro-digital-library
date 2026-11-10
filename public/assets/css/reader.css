@@ -11,7 +11,8 @@
 .plain-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
 .h4 { font-size: var(--fs-md); margin: 0; }
 
-:root { --desk: #f3f5fb; --desk-edge: #e3e8f4; --bar: rgb(243 245 251 / 86%); --bezel: #20263a; --bezel-edge: #151a29; --track: #d3d9e8; --sky: none; }
+/* Light = Pearl Cosmic desk: pearl centre, icy-lavender edge, calm for long reading. */
+:root { --desk: #f9f9fc; --desk-edge: #eceef6; --bar: rgb(250 250 253 / 86%); --bezel: #20263a; --bezel-edge: #151a29; --track: #dcdfec; --sky: none; }
 :root[data-theme="dark"] { --desk: #0a1124; --desk-edge: #03060f; --bar: rgb(7 12 28 / 78%); --bezel: #02040a; --bezel-edge: #1d2a4a; --track: #1b2645; --sky: url("../images/background/cosmic-sky.jpg"); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --desk: #0a1124; --desk-edge: #03060f; --bar: rgb(7 12 28 / 78%); --bezel: #02040a; --bezel-edge: #1d2a4a; --track: #1b2645; --sky: url("../images/background/cosmic-sky.jpg"); } }
 
@@ -121,6 +122,30 @@
 .reader-info__head { display: flex; justify-content: space-between; align-items: center; }
 .reader-info h3 { margin: 0; }
 kbd { display: inline-block; min-width: 1.7em; padding: 0 .4em; border: 1px solid var(--c-border-strong); border-bottom-width: 2px; border-radius: 5px; background: var(--c-surface-2); text-align: center; font-size: .8em; }
+
+/* ---------- Background shield (reader.js) ----------
+   While the reader is in the background the page and thumbnails are blurred
+   beyond legibility and a short notice is shown. The page keeps its size, so
+   nothing shifts when reading resumes. */
+.reader-stage, .reader-thumbs { transition: filter .2s var(--ease), opacity .2s var(--ease); }
+.reader.is-shielded .reader-stage,
+.reader.is-shielded .reader-thumbs { filter: blur(26px) saturate(.4); opacity: .35; pointer-events: none; }
+.reader-shield { position: absolute; inset: 0; z-index: 25; display: grid; place-items: center; padding: 1rem; }
+.reader-shield[hidden] { display: none; }
+.reader-shield__card {
+    max-width: 24rem; display: grid; justify-items: center; gap: .5rem; text-align: center;
+    padding: 1.4rem 1.5rem; border-radius: 18px;
+    background: color-mix(in srgb, var(--c-surface) 92%, transparent);
+    border: 1px solid var(--c-border);
+    box-shadow: var(--shadow-lg);
+    animation: rise-in .2s var(--ease);
+}
+.reader-shield__icon { width: 28px; height: 28px; color: var(--c-primary); }
+.reader-shield__title { margin: 0; font-weight: 700; color: var(--c-text); }
+.reader-shield__text { margin: 0 0 .4rem; font-size: var(--fs-sm); color: var(--c-muted); line-height: 1.7; }
+@media (prefers-reduced-motion: reduce) {
+    .reader-stage, .reader-thumbs { transition: none; }
+}
 
 @media (max-width: 760px) {
     .reader-thumbs { position: absolute; inset-block: 0; inset-inline-start: 0; z-index: 15; box-shadow: var(--shadow-lg); width: 140px; background: var(--c-surface); }

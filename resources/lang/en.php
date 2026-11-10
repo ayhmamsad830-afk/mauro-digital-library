@@ -248,6 +248,10 @@ return [
     'reader.no_search_title' => 'Search inside the book is unavailable',
     'reader.no_search_text' => 'Pages are delivered as images without a text layer, so full-text search inside the book is not available in this version. You can search titles and authors from the library.',
     'reader.protection_text' => 'Pages carry a built-in watermark. No website can reliably prevent screenshots or photos of the screen.',
+    'reader.shield_title' => 'Reading paused',
+    'reader.shield_text' => 'The page is hidden while the reader is in the background. Pages carry a personal watermark that identifies this reading session.',
+    'reader.shield_resume' => 'Continue reading',
+    'reader.capture_notice' => 'Reminder: every page carries a personal watermark linked to this reading session.',
 
     'auth.title' => 'Sign in',
     'auth.subtitle' => 'An account is optional. Reading is open to everyone without signing up.',

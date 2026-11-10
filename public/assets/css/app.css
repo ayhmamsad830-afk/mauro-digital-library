@@ -77,22 +77,22 @@
     --starlight: #e6ebf7;   /* soft white type */
     --white: #ffffff;
 
-    /* Colour roles — light */
-    --c-bg: #f5f7fc;
+    /* Colour roles — light: "Pearl Cosmic" — pearl white, icy blue, a breath of lavender */
+    --c-bg: #f8f8fc;               /* pearl */
     --c-surface: var(--white);
-    --c-surface-2: #eef1f9;
-    --c-surface-3: #e2e7f3;
-    --c-text: #141b33;
-    --c-muted: #525c78;
-    --c-border: #e0e5f0;
-    --c-border-strong: #c3cbe0;
+    --c-surface-2: #f2f3f9;
+    --c-surface-3: #e8eaf4;
+    --c-text: #151a30;             /* 16:1 on pearl */
+    --c-muted: #535b75;            /* 6.6:1 on pearl */
+    --c-border: #e5e6f0;
+    --c-border-strong: #cbcfe0;
     --c-primary: #2b55c9;
     --c-primary-strong: #1d3f9e;
-    --c-primary-soft: #e5ecfc;
+    --c-primary-soft: #e9effc;     /* icy blue */
     --c-on-primary: #ffffff;
-    --c-accent: #6a4fd0;
-    --c-accent-text: #5a3fc0;     /* violet dark enough for text on white (AA) */
-    --c-accent-soft: #eeeafc;
+    --c-accent: #6b55c8;
+    --c-accent-text: #5940b8;      /* lavender dark enough for text on white (AA) */
+    --c-accent-soft: #f1edfb;
     --c-focus: #2b55c9;
     --c-success: #2f7a4a;
     --c-success-soft: #e0efe4;
@@ -105,17 +105,18 @@
     --c-ink: #0a1024;              /* deep band backgrounds (footer, feature panels) */
     --c-on-ink: var(--starlight);
     --c-on-ink-muted: #9aa6c2;
-    --c-header: rgb(245 247 252 / 82%);
-    --c-glow: rgb(43 85 201 / 22%);   /* hover light around book covers */
+    --c-header: rgb(250 250 253 / 80%);
+    --c-glow: rgb(110 145 235 / 26%);   /* icy light around hovered book covers */
 
     --radius-sm: 8px;
     --radius: 14px;
     --radius-lg: 22px;
     --radius-pill: 999px;
-    --shadow-sm: 0 1px 2px rgb(20 27 51 / 6%);
-    --shadow: 0 1px 2px rgb(20 27 51 / 5%), 0 10px 28px -8px rgb(20 27 51 / 12%);
-    --shadow-lg: 0 2px 6px rgb(20 27 51 / 7%), 0 28px 56px -16px rgb(20 27 51 / 24%);
-    --shadow-book: 0 1px 1px rgb(20 27 51 / 10%), 0 6px 14px -4px rgb(20 27 51 / 22%), 0 22px 40px -18px rgb(20 27 51 / 32%);
+    /* Soft ambient shadows, tinted towards indigo rather than grey. */
+    --shadow-sm: 0 1px 2px rgb(48 52 96 / 6%);
+    --shadow: 0 1px 2px rgb(48 52 96 / 5%), 0 12px 30px -10px rgb(48 52 96 / 12%);
+    --shadow-lg: 0 2px 6px rgb(48 52 96 / 6%), 0 30px 60px -18px rgb(48 52 96 / 22%);
+    --shadow-book: 0 1px 1px rgb(48 52 96 / 10%), 0 6px 14px -4px rgb(48 52 96 / 18%), 0 22px 40px -18px rgb(48 52 96 / 28%);
 
     --container: 1220px;
     --gutter: clamp(16px, 4vw, 36px);
