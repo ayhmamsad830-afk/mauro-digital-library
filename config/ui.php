@@ -17,4 +17,8 @@ return [
     'home_latest' => 6,
     'home_popular' => 8,
     'home_categories' => 8,
+
+    // Cosmic cursor trail on public pages (desktop mouse + dark theme only; always
+    // off for touch, reduced motion and low-power devices). UI_CURSOR_TRAIL=false disables it.
+    'cursor_trail' => (bool) env('UI_CURSOR_TRAIL', true),
 ];

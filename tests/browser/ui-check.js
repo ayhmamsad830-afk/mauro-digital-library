@@ -122,7 +122,8 @@ async function newPage(browser, vp, cookies = []) {
         const persisted = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
         ok(persisted === after, `theme: persisted after reload (${persisted})`);
         const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-        ok(after === 'dark' ? bg === 'rgb(18, 23, 21)' : bg === 'rgb(245, 240, 230)', `theme: body background matches (${bg})`);
+        // Cosmic palette: deep-space navy (dark) / bright cool white (light).
+        ok(after === 'dark' ? bg === 'rgb(6, 10, 23)' : bg === 'rgb(245, 247, 252)', `theme: body background matches (${bg})`);
         await ctx.close();
     }
 
@@ -178,6 +179,34 @@ async function newPage(browser, vp, cookies = []) {
         ok(!/\.pdf\b/i.test(html), `reader/${vpName}: no .pdf reference in markup`);
         ok(page._errors.length === 0, `reader/${vpName}: JS errors ${page._errors.join(' | ')}`);
         await ctx.close();
+    }
+
+    // 6. Cosmic atmosphere: decorative only, never hides content, honours reduced motion
+    {
+        const { ctx, page } = await newPage(browser, VIEWPORTS.desktop);
+        await page.goto(BASE + '/');
+        const sky = await page.evaluate(() => ({
+            layer: !!document.querySelector('.cosmos[aria-hidden="true"]'),
+            stars: document.querySelectorAll('.cosmos .star').length,
+        }));
+        ok(sky.layer && sky.stars > 0, `cosmic: sky layer + twinkling stars (${JSON.stringify(sky)})`);
+        for (let i = 0; i < 14; i++) { await page.mouse.wheel(0, 600); await page.waitForTimeout(120); }
+        await page.waitForTimeout(1200);
+        const hidden = await page.evaluate(() => [...document.querySelectorAll('.reveal')].filter(e => getComputedStyle(e).opacity < 0.99).length);
+        ok(hidden === 0, `cosmic: all scroll-reveal content visible after scrolling (${hidden} hidden)`);
+        ok(page._errors.length === 0, `cosmic: JS errors ${page._errors.join(' | ')}`);
+        await ctx.close();
+
+        const rm = await browser.newContext({ viewport: VIEWPORTS.desktop, reducedMotion: 'reduce' });
+        const p2 = await rm.newPage();
+        await p2.goto(BASE + '/');
+        const still = await p2.evaluate(() => ({
+            stars: document.querySelectorAll('.star').length,
+            reveal: document.querySelectorAll('.reveal').length,
+            trail: !!document.querySelector('.cursor-trail'),
+        }));
+        ok(still.stars === 0 && still.reveal === 0 && !still.trail, `cosmic: reduced motion disables decorative effects (${JSON.stringify(still)})`);
+        await rm.close();
     }
 
     await browser.close();

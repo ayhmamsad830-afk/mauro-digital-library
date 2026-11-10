@@ -5,7 +5,12 @@
 @media (max-width: 640px) { .hide-sm { display: none !important; } }
 .h4 { font-size: var(--fs-md); margin: 0; display: flex; align-items: center; gap: .45rem; }
 
-.admin-body { background: var(--c-bg) url("../images/background/starry-sky.jpg") center / cover no-repeat fixed; }
+/* Admin is a work tool: a calm, static version of the sky (no animation). */
+.admin-body { background: radial-gradient(60rem 40rem at 100% 0%, rgb(79 140 255 / 7%), transparent 65%), var(--c-bg); }
+:root[data-theme="dark"] .admin-body { background: linear-gradient(rgb(6 10 23 / 80%), rgb(6 10 23 / 92%)), #060a17 url("../images/background/cosmic-sky.jpg") center / cover no-repeat fixed; }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .admin-body { background: linear-gradient(rgb(6 10 23 / 80%), rgb(6 10 23 / 92%)), #060a17 url("../images/background/cosmic-sky.jpg") center / cover no-repeat fixed; }
+}
 .admin { display: grid; grid-template-columns: 268px minmax(0, 1fr); min-height: 100vh; }
 .admin-sidebar-wrap { display: block; position: sticky; top: 0; height: 100vh; }
 .admin-sidebar-wrap .drawer__backdrop { display: none; }

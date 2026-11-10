@@ -6,6 +6,10 @@
  * @var list<array> $categories
  * @var list<array> $continueReading
  */
+// "Most read" is ranked by books.reads_count (real reader sessions). Books nobody
+// has opened yet carry no reading signal, so they are left out; with no reads at
+// all the section is hidden rather than showing an arbitrary order.
+$popular = array_values(array_filter($popular, static fn (array $b): bool => (int) ($b['reads_count'] ?? 0) > 0));
 $hasBooks = $latest !== [] || $popular !== [];
 // Real catalogue covers fanned behind the featured book (decorative, no extra query).
 $shelf = [];

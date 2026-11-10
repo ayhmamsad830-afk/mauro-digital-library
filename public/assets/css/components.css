@@ -197,18 +197,12 @@ legend { font-weight: 700; padding-inline: .45rem; }
    card lifts and gains a thin solid offset shadow in the accent colour. */
 .book-card {
     --offset: 7px;                       /* cover backdrop offset */
-    --lift-x: 4px;                       /* hover offset shadow, mirrored in RTL */
     position: relative; display: flex; flex-direction: column; gap: 1rem; width: 100%;
     padding: .9rem .9rem 1rem;
     background: var(--c-surface);
-    border-radius: 6px;
-    box-shadow: 0 1px 2px rgb(36 41 35 / 4%), 0 10px 28px -14px rgb(36 41 35 / 16%);
-    transition: transform .3s var(--ease), box-shadow .3s var(--ease);
-}
-[dir="rtl"] .book-card { --lift-x: -4px; }
-.book-card:hover, .book-card:focus-within {
-    transform: translateY(-3px);
-    box-shadow: var(--lift-x) 4px 0 0 var(--c-primary), 0 14px 30px -16px rgb(36 41 35 / 22%);
+    border-radius: 10px;
+    box-shadow: 0 0 0 1px var(--c-border), 0 10px 28px -16px rgb(20 27 51 / 18%);
+    transition: transform .45s var(--ease-out, var(--ease)), box-shadow .45s var(--ease-out, var(--ease)), background-color .3s;
 }
 
 /* Cover on an offset panel (the panel peeks out at the start-bottom corner). */
@@ -217,15 +211,27 @@ legend { font-weight: 700; padding-inline: .45rem; }
     content: ""; position: absolute; z-index: 0;
     inset-block: var(--offset) 0; inset-inline: 0 var(--offset);
     border-radius: 4px 12px 4px 12px;
-    background: color-mix(in srgb, var(--c-accent) 26%, var(--c-surface));
-    transition: transform .35s var(--ease);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--c-primary) 20%, var(--c-surface)), color-mix(in srgb, var(--c-accent) 18%, var(--c-surface)));
+    transition: transform .45s var(--ease-out, var(--ease)), opacity .45s;
 }
-.book-card__media .cover { position: relative; z-index: 1; border-radius: 4px 12px 4px 12px; }
+.book-card__media .cover { position: relative; z-index: 1; border-radius: 4px 12px 4px 12px; transition: box-shadow .45s var(--ease-out, var(--ease)); }
 [dir="rtl"] .book-card__media .cover, [dir="rtl"] .book-card__media::before { border-radius: 12px 4px 12px 4px; }
-.book-card__media .cover > * { transition: transform .5s var(--ease); }
-.book-card:hover .book-card__media .cover > * { transform: scale(1.03); }
-.book-card:hover .book-card__media::before { transform: translate(calc(var(--lift-x) * -.5), 2px); }
+.book-card__media .cover > * { transition: transform .6s var(--ease-out, var(--ease)); }
 .book-card__badge { position: absolute; top: .5rem; inset-inline-end: .5rem; z-index: 3; }
+
+/* Hover / keyboard focus: the card rises, the cover catches a soft blue light. */
+.book-card:hover,
+.book-card:focus-within {
+    transform: translateY(-6px);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--c-primary) 35%, var(--c-border)), 0 26px 50px -24px rgb(20 27 51 / 35%), 0 0 42px -14px var(--c-glow);
+}
+.book-card:hover .book-card__media .cover,
+.book-card:focus-within .book-card__media .cover {
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--c-primary) 40%, transparent), 0 12px 30px -10px var(--c-glow), 0 0 34px -6px var(--c-glow);
+}
+.book-card:hover .book-card__media .cover > * { transform: scale(1.045); }
+.book-card:hover .book-card__media::before { transform: translate(calc(var(--offset) * -.4), 3px); opacity: .85; }
+[dir="rtl"] .book-card:hover .book-card__media::before { transform: translate(calc(var(--offset) * .4), 3px); }
 
 .book-card__body { display: flex; flex-direction: column; gap: .3rem; flex: 1; min-width: 0; }
 .book-card__category {
@@ -241,7 +247,7 @@ html[lang="ar"] .book-card__category { letter-spacing: 0; text-transform: none; 
 html[lang="ar"] .book-card__title { line-height: 1.55; min-height: calc(2 * 1.55em); font-size: 1.1rem; letter-spacing: 0; padding-top: .05em; }
 .book-card__link { color: var(--c-text); text-decoration: none; transition: color var(--dur); }
 .book-card__link::after { content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: 2; } /* whole card (cover included) opens the book */
-.book-card__link:hover { color: var(--c-primary); }
+.book-card__link:hover, .book-card:hover .book-card__link { color: var(--c-primary-strong); }
 .book-card__link:focus-visible { outline: none; }
 .book-card:has(.book-card__link:focus-visible) { outline: 2px solid var(--c-focus); outline-offset: 3px; }
 .book-card__author { margin: 0; font-size: var(--fs-sm); color: var(--c-muted); line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
@@ -263,18 +269,14 @@ html[lang="ar"] .book-card__title { line-height: 1.55; min-height: calc(2 * 1.55
 .book-card__read:hover .icon { transform: translateX(2px); }
 [dir="rtl"] .book-card__read:hover .icon { transform: scaleX(-1) translateX(2px); }
 
-/* Dark: elevated charcoal card, gold accents. */
-:root[data-theme="dark"] .book-card { background: color-mix(in srgb, var(--c-surface-2) 55%, var(--c-surface)); box-shadow: 0 0 0 1px rgb(255 255 255 / 4%), 0 12px 30px -16px rgb(0 0 0 / 70%); }
-:root[data-theme="dark"] .book-card:hover, :root[data-theme="dark"] .book-card:focus-within { box-shadow: var(--lift-x) 4px 0 0 rgb(210 166 108 / 60%), 0 14px 30px -16px rgb(0 0 0 / 70%); }
-:root[data-theme="dark"] .book-card__media::before { background: rgb(210 166 108 / 16%); }
-:root[data-theme="dark"] .book-card__read { color: #ddb684; }
+/* Dark: a translucent midnight card over the sky, hairline starlight border. */
+:root[data-theme="dark"] .book-card { background: color-mix(in srgb, var(--c-surface) 84%, transparent); box-shadow: 0 0 0 1px rgb(122 167 255 / 9%), 0 14px 32px -18px rgb(0 0 0 / 80%); }
+:root[data-theme="dark"] .book-card:hover, :root[data-theme="dark"] .book-card:focus-within { background: color-mix(in srgb, var(--c-surface-2) 90%, transparent); box-shadow: 0 0 0 1px rgb(122 167 255 / 28%), 0 28px 54px -24px rgb(0 0 0 / 85%), 0 0 46px -12px var(--c-glow); }
 :root[data-theme="dark"] .cover { box-shadow: 0 0 0 1px rgb(255 255 255 / 6%), 0 4px 10px -6px rgb(0 0 0 / 50%); }
 :root[data-theme="dark"] .rail__btn { box-shadow: none; }
 @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .book-card { background: color-mix(in srgb, var(--c-surface-2) 55%, var(--c-surface)); box-shadow: 0 0 0 1px rgb(255 255 255 / 4%), 0 12px 30px -16px rgb(0 0 0 / 70%); }
-    :root:not([data-theme="light"]) .book-card:hover, :root:not([data-theme="light"]) .book-card:focus-within { box-shadow: var(--lift-x) 4px 0 0 rgb(210 166 108 / 60%), 0 14px 30px -16px rgb(0 0 0 / 70%); }
-    :root:not([data-theme="light"]) .book-card__media::before { background: rgb(210 166 108 / 16%); }
-    :root:not([data-theme="light"]) .book-card__read { color: #ddb684; }
+    :root:not([data-theme="light"]) .book-card { background: color-mix(in srgb, var(--c-surface) 84%, transparent); box-shadow: 0 0 0 1px rgb(122 167 255 / 9%), 0 14px 32px -18px rgb(0 0 0 / 80%); }
+    :root:not([data-theme="light"]) .book-card:hover, :root:not([data-theme="light"]) .book-card:focus-within { background: color-mix(in srgb, var(--c-surface-2) 90%, transparent); box-shadow: 0 0 0 1px rgb(122 167 255 / 28%), 0 28px 54px -24px rgb(0 0 0 / 85%), 0 0 46px -12px var(--c-glow); }
     :root:not([data-theme="light"]) .cover { box-shadow: 0 0 0 1px rgb(255 255 255 / 6%), 0 4px 10px -6px rgb(0 0 0 / 50%); }
     :root:not([data-theme="light"]) .rail__btn { box-shadow: none; }
 }
@@ -283,8 +285,14 @@ html[lang="ar"] .book-card__title { line-height: 1.55; min-height: calc(2 * 1.55
     .book-card__title { font-size: 1.02rem; }
     .book-card__foot { flex-wrap: wrap; row-gap: 0; }
 }
-@media (prefers-reduced-motion: reduce) {
+/* Touch screens: no sticky hover lift after a tap; a gentle press instead. */
+@media (hover: none) {
     .book-card:hover, .book-card:focus-within { transform: none; }
+    .book-card:hover .book-card__media .cover > *, .book-card:hover .book-card__media::before { transform: none; }
+    .book-card:active { transform: scale(.985); transition-duration: .15s; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .book-card:hover, .book-card:focus-within, .book-card:active { transform: none; }
     .book-card:hover .book-card__media .cover > *, .book-card:hover .book-card__media::before { transform: none; }
 }
 

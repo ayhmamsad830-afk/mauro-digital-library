@@ -158,6 +158,7 @@
 
     function go(n, opts) {
         n = Math.min(total, Math.max(1, n | 0));
+        turn = n > page ? 1 : (n < page ? -1 : 0);
         page = n;
         loadingEl.hidden = false;
         errorEl.hidden = true;
@@ -175,11 +176,28 @@
         preload(n + 1); preload(n - 1);
     }
 
+    /* Page transition: purely visual, played AFTER the new page has loaded, so it
+       never delays loading, navigation or progress saving. A short fade, plus a
+       slight slide in the direction of travel (mirrored for right-to-left books).
+       Skipped when reduced motion is requested or the Web Animations API is missing. */
+    var turn = 0;
+    var reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    function animateTurn() {
+        if (reduceMotion || typeof img.animate !== 'function') return;
+        var dx = turn * (rtl ? -1 : 1) * 22;
+        img.animate(
+            [{ opacity: 0, transform: 'translateX(' + dx + 'px)' }, { opacity: 1, transform: 'translateX(0)' }],
+            { duration: turn ? 320 : 240, easing: 'cubic-bezier(.16, 1, .3, 1)' }
+        );
+        turn = 0;
+    }
+
     img.addEventListener('load', function () {
         retried = false;
         loadingEl.hidden = true;
         img.classList.remove('is-loading');
         applySize();
+        animateTurn();
     });
     var retried = false;
     img.addEventListener('error', function () {

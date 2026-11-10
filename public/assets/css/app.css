@@ -4,8 +4,10 @@
    Files:  app.css (this)  → components.css → pages.css  (+ reader.css, admin.css)
    Logical properties (inline/block) are used everywhere so one stylesheet
    serves RTL (Arabic, default) and LTR (English).
-   Direction: "premium editorial digital library" — warm ivory paper, deep
-   teal ink, restrained muted-gold accents; a calm "night library" in dark.
+   Direction: "premium cosmic digital library" — deep-space navy and midnight
+   blue, electric-blue accents, a whisper of cosmic violet, soft white type.
+   Dark (default) is the night sky; light is a bright, clean daylight version.
+   Motion and the animated sky live in cosmic.css / cosmic.js.
    ========================================================================== */
 
 /* ---------- 0. Self-hosted fonts (OFL, /assets/fonts — no external requests) ----------
@@ -67,51 +69,53 @@
     --sp-1: .25rem; --sp-2: .5rem; --sp-3: .75rem; --sp-4: 1rem;
     --sp-5: 1.5rem; --sp-6: 2rem; --sp-7: 3rem; --sp-8: 4.5rem;
 
-    /* Brand palette */
-    --ivory: #f5f0e6;
-    --teal: #195f59;
-    --gold: #b98a52;
-    --charcoal: #242923;
+    /* Brand palette — cosmic */
+    --space: #060a17;       /* deep space navy */
+    --midnight: #0d1428;    /* midnight blue */
+    --electric: #4f8cff;    /* electric blue accent */
+    --nebula: #8b7cf6;      /* subtle cosmic violet */
+    --starlight: #e6ebf7;   /* soft white type */
     --white: #ffffff;
 
-    /* Colour roles — light (default) */
-    --c-bg: var(--ivory);
+    /* Colour roles — light */
+    --c-bg: #f5f7fc;
     --c-surface: var(--white);
-    --c-surface-2: #ede6d8;
-    --c-surface-3: #e3d9c6;
-    --c-text: var(--charcoal);
-    --c-muted: #5c635b;
-    --c-border: #e2d8c6;
-    --c-border-strong: #cbbda3;
-    --c-primary: var(--teal);
-    --c-primary-strong: #124843;
-    --c-primary-soft: #dcebe6;
+    --c-surface-2: #eef1f9;
+    --c-surface-3: #e2e7f3;
+    --c-text: #141b33;
+    --c-muted: #525c78;
+    --c-border: #e0e5f0;
+    --c-border-strong: #c3cbe0;
+    --c-primary: #2b55c9;
+    --c-primary-strong: #1d3f9e;
+    --c-primary-soft: #e5ecfc;
     --c-on-primary: #ffffff;
-    --c-accent: var(--gold);
-    --c-accent-text: #87602f;     /* gold dark enough for text on ivory (AA) */
-    --c-accent-soft: #f1e5d3;
-    --c-focus: var(--teal);
+    --c-accent: #6a4fd0;
+    --c-accent-text: #5a3fc0;     /* violet dark enough for text on white (AA) */
+    --c-accent-soft: #eeeafc;
+    --c-focus: #2b55c9;
     --c-success: #2f7a4a;
     --c-success-soft: #e0efe4;
     --c-warning: #84570a;
     --c-warning-soft: #f8ecd0;
     --c-danger: #a23b2a;
     --c-danger-soft: #f7e0da;
-    --c-star: #b98a52;
-    --c-overlay: rgb(36 41 35 / 48%);
-    --c-ink: var(--charcoal);      /* deep band backgrounds (footer, feature panels) */
-    --c-on-ink: #f1ebdf;
-    --c-on-ink-muted: #b9b6aa;
-    --c-header: rgb(245 240 230 / 86%);
+    --c-star: #c08a1e;
+    --c-overlay: rgb(10 16 36 / 50%);
+    --c-ink: #0a1024;              /* deep band backgrounds (footer, feature panels) */
+    --c-on-ink: var(--starlight);
+    --c-on-ink-muted: #9aa6c2;
+    --c-header: rgb(245 247 252 / 82%);
+    --c-glow: rgb(43 85 201 / 22%);   /* hover light around book covers */
 
     --radius-sm: 8px;
     --radius: 14px;
     --radius-lg: 22px;
     --radius-pill: 999px;
-    --shadow-sm: 0 1px 2px rgb(36 41 35 / 6%);
-    --shadow: 0 1px 2px rgb(36 41 35 / 5%), 0 10px 28px -8px rgb(36 41 35 / 12%);
-    --shadow-lg: 0 2px 6px rgb(36 41 35 / 7%), 0 28px 56px -16px rgb(36 41 35 / 24%);
-    --shadow-book: 0 1px 1px rgb(36 41 35 / 10%), 0 6px 14px -4px rgb(36 41 35 / 22%), 0 22px 40px -18px rgb(36 41 35 / 32%);
+    --shadow-sm: 0 1px 2px rgb(20 27 51 / 6%);
+    --shadow: 0 1px 2px rgb(20 27 51 / 5%), 0 10px 28px -8px rgb(20 27 51 / 12%);
+    --shadow-lg: 0 2px 6px rgb(20 27 51 / 7%), 0 28px 56px -16px rgb(20 27 51 / 24%);
+    --shadow-book: 0 1px 1px rgb(20 27 51 / 10%), 0 6px 14px -4px rgb(20 27 51 / 22%), 0 22px 40px -18px rgb(20 27 51 / 32%);
 
     --container: 1220px;
     --gutter: clamp(16px, 4vw, 36px);
@@ -122,35 +126,37 @@
     color-scheme: light;
 }
 
-/* Dark: "night library" — deep green-charcoal, warm ivory text, restrained gold. */
+/* Dark (default): the night sky — deep navy, soft white type, electric-blue light. */
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-        --c-bg: #121715; --c-surface: #1a201d; --c-surface-2: #222a26; --c-surface-3: #2b3530;
-        --c-text: #ece6da; --c-muted: #a6ada4; --c-border: #2d3732; --c-border-strong: #43504a;
-        --c-primary: #79c2b6; --c-primary-strong: #a2d8ce; --c-primary-soft: #1b3531; --c-on-primary: #0d1916;
-        --c-accent: #d2a66c; --c-accent-text: #ddb684; --c-accent-soft: #352a1c; --c-focus: #d2a66c;
-        --c-success: #79c896; --c-success-soft: #1b3325; --c-warning: #e4be66; --c-warning-soft: #392f19;
-        --c-danger: #f08c7a; --c-danger-soft: #3d221d; --c-star: #d6aa6e; --c-overlay: rgb(0 0 0 / 62%);
-        --c-ink: #0c100e; --c-on-ink: #ece6da; --c-on-ink-muted: #9da59c; --c-header: rgb(18 23 21 / 84%);
-        --shadow-sm: 0 1px 2px rgb(0 0 0 / 35%);
-        --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 10px 28px -8px rgb(0 0 0 / 45%);
-        --shadow-lg: 0 2px 6px rgb(0 0 0 / 35%), 0 28px 56px -16px rgb(0 0 0 / 60%);
-        --shadow-book: 0 1px 1px rgb(0 0 0 / 40%), 0 6px 14px -4px rgb(0 0 0 / 50%), 0 22px 40px -18px rgb(0 0 0 / 70%);
+        --c-bg: #060a17; --c-surface: #0d1428; --c-surface-2: #131c36; --c-surface-3: #1a2545;
+    --c-text: #e6ebf7; --c-muted: #9ba7c4; --c-border: #1e2944; --c-border-strong: #33416a;
+    --c-primary: #7aa7ff; --c-primary-strong: #a9c6ff; --c-primary-soft: #14224a; --c-on-primary: #050b1d;
+    --c-accent: #a996f6; --c-accent-text: #bcadfb; --c-accent-soft: #221c45; --c-focus: #8fb4ff;
+    --c-success: #6fd09a; --c-success-soft: #13301f; --c-warning: #e4be66; --c-warning-soft: #392f19;
+    --c-danger: #f08c7a; --c-danger-soft: #3d221d; --c-star: #e7c06a; --c-overlay: rgb(2 4 12 / 66%);
+    --c-ink: #040712; --c-on-ink: #e6ebf7; --c-on-ink-muted: #8f9bb8; --c-header: rgb(6 10 23 / 72%);
+    --c-glow: rgb(79 140 255 / 38%);
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
+    --shadow: 0 1px 2px rgb(0 0 0 / 35%), 0 10px 28px -8px rgb(0 0 0 / 55%);
+    --shadow-lg: 0 2px 6px rgb(0 0 0 / 40%), 0 28px 56px -16px rgb(0 0 0 / 70%);
+    --shadow-book: 0 1px 1px rgb(0 0 0 / 45%), 0 6px 14px -4px rgb(0 0 0 / 55%), 0 22px 40px -18px rgb(0 0 0 / 75%);
         color-scheme: dark;
     }
 }
 :root[data-theme="dark"] {
-    --c-bg: #121715; --c-surface: #1a201d; --c-surface-2: #222a26; --c-surface-3: #2b3530;
-    --c-text: #ece6da; --c-muted: #a6ada4; --c-border: #2d3732; --c-border-strong: #43504a;
-    --c-primary: #79c2b6; --c-primary-strong: #a2d8ce; --c-primary-soft: #1b3531; --c-on-primary: #0d1916;
-    --c-accent: #d2a66c; --c-accent-text: #ddb684; --c-accent-soft: #352a1c; --c-focus: #d2a66c;
-    --c-success: #79c896; --c-success-soft: #1b3325; --c-warning: #e4be66; --c-warning-soft: #392f19;
-    --c-danger: #f08c7a; --c-danger-soft: #3d221d; --c-star: #d6aa6e; --c-overlay: rgb(0 0 0 / 62%);
-    --c-ink: #0c100e; --c-on-ink: #ece6da; --c-on-ink-muted: #9da59c; --c-header: rgb(18 23 21 / 84%);
-    --shadow-sm: 0 1px 2px rgb(0 0 0 / 35%);
-    --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 10px 28px -8px rgb(0 0 0 / 45%);
-    --shadow-lg: 0 2px 6px rgb(0 0 0 / 35%), 0 28px 56px -16px rgb(0 0 0 / 60%);
-    --shadow-book: 0 1px 1px rgb(0 0 0 / 40%), 0 6px 14px -4px rgb(0 0 0 / 50%), 0 22px 40px -18px rgb(0 0 0 / 70%);
+    --c-bg: #060a17; --c-surface: #0d1428; --c-surface-2: #131c36; --c-surface-3: #1a2545;
+    --c-text: #e6ebf7; --c-muted: #9ba7c4; --c-border: #1e2944; --c-border-strong: #33416a;
+    --c-primary: #7aa7ff; --c-primary-strong: #a9c6ff; --c-primary-soft: #14224a; --c-on-primary: #050b1d;
+    --c-accent: #a996f6; --c-accent-text: #bcadfb; --c-accent-soft: #221c45; --c-focus: #8fb4ff;
+    --c-success: #6fd09a; --c-success-soft: #13301f; --c-warning: #e4be66; --c-warning-soft: #392f19;
+    --c-danger: #f08c7a; --c-danger-soft: #3d221d; --c-star: #e7c06a; --c-overlay: rgb(2 4 12 / 66%);
+    --c-ink: #040712; --c-on-ink: #e6ebf7; --c-on-ink-muted: #8f9bb8; --c-header: rgb(6 10 23 / 72%);
+    --c-glow: rgb(79 140 255 / 38%);
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
+    --shadow: 0 1px 2px rgb(0 0 0 / 35%), 0 10px 28px -8px rgb(0 0 0 / 55%);
+    --shadow-lg: 0 2px 6px rgb(0 0 0 / 40%), 0 28px 56px -16px rgb(0 0 0 / 70%);
+    --shadow-book: 0 1px 1px rgb(0 0 0 / 45%), 0 6px 14px -4px rgb(0 0 0 / 55%), 0 22px 40px -18px rgb(0 0 0 / 75%);
     color-scheme: dark;
 }
 
@@ -162,7 +168,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: var(--c-bg) url("../images/background/starry-sky.jpg") center / cover no-repeat fixed;
+    background: var(--c-bg); /* the animated sky is the fixed .cosmos layer (cosmic.css) */
     color: var(--c-text);
     font-family: var(--font-body);
     font-size: var(--fs-base);
@@ -338,9 +344,9 @@ html[lang="ar"] .drawer__section-title { text-transform: none; letter-spacing: 0
     background: var(--c-ink); color: var(--c-on-ink);
     --c-muted: var(--c-on-ink-muted);
     --c-border: rgb(255 255 255 / 10%);
-    --c-focus: var(--gold);
+    --c-focus: #8fb4ff;
 }
-.site-footer::before { content: ""; display: block; height: 3px; background: linear-gradient(90deg, transparent, var(--gold) 20%, var(--gold) 80%, transparent); opacity: .55; }
+.site-footer::before { content: ""; display: block; height: 3px; background: linear-gradient(90deg, transparent, var(--electric) 25%, var(--nebula) 75%, transparent); opacity: .5; }
 .site-footer .brand, .site-footer .brand:hover { color: var(--c-on-ink); }
 .site-footer__grid {
     display: grid; gap: var(--sp-6); padding-block: var(--sp-7) var(--sp-6);
@@ -350,12 +356,12 @@ html[lang="ar"] .drawer__section-title { text-transform: none; letter-spacing: 0
 .site-footer__brand p { margin: 0; max-width: 30rem; }
 .site-footer__tagline { font-family: var(--font-display); font-size: var(--fs-md); color: var(--c-on-ink); }
 .site-footer__note { display: flex; gap: .45rem; align-items: flex-start; }
-.site-footer__note .icon { margin-top: .25em; color: var(--gold); }
-.site-footer h2 { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .1em; color: var(--gold); margin-bottom: .9rem; font-weight: 700; }
+.site-footer__note .icon { margin-top: .25em; color: #8fb4ff; }
+.site-footer h2 { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .1em; color: #a9c6ff; margin-bottom: .9rem; font-weight: 700; }
 html[lang="ar"] .site-footer h2 { text-transform: none; letter-spacing: 0; font-size: var(--fs-sm); }
 .site-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
 .site-footer a { color: var(--c-on-ink); text-decoration: none; opacity: .88; transition: opacity var(--dur), color var(--dur); }
-.site-footer a:hover { color: var(--c-on-ink); opacity: 1; text-decoration: underline; text-decoration-color: var(--gold); }
+.site-footer a:hover { color: var(--c-on-ink); opacity: 1; text-decoration: underline; text-decoration-color: var(--electric); }
 .site-footer__bottom {
     display: flex; flex-wrap: wrap; gap: var(--sp-3) var(--sp-5); justify-content: space-between;
     padding-block: var(--sp-4) var(--sp-5); border-top: 1px solid var(--c-border);

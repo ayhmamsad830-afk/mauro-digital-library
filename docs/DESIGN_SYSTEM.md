@@ -16,6 +16,8 @@ Live reference: `/styleguide` (demo mode only — `APP_DEMO_UI=true`, never in p
 | `public/assets/css/pages.css` | Home, catalogue, book details, auth, account, legal, styleguide, error pages |
 | `public/assets/css/reader.css` | Protected reader (page images only, `user-select: none`, hidden in print) |
 | `public/assets/css/admin.css` | Admin shell (sidebar → drawer on mobile) |
+| `public/assets/css/cosmic.css` | Cosmic sky layer, twinkling/shooting stars, scroll reveal, hero float, cursor trail (see `docs/COSMIC_ANIMATIONS_IMPLEMENTATION.md`) |
+| `public/assets/js/cosmic.js` | Decorative motion only: stars, shooting star, parallax, scroll reveal, cursor trail |
 | `public/assets/js/theme.js` | Applies saved theme before first paint |
 | `public/assets/js/app.js` | Theme toggle, drawers (focus trap, Esc), auto-submit selects, toasts, loading buttons |
 | `public/assets/js/reader.js` | Reader controller (navigation, zoom, fit, fullscreen, thumbnails, keyboard, swipe, guest progress, copy deterrence) |
@@ -23,6 +25,7 @@ Live reference: `/styleguide` (demo mode only — `APP_DEMO_UI=true`, never in p
 ## Tokens
 Colour: `--c-bg, --c-surface(-2/-3), --c-text, --c-muted, --c-border(-strong), --c-primary(-strong/-soft), --c-accent(-soft), --c-success/warning/danger(-soft), --c-star, --c-focus`.
 Dark values apply with `data-theme="dark"`, or by `prefers-color-scheme: dark` when the visitor has not chosen.
+Palette (cosmic, 2026-11): deep-space navy `#060a17`, midnight `#0d1428`, electric blue `#4f8cff`, cosmic violet `#8b7cf6`, soft white `#e6ebf7`; `--c-glow` is the blue light around hovered covers.
 Type scale `--fs-xs … --fs-3xl` (fluid `clamp`), spacing `--sp-1 … --sp-8`, radii, shadows, `--container`, `--gutter`, `--header-h`.
 
 ## Theme & language persistence

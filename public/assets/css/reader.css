@@ -1,23 +1,28 @@
 /* ==========================================================================
    Protected reader — page images only, no text layer.
    Selection/drag are disabled inside the reader only (spec §7.2).
-   Minimal reading: a calm ivory desk, the page framed like a reading device,
-   a centred small-caps title over a hairline progress bar, quiet controls.
+   Minimal reading: a calm midnight desk (a bright paper desk in light mode),
+   the page framed like a reading device, a centred title over a glowing
+   hairline progress bar, quiet floating controls. The sky here is static:
+   nothing moves around the page except the page itself when it turns.
    ========================================================================== */
 .hide-sm { }
 @media (max-width: 640px) { .hide-sm { display: none !important; } }
 .plain-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
 .h4 { font-size: var(--fs-md); margin: 0; }
 
-:root { --desk: #efe9df; --desk-edge: #e6dfd2; --bar: rgb(239 233 223 / 88%); --bezel: #3b3d3c; --bezel-edge: #2c2e2d; --track: #d8d0c1; }
-:root[data-theme="dark"] { --desk: #121715; --desk-edge: #0c100e; --bar: rgb(18 23 21 / 88%); --bezel: #050706; --bezel-edge: #2a332e; --track: #2b3530; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --desk: #121715; --desk-edge: #0c100e; --bar: rgb(18 23 21 / 88%); --bezel: #050706; --bezel-edge: #2a332e; --track: #2b3530; } }
+:root { --desk: #f3f5fb; --desk-edge: #e3e8f4; --bar: rgb(243 245 251 / 86%); --bezel: #20263a; --bezel-edge: #151a29; --track: #d3d9e8; --sky: none; }
+:root[data-theme="dark"] { --desk: #0a1124; --desk-edge: #03060f; --bar: rgb(7 12 28 / 78%); --bezel: #02040a; --bezel-edge: #1d2a4a; --track: #1b2645; --sky: url("../images/background/cosmic-sky.jpg"); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --desk: #0a1124; --desk-edge: #03060f; --bar: rgb(7 12 28 / 78%); --bezel: #02040a; --bezel-edge: #1d2a4a; --track: #1b2645; --sky: url("../images/background/cosmic-sky.jpg"); } }
 
-.reader-body { height: 100vh; height: 100dvh; overflow: hidden; background: var(--desk) url("../images/background/starry-sky.jpg") center / cover no-repeat fixed; }
+.reader-body { height: 100vh; height: 100dvh; overflow: hidden; background: var(--desk-edge); }
 .reader {
     display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto;
     height: 100vh; height: 100dvh;
-    background: radial-gradient(90% 70% at 50% 40%, var(--desk), var(--desk-edge));
+    background:
+        radial-gradient(90% 70% at 50% 40%, color-mix(in srgb, var(--desk) 86%, transparent), color-mix(in srgb, var(--desk-edge) 94%, transparent)),
+        var(--sky) center / cover no-repeat,
+        var(--desk-edge);
 }
 .reader:fullscreen { background: var(--desk); }
 
@@ -44,21 +49,28 @@
 .reader-zoom { min-width: 3rem; text-align: center; font-size: var(--fs-xs); font-weight: 600; font-variant-numeric: tabular-nums; color: var(--c-muted); }
 .reader-bar [aria-pressed="true"], .reader-bar [aria-expanded="true"] { color: var(--c-text) !important; background: color-mix(in srgb, var(--c-text) 9%, transparent) !important; }
 /* Hairline progress (as in a reading device) */
-.reader-progress { width: 100%; height: 3px; border-radius: 3px; background: var(--track); }
+.reader-progress { width: 100%; height: 3px; border-radius: 3px; background: var(--track); border: 0; -webkit-appearance: none; appearance: none; overflow: hidden; }
 .reader-progress::-webkit-progress-bar { background: var(--track); border-radius: 3px; }
-.reader-progress::-webkit-progress-value { background: color-mix(in srgb, var(--c-text) 55%, var(--desk)); border-radius: 3px; }
-.reader-progress::-moz-progress-bar { background: color-mix(in srgb, var(--c-text) 55%, var(--desk)); border-radius: 3px; }
+.reader-progress::-webkit-progress-value { background: linear-gradient(90deg, #4f8cff, #8b7cf6); border-radius: 3px; box-shadow: 0 0 8px rgb(79 140 255 / 60%); transition: width .35s var(--ease); }
+.reader-progress::-moz-progress-bar { background: linear-gradient(90deg, #4f8cff, #8b7cf6); border-radius: 3px; }
+[dir="rtl"] .reader-progress::-webkit-progress-value { background: linear-gradient(270deg, #4f8cff, #8b7cf6); }
 
+/* Bottom controls float as one quiet pill under the page. */
 .reader-bar--bottom {
-    display: flex; justify-content: center; gap: .5rem;
-    padding-block: .5rem max(.6rem, env(safe-area-inset-bottom));
-    background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none;
+    display: flex; justify-content: center; align-items: center; gap: .35rem;
+    justify-self: center; width: auto; max-width: calc(100% - 1.5rem);
+    margin-block-end: max(.6rem, env(safe-area-inset-bottom));
+    padding: .3rem .4rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--c-border-strong) 60%, transparent);
+    box-shadow: 0 14px 30px -18px rgb(0 0 0 / 60%);
 }
 .reader-nav { min-width: 44px; }
-.reader-bar--bottom .reader-nav { background: transparent; color: var(--c-muted); border: 1px solid transparent; font-weight: 600; }
-.reader-bar--bottom .reader-nav:hover { color: var(--c-text); border-color: var(--c-border-strong); background: transparent; }
+.reader-bar--bottom .reader-nav { background: transparent; color: var(--c-muted); border: 1px solid transparent; border-radius: 999px; font-weight: 600; transition: color var(--dur), background-color var(--dur), border-color var(--dur); }
+.reader-bar--bottom .reader-nav:hover:not(:disabled) { color: var(--c-text); background: color-mix(in srgb, var(--c-primary) 12%, transparent); border-color: color-mix(in srgb, var(--c-primary) 30%, transparent); }
+.reader-bar--bottom .reader-nav:disabled { opacity: .4; }
 .reader-goto { display: flex; align-items: center; gap: .35rem; font-variant-numeric: tabular-nums; font-size: var(--fs-sm); color: var(--c-muted); }
-.reader-goto__input { width: 3.6rem; min-height: 34px; text-align: center; padding: .2rem; border-radius: 8px; font-weight: 600; -moz-appearance: textfield; background: transparent; border-color: var(--c-border-strong); }
+.reader-goto__input { width: 3.6rem; min-height: 34px; text-align: center; padding: .2rem; border-radius: 999px; font-weight: 600; -moz-appearance: textfield; background: transparent; border-color: var(--c-border-strong); }
 .reader-goto__input::-webkit-inner-spin-button, .reader-goto__input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .reader-goto__total { white-space: nowrap; }
 
@@ -81,9 +93,18 @@
     border-radius: 3px;
     box-shadow: 0 0 0 12px var(--bezel), 0 0 0 13px var(--bezel-edge), 0 24px 50px -14px rgb(0 0 0 / 40%), 0 50px 90px -40px rgb(0 0 0 / 35%);
     -webkit-user-drag: none; user-select: none; pointer-events: none;
-    transition: opacity .2s var(--ease);
+    transition: opacity .25s var(--ease);
 }
+:root[data-theme="dark"] .reader-page__img { box-shadow: 0 0 0 12px var(--bezel), 0 0 0 13px var(--bezel-edge), 0 24px 50px -14px rgb(0 0 0 / 60%), 0 0 80px -30px rgb(79 140 255 / 35%); }
+/* While the next page loads the current one dims; reader.js fades/slides the new page in. */
 .reader-page__img.is-loading { opacity: .35; }
+/* Loading: a soft shimmer instead of a bare spinner (the spinner stays for screen readers). */
+.reader-page__state[data-page-loading]:not([hidden])::before {
+    content: ""; position: absolute; inset: 12px; border-radius: 3px; z-index: -1;
+    background: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--c-primary) 10%, transparent) 50%, transparent 70%) 0 0 / 250% 100%;
+    animation: reader-shimmer 1.6s linear infinite;
+}
+@keyframes reader-shimmer { from { background-position: 125% 0; } to { background-position: -125% 0; } }
 .reader-page__state { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: .75rem; text-align: center; padding: 1rem; }
 .reader-page__state--error { background: var(--c-surface); border: 1px dashed var(--c-border-strong); border-radius: var(--radius); }
 
@@ -93,7 +114,7 @@
 .reader-thumb { width: 100%; display: flex; flex-direction: column; align-items: center; gap: .35rem; padding: .4rem; border: 1px solid transparent; border-radius: 10px; background: none; color: var(--c-muted); font: inherit; font-size: var(--fs-xs); font-variant-numeric: tabular-nums; cursor: pointer; transition: border-color var(--dur), background-color var(--dur); }
 .reader-thumb img { width: 100%; height: auto; aspect-ratio: 180 / 254; background: #fff; box-shadow: var(--shadow-sm); border-radius: 2px; pointer-events: none; }
 .reader-thumb:hover { background: color-mix(in srgb, var(--c-text) 6%, transparent); }
-.reader-thumb[aria-current="page"] { border-color: var(--c-text); color: var(--c-text); font-weight: 700; }
+.reader-thumb[aria-current="page"] { border-color: var(--c-primary); color: var(--c-text); font-weight: 700; box-shadow: 0 0 18px -8px var(--c-glow); }
 
 /* ---------- Info panel ---------- */
 .reader-info { position: absolute; inset-block-start: .85rem; inset-inline-end: .85rem; width: min(350px, calc(100% - 1.7rem)); max-height: calc(100% - 1.7rem); overflow-y: auto; padding: var(--sp-5); z-index: 20; box-shadow: var(--shadow-lg); display: flex; flex-direction: column; gap: .8rem; animation: rise-in .2s var(--ease); }
