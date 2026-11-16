@@ -20,6 +20,6 @@ return [
     'watermark_cache' => $root . '/private/watermark-cache',
     'covers' => $root . '/private/covers',
     'temp' => $root . '/private/temp',
-    'pdf_max_bytes' => (int) env('PDF_MAX_UPLOAD_MB', 10) * 1024 * 1024,
+    'pdf_max_bytes' => (int) env('PDF_MAX_UPLOAD_MB', 500) * 1024 * 1024,
     'cover_max_bytes' => (int) env('COVER_MAX_UPLOAD_MB', 2) * 1024 * 1024,
 ];

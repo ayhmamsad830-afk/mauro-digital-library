@@ -60,7 +60,7 @@ On the book page, section **Cover** (الغلاف): choose a JPEG, PNG or WebP i
 
 ## 7. Upload the PDF and process it
 
-1. Section **PDF file**: choose the PDF (up to 10 MB) → **Upload** (رفع).
+1. Section **PDF file**: choose the PDF (up to 500 MB) → **Upload** (رفع).
 2. A version **v1** appears as **Waiting for processing** (بانتظار المعالجة).
 3. Books up to 60 pages: click **Process now** (معالجة الآن) and wait a few seconds.
    Longer books are processed automatically by the server within a few minutes — just come back later.

@@ -24,5 +24,11 @@ $val = static fn (string $k) => old($k, $values[$k]); ?>
         <p class="help" id="s-mail-help"><?= e(__('admin.set_contact_help')) ?></p>
         <?php if ($err = field_error('contact_email')): ?><p class="error-text" id="s-mail-err"><?= e($err) ?></p><?php endif; ?>
     </div>
+    <div class="field">
+        <label class="label" for="s-preview"><?= e(__('admin.set_preview')) ?></label>
+        <input class="input ltr" id="s-preview" type="number" name="guest_preview_pages" min="1" max="<?= e(\App\Services\GuestPreview::MAX_PAGES) ?>" step="1" inputmode="numeric" value="<?= e((string) $val('guest_preview_pages')) ?>" aria-describedby="s-preview-help<?= field_error('guest_preview_pages') ? ' s-preview-err' : '' ?>">
+        <p class="help" id="s-preview-help"><?= e(__('admin.set_preview_help')) ?></p>
+        <?php if ($err = field_error('guest_preview_pages')): ?><p class="error-text" id="s-preview-err"><?= e($err) ?></p><?php endif; ?>
+    </div>
     <div class="form-actions"><button class="btn btn--primary" type="submit"><?= e(__('styleguide.save')) ?></button></div>
 </form>

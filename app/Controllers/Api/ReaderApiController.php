@@ -9,6 +9,7 @@ use App\Core\HttpException;
 use App\Core\Request;
 use App\Core\Response;
 use App\Services\Auth;
+use App\Services\GuestPreview;
 use App\Services\RateLimiter;
 use App\Services\ReadingProgressService;
 use App\Services\Reader\PageDeliveryService;
@@ -81,6 +82,10 @@ final class ReaderApiController extends Controller
         if ($page < 1 || $page > $a['file']['pages']) {
             throw HttpException::notFound();
         }
+        // Guests: free preview only. Pages beyond it need a (free) account.
+        if (!GuestPreview::allows($page)) {
+            throw new HttpException(403, __('reader.preview_locked'));
+        }
         $rs = (int) $a['session']['id'];
         $bucket = $variant === 'thumb' ? 'reader_thumbs' : 'reader_pages';
         RateLimiter::enforce($bucket, "rs:$rs");
@@ -110,6 +115,7 @@ final class ReaderApiController extends Controller
             'thumbUrl' => "/api/books/$bookId/thumbnails/{n}",
             'token' => ['rs' => $rs] + ReaderTokenService::issue($rs, $bookId, $r['file']['id']),
             'member' => Auth::user() !== null,
+            'previewPages' => GuestPreview::limit(),
         ];
         if ($withProgress && ($uid = Auth::id())) {
             $data['progress'] = ReadingProgressService::get($uid, $bookId);

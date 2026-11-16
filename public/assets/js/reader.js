@@ -30,8 +30,13 @@
     var thumbs = root.querySelector('[data-thumbs]');
     var thumbsList = root.querySelector('[data-thumbs-list]');
     var info = root.querySelector('[data-info]');
+    var gate = root.querySelector('[data-gate]');
+    var shield = root.querySelector('[data-shield]');
 
     var total = Math.max(1, M.pageCount | 0); // updated by boot() once the session manifest arrives
+    // Guests: free preview of the first N pages (the server refuses later pages too). null = member.
+    var preview = M.previewPages ? (M.previewPages | 0) : null;
+    function locked(n) { return preview !== null && n > preview; }
     var rtl = M.dir === 'rtl';
     var page = 1;
     var fit = 'width';        // 'width' | 'page' | 'free'
@@ -78,7 +83,10 @@
             token = d.token;
             scheduleRenew();
             // Reload thumbnails that have not loaded yet with the fresh token.
-            if (thumbsList) thumbsList.querySelectorAll('img').forEach(function (t, i) { if (!t.complete || !t.naturalWidth) t.src = thumbUrl(i + 1); });
+            if (thumbsList) thumbsList.querySelectorAll('img').forEach(function (t) {
+                var n = +t.parentNode.getAttribute('data-goto-page');
+                if (n && (!t.complete || !t.naturalWidth)) t.src = thumbUrl(n);
+            });
         });
     }
 
@@ -89,6 +97,7 @@
             M.pageUrl = d.pageUrl; M.thumbUrl = d.thumbUrl;
             M.pageCount = d.pageCount; M.fileVersion = d.fileVersion; M.aspect = d.aspect;
             M.member = !!d.member; M.serverProgress = d.progress || null;
+            preview = d.previewPages ? (d.previewPages | 0) : null;
             scheduleRenew();
         });
     }
@@ -149,15 +158,36 @@
     /* ---------------- Page loading ---------------- */
     var preloaded = {};
     function preload(n) {
-        if (n < 1 || n > total || preloaded[n]) return;
+        if (n < 1 || n > total || preloaded[n] || locked(n)) return;
         var p = new Image();
         p.decoding = 'async';
         p.src = pageUrl(n);
         preloaded[n] = p;
     }
 
+    /* ---------------- Free-preview wall (guests) ---------------- */
+    function showGate() {
+        if (!gate) return;
+        gate.hidden = false;
+        root.classList.add('is-gated');
+        var first = gate.querySelector('a, button');
+        if (first) first.focus({ preventScroll: true });
+    }
+    function hideGate() {
+        if (!gate) return;
+        gate.hidden = true;
+        root.classList.remove('is-gated');
+    }
+
     function go(n, opts) {
         n = Math.min(total, Math.max(1, n | 0));
+        if (locked(n)) {
+            // Keep the last free page underneath (load it if nothing is shown yet) and ask to sign up.
+            if (!img.getAttribute('src') || page > preview) go(preview, { noSave: true });
+            showGate();
+            return;
+        }
+        hideGate();
         page = n;
         loadingEl.hidden = false;
         errorEl.hidden = true;
@@ -167,7 +197,7 @@
         input.value = n;
         progress.value = n;
         root.querySelector('[data-action="prev"]').disabled = n <= 1;
-        root.querySelector('[data-action="next"]').disabled = n >= total;
+        root.querySelector('[data-action="next"]').disabled = n >= total; // at the preview's end, "next" opens the sign-up wall
         markThumb();
         if (!(opts && opts.noSave)) saveProgress();
         if (history.replaceState) history.replaceState(null, '', '#page=' + n);
@@ -204,6 +234,19 @@
             b.type = 'button';
             b.className = 'reader-thumb';
             b.setAttribute('data-goto-page', i);
+            var s = document.createElement('span');
+            s.textContent = i;
+            if (locked(i)) {
+                // Never request images past the free preview: show a locked placeholder.
+                b.classList.add('reader-thumb--locked');
+                b.setAttribute('aria-label', M.i18n.lockedThumb.replace(':page', i));
+                var lk = document.createElement('span');
+                lk.className = 'reader-thumb__lock';
+                lk.setAttribute('aria-hidden', 'true');
+                lk.textContent = '🔒';
+                b.appendChild(lk); b.appendChild(s); li.appendChild(b); frag.appendChild(li);
+                continue;
+            }
             b.setAttribute('aria-label', M.i18n.thumbLabel.replace(':page', i));
             var t = document.createElement('img');
             t.loading = 'lazy';
@@ -212,8 +255,6 @@
             t.draggable = false;
             t.width = 120; t.height = 170;
             t.src = thumbUrl(i);
-            var s = document.createElement('span');
-            s.textContent = i;
             b.appendChild(t); b.appendChild(s); li.appendChild(b); frag.appendChild(li);
         }
         thumbsList.appendChild(frag);
@@ -264,6 +305,7 @@
             case 'fullscreen': toggleFullscreen(); break;
             case 'thumbs': toggleThumbs(); break;
             case 'info': toggleInfo(); break;
+            case 'gate-back': hideGate(); go(preview || 1); stage.focus(); break;
             case 'bookmark':
                 if (M.bookmarkUrl) {
                     postJson(M.bookmarkUrl, { book_id: M.book.id, page: page }).then(function (d) {
@@ -313,9 +355,53 @@
             case '-': case '_': setZoom(zoom - ZOOM_STEP); break;
             case 'f': case 'F': toggleFullscreen(); break;
             case 't': case 'T': toggleThumbs(); break;
-            case 'Escape': if (!info.hidden) toggleInfo(); break;
+            case 'Escape': if (!info.hidden) toggleInfo(); else if (gate && !gate.hidden) { hideGate(); go(preview || 1); } break;
         }
     });
+
+    /* ---------------- Capture deterrence (privacy screen) ----------------
+     * A website cannot block the operating system's screenshot or a camera.
+     * What it CAN do: hide the page whenever the reader window loses focus or
+     * becomes hidden (screen-capture tools, app switchers, other windows), while
+     * printing, and as soon as a screenshot shortcut is pressed; and try to clear
+     * the clipboard after Print Screen. The watermark baked into every page
+     * still identifies the reading session if a capture leaks anyway. */
+    var shieldTimer = null;
+    function shieldOn(ms) {
+        if (!shield) return;
+        shield.hidden = false;
+        root.classList.add('is-shielded');
+        clearTimeout(shieldTimer);
+        if (ms) shieldTimer = setTimeout(shieldOff, ms);
+    }
+    function shieldOff() {
+        if (!shield || document.hidden || !document.hasFocus()) return;
+        shield.hidden = true;
+        root.classList.remove('is-shielded');
+    }
+    window.addEventListener('blur', function () { shieldOn(); });
+    window.addEventListener('focus', function () { setTimeout(shieldOff, 200); });
+    document.addEventListener('visibilitychange', function () { if (document.hidden) shieldOn(); else setTimeout(shieldOff, 200); });
+    window.addEventListener('beforeprint', function () { shieldOn(); });
+    window.addEventListener('afterprint', function () { setTimeout(shieldOff, 300); });
+    var captureCombo = false;
+    document.addEventListener('keydown', function (e) {
+        // Win+Shift+S (Snipping Tool), Cmd+Shift+3/4/5 (macOS): hide as soon as the modifiers go down.
+        if (e.key === 'PrintScreen') shieldOn(2500);
+        else if (e.metaKey && e.shiftKey) { captureCombo = true; shieldOn(3000); }
+        else if (e.key === 'Meta' || e.key === 'OS') shieldOn(); // only while held (see keyup)
+    }, true);
+    document.addEventListener('keyup', function (e) {
+        if ((e.key === 'Meta' || e.key === 'OS') && !captureCombo) setTimeout(shieldOff, 300);
+        if (e.key === 'Meta' || e.key === 'OS') captureCombo = false;
+        if (e.key === 'PrintScreen' || e.keyCode === 44) {
+            shieldOn(2500);
+            try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText('').catch(function () {}); } catch (err) { /* not allowed */ }
+            toast(M.i18n.captureBlocked);
+        }
+    }, true);
+    // Started while another window had focus (e.g. opened from a link in another app).
+    if (!document.hasFocus()) shieldOn();
 
     /* ---------------- Touch swipe (mobile) ---------------- */
     var sx = 0, sy = 0, st = 0;

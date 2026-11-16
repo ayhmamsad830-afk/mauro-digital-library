@@ -10,6 +10,7 @@ use App\Core\Response;
 use App\Core\View;
 use App\Services\Auth;
 use App\Services\BookAccessPolicy;
+use App\Services\GuestPreview;
 use App\Services\Reader\ReaderSessionService;
 
 /**
@@ -60,6 +61,12 @@ final class ReaderController extends Controller
                 'demo' => false,
             ];
         }
+
+        // Guests: free preview of the first pages, then a free sign-up wall (enforced server-side too).
+        $manifest['previewPages'] = GuestPreview::limit();
+        $back = route('reader.show', ['slug' => $book['slug']]);
+        $manifest['registerUrl'] = route('register', [], ['redirect' => $back]);
+        $manifest['loginUrl'] = route('login', [], ['redirect' => $back]);
 
         return Response::html(View::render('reader/show', [
             'pageTitle' => __('reader.title', ['title' => $book['title']]),

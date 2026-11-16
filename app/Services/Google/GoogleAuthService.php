@@ -8,6 +8,7 @@ use App\Core\Database;
 use App\Core\Logger;
 use App\Core\Session;
 use App\Services\Auth;
+use App\Services\MemberPasswordAuth;
 
 /**
  * Turns a verified Google identity into a local account and a session
@@ -52,8 +53,26 @@ final class GoogleAuthService
         $user = Database::first('SELECT id, status, email FROM users WHERE google_sub = :s', ['s' => $id['sub']]);
         $created = false;
         if ($user === null) {
+            $existing = Database::first('SELECT id, google_sub, status FROM users WHERE email = :e', ['e' => $id['email']]);
+            if ($existing !== null && str_starts_with((string) $existing['google_sub'], MemberPasswordAuth::SUB_PREFIX)) {
+                // An e-mail + password account with this address: Google has just proven ownership of the
+                // address, so link the account to this Google identity. Its password was never verified by
+                // e-mail, so it is removed (prevents someone registering another person's address first).
+                $userId = (int) $existing['id'];
+                if ($existing['status'] !== 'active') {
+                    self::audit($userId, 'failure', 'suspended', $ip);
+                    return ['ok' => false, 'reason' => 'suspended', 'user_id' => $userId, 'created' => false];
+                }
+                Database::query(
+                    'UPDATE users SET google_sub = :s, avatar_url = :a, email_verified_at = :v, password_hash = NULL, last_login_at = :l, updated_at = :u WHERE id = :id',
+                    ['s' => $id['sub'], 'a' => $id['picture'], 'v' => $now, 'l' => $now, 'u' => $now, 'id' => $userId]
+                );
+                Auth::login($userId);
+                self::audit($userId, 'success', 'linked_email_account', $ip);
+                return ['ok' => true, 'reason' => null, 'user_id' => $userId, 'created' => false];
+            }
             // Same e-mail already bound to another Google account → refuse rather than merge silently.
-            if (Database::scalar('SELECT id FROM users WHERE email = :e', ['e' => $id['email']])) {
+            if ($existing !== null) {
                 self::audit(null, 'failure', 'email_conflict', $ip);
                 return ['ok' => false, 'reason' => 'email_conflict', 'user_id' => null, 'created' => false];
             }

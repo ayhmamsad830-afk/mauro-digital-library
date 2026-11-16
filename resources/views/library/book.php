@@ -131,7 +131,7 @@ $rightsLabels = ['owned' => __('book.rights_owned'), 'licensed' => __('book.righ
             <div class="card card--pad">
                 <h2 class="h4"><?= icon('info', 'icon--sm') ?> <?= e(__('book.reading_info_title')) ?></h2>
                 <ul class="plain-list small muted">
-                    <li><?= e(__('book.reading_info_1')) ?></li>
+                    <li><?= e(__('book.reading_info_1', ['n' => \App\Services\GuestPreview::pages()])) ?></li>
                     <li><?= e(__('book.reading_info_2')) ?></li>
                     <li><?= e(__('book.reading_info_3')) ?></li>
                 </ul>

@@ -154,6 +154,40 @@
     color-scheme: dark;
 }
 
+/* Vintage paper: seamless stain/grain/fibre tiles (public/assets/images/paper,
+   one per theme), browned page edges, and an aged edge on every card. */
+:root {
+    /* Light: yellowed parchment instead of clean ivory. */
+    --c-bg: #efe2c4; --c-surface: #f8efd9; --c-surface-2: #ebdcba; --c-surface-3: #e0cda6;
+    --c-border: #dbc79f; --c-border-strong: #c3a97b; --c-accent-text: #7a5427;
+    --c-header: rgb(239 226 196 / 88%);
+    --c-bg: #ead8b0; --c-surface: #f4e6c6; --c-surface-2: #e8d3a8; --c-surface-3: #dcc394;
+    --c-border: #d4bb8a; --c-border-strong: #b99a62; --c-header: rgb(234 216 176 / 90%);
+    --paper-grain: url("../images/paper/paper-light.webp");
+    --paper-stain: url("../images/paper/paper-stain-light.webp");
+    --paper-edge: radial-gradient(ellipse 118% 90% at 50% 45%, transparent 40%, rgb(118 72 22 / 28%) 78%, rgb(78 44 12 / 58%) 100%);
+    --paper-card-edge: radial-gradient(ellipse at center, transparent 55%, rgb(140 88 30 / 22%) 100%);
+    /* Burnt, browned rim around each sheet (inset, so torn edges keep it). */
+    --paper-burn: inset 0 0 0 1px rgb(118 72 22 / 26%), inset 0 0 16px 1px rgb(122 70 18 / 40%), inset 0 0 44px -6px rgb(150 96 34 / 30%);
+}
+:root[data-theme="dark"] {
+    /* Aged paper for night reading: warm browns instead of green-charcoal. */
+    --c-bg: #1b1712; --c-surface: #231e18; --c-surface-2: #2c261f; --c-surface-3: #363027;
+    --c-muted: #b3aa9b; --c-border: #3a3229; --c-border-strong: #544a3d;
+    --c-ink: #14110d; --c-header: rgb(27 23 18 / 86%);
+    --paper-grain: url("../images/paper/paper-dark.webp");
+    --paper-stain: url("../images/paper/paper-stain-dark.webp");
+    --paper-edge: radial-gradient(ellipse 118% 90% at 50% 45%, transparent 40%, rgb(0 0 0 / 48%) 100%);
+    --paper-card-edge: radial-gradient(ellipse at center, transparent 55%, rgb(0 0 0 / 28%) 100%);
+    --paper-burn: inset 0 0 0 1px rgb(0 0 0 / 40%), inset 0 0 18px 2px rgb(0 0 0 / 50%), inset 0 0 48px -8px rgb(0 0 0 / 38%);
+}
+
+/* Generated torn-paper outlines (deckled edges); two variants for variety. */
+:root {
+    --torn-a: polygon(0.0% 4px, 3.0% 1px, 5.1% 3px, 7.4% 6px, 10.3% 2px, 13.2% 3px, 15.9% 4px, 17.9% 2px, 20.5% 2px, 23.1% 3px, 26.0% 7px, 28.8% 0px, 31.2% 4px, 33.6% 1px, 35.2% 2px, 36.7% 4px, 39.2% 0px, 41.1% 1px, 43.5% 1px, 46.5% 1px, 48.6% 2px, 50.4% 0px, 52.4% 4px, 55.1% 2px, 58.0% 1px, 59.8% 5px, 62.0% 4px, 64.9% 5px, 66.5% 2px, 68.7% 5px, 71.6% 2px, 74.0% 0px, 75.5% 0px, 78.3% 2px, 81.1% 4px, 83.4% 2px, 86.1% 4px, 89.0% 1px, 90.7% 1px, 92.9% 0px, 94.4% 0px, 96.9% 0px, 98.9% 2px, calc(100% - 4px) 0.0%, calc(100% - 0px) 1.9%, calc(100% - 1px) 4.6%, calc(100% - 4px) 6.9%, calc(100% - 4px) 9.6%, calc(100% - 3px) 11.4%, calc(100% - 1px) 13.0%, calc(100% - 4px) 14.5%, calc(100% - 4px) 17.2%, calc(100% - 0px) 18.9%, calc(100% - 1px) 21.0%, calc(100% - 5px) 22.9%, calc(100% - 3px) 24.7%, calc(100% - 0px) 26.4%, calc(100% - 2px) 28.8%, calc(100% - 0px) 31.3%, calc(100% - 4px) 34.0%, calc(100% - 3px) 36.4%, calc(100% - 4px) 39.3%, calc(100% - 0px) 41.7%, calc(100% - 1px) 44.0%, calc(100% - 3px) 46.4%, calc(100% - 1px) 48.3%, calc(100% - 1px) 50.8%, calc(100% - 4px) 53.1%, calc(100% - 1px) 56.0%, calc(100% - 4px) 58.9%, calc(100% - 1px) 60.8%, calc(100% - 4px) 62.5%, calc(100% - 4px) 64.1%, calc(100% - 2px) 67.1%, calc(100% - 4px) 68.8%, calc(100% - 4px) 70.9%, calc(100% - 3px) 73.7%, calc(100% - 4px) 76.1%, calc(100% - 5px) 78.3%, calc(100% - 3px) 80.2%, calc(100% - 2px) 82.8%, calc(100% - 3px) 84.4%, calc(100% - 4px) 87.1%, calc(100% - 4px) 88.8%, calc(100% - 4px) 90.4%, calc(100% - 4px) 93.2%, calc(100% - 1px) 95.1%, calc(100% - 0px) 96.7%, calc(100% - 1px) 98.5%, 100.0% calc(100% - 1px), 97.0% calc(100% - 3px), 95.2% calc(100% - 0px), 92.8% calc(100% - 1px), 90.7% calc(100% - 3px), 89.1% calc(100% - 2px), 87.6% calc(100% - 1px), 84.8% calc(100% - 0px), 81.8% calc(100% - 2px), 79.3% calc(100% - 3px), 76.6% calc(100% - 1px), 75.1% calc(100% - 1px), 73.3% calc(100% - 1px), 70.3% calc(100% - 2px), 67.5% calc(100% - 2px), 64.5% calc(100% - 2px), 62.7% calc(100% - 0px), 60.7% calc(100% - 2px), 58.1% calc(100% - 3px), 56.0% calc(100% - 7px), 54.2% calc(100% - 4px), 51.8% calc(100% - 3px), 49.3% calc(100% - 2px), 46.3% calc(100% - 1px), 44.4% calc(100% - 3px), 41.9% calc(100% - 5px), 40.4% calc(100% - 3px), 38.4% calc(100% - 3px), 36.8% calc(100% - 0px), 34.2% calc(100% - 7px), 31.8% calc(100% - 1px), 29.0% calc(100% - 2px), 26.5% calc(100% - 1px), 24.1% calc(100% - 3px), 21.1% calc(100% - 0px), 18.5% calc(100% - 1px), 16.0% calc(100% - 4px), 13.0% calc(100% - 4px), 10.0% calc(100% - 0px), 8.2% calc(100% - 3px), 6.4% calc(100% - 4px), 4.6% calc(100% - 2px), 3.0% calc(100% - 2px), 0.5% calc(100% - 1px), 0px 100.0%, 1px 97.1%, 3px 94.7%, 3px 92.1%, 3px 90.0%, 2px 87.6%, 2px 86.0%, 3px 83.5%, 7px 80.8%, 1px 78.1%, 7px 75.3%, 4px 73.2%, 3px 71.2%, 1px 68.9%, 6px 66.6%, 4px 64.8%, 1px 62.6%, 3px 60.3%, 6px 58.5%, 7px 55.6%, 1px 52.6%, 3px 51.1%, 2px 48.3%, 2px 45.8%, 2px 44.2%, 3px 41.5%, 2px 40.0%, 3px 37.7%, 2px 34.9%, 0px 32.7%, 2px 30.6%, 2px 27.7%, 1px 26.0%, 4px 23.0%, 3px 20.9%, 0px 19.3%, 1px 16.3%, 0px 14.6%, 3px 11.6%, 4px 9.6%, 7px 7.7%, 3px 5.3%, 3px 3.8%, 3px 2.2%);
+    --torn-b: polygon(0.0% 3px, 2.9% 2px, 5.2% 3px, 8.0% 5px, 9.9% 2px, 12.4% 5px, 14.4% 1px, 17.2% 3px, 19.9% 7px, 22.2% 4px, 25.0% 5px, 27.7% 0px, 29.4% 3px, 31.0% 2px, 33.6% 0px, 35.7% 2px, 37.2% 2px, 40.2% 1px, 42.8% 7px, 45.6% 0px, 48.1% 3px, 50.2% 3px, 52.1% 1px, 54.0% 2px, 56.5% 0px, 58.4% 4px, 60.3% 1px, 63.2% 2px, 65.8% 0px, 67.4% 4px, 70.0% 3px, 72.8% 2px, 74.5% 4px, 76.4% 1px, 78.1% 4px, 79.8% 4px, 81.6% 0px, 83.3% 3px, 84.8% 4px, 86.5% 1px, 89.0% 1px, 91.9% 1px, 94.1% 0px, 95.8% 2px, 97.3% 2px, calc(100% - 0px) 0.0%, calc(100% - 4px) 1.6%, calc(100% - 0px) 3.7%, calc(100% - 2px) 5.2%, calc(100% - 1px) 7.2%, calc(100% - 3px) 10.0%, calc(100% - 2px) 12.7%, calc(100% - 2px) 15.3%, calc(100% - 3px) 17.0%, calc(100% - 4px) 19.0%, calc(100% - 4px) 20.5%, calc(100% - 4px) 22.5%, calc(100% - 1px) 24.6%, calc(100% - 4px) 27.5%, calc(100% - 0px) 29.1%, calc(100% - 3px) 31.2%, calc(100% - 0px) 33.4%, calc(100% - 5px) 36.2%, calc(100% - 1px) 38.7%, calc(100% - 4px) 40.4%, calc(100% - 2px) 43.2%, calc(100% - 3px) 45.5%, calc(100% - 0px) 47.1%, calc(100% - 2px) 49.6%, calc(100% - 1px) 51.2%, calc(100% - 6px) 53.6%, calc(100% - 0px) 55.6%, calc(100% - 3px) 58.3%, calc(100% - 0px) 60.5%, calc(100% - 1px) 63.0%, calc(100% - 0px) 65.2%, calc(100% - 2px) 66.9%, calc(100% - 4px) 68.7%, calc(100% - 1px) 71.2%, calc(100% - 3px) 74.1%, calc(100% - 2px) 75.9%, calc(100% - 0px) 77.5%, calc(100% - 0px) 80.2%, calc(100% - 1px) 83.0%, calc(100% - 3px) 86.0%, calc(100% - 0px) 88.0%, calc(100% - 1px) 90.5%, calc(100% - 0px) 92.5%, calc(100% - 0px) 94.6%, calc(100% - 5px) 97.0%, calc(100% - 2px) 99.0%, 100.0% calc(100% - 4px), 97.1% calc(100% - 1px), 94.7% calc(100% - 2px), 91.9% calc(100% - 1px), 90.3% calc(100% - 3px), 87.6% calc(100% - 4px), 85.2% calc(100% - 5px), 83.5% calc(100% - 0px), 81.6% calc(100% - 4px), 79.4% calc(100% - 2px), 77.8% calc(100% - 4px), 75.4% calc(100% - 2px), 73.9% calc(100% - 3px), 71.3% calc(100% - 0px), 68.5% calc(100% - 1px), 66.1% calc(100% - 1px), 63.3% calc(100% - 4px), 60.4% calc(100% - 3px), 58.5% calc(100% - 3px), 56.7% calc(100% - 1px), 54.2% calc(100% - 3px), 52.2% calc(100% - 0px), 50.4% calc(100% - 1px), 47.9% calc(100% - 4px), 46.2% calc(100% - 0px), 44.2% calc(100% - 3px), 42.2% calc(100% - 0px), 40.0% calc(100% - 0px), 37.7% calc(100% - 1px), 35.5% calc(100% - 1px), 33.7% calc(100% - 5px), 32.2% calc(100% - 7px), 30.5% calc(100% - 0px), 28.0% calc(100% - 4px), 25.8% calc(100% - 1px), 24.0% calc(100% - 0px), 22.4% calc(100% - 2px), 20.0% calc(100% - 3px), 17.7% calc(100% - 0px), 15.1% calc(100% - 3px), 13.3% calc(100% - 4px), 10.6% calc(100% - 4px), 8.0% calc(100% - 7px), 6.4% calc(100% - 3px), 3.4% calc(100% - 6px), 1.0% calc(100% - 2px), 2px 100.0%, 6px 97.9%, 1px 95.4%, 4px 93.0%, 0px 90.1%, 1px 88.3%, 2px 86.6%, 4px 83.9%, 1px 81.9%, 3px 79.0%, 3px 77.3%, 2px 75.1%, 6px 72.9%, 0px 70.4%, 2px 68.6%, 0px 67.0%, 0px 64.3%, 0px 61.6%, 0px 58.7%, 4px 56.3%, 5px 54.4%, 4px 52.6%, 4px 50.8%, 2px 47.9%, 4px 45.5%, 4px 42.6%, 1px 40.6%, 3px 37.9%, 3px 35.8%, 1px 33.4%, 0px 31.2%, 0px 29.5%, 3px 27.4%, 2px 25.5%, 0px 23.9%, 0px 22.3%, 1px 20.1%, 0px 17.4%, 2px 15.5%, 2px 13.3%, 1px 10.6%, 3px 8.7%, 0px 6.7%, 0px 4.9%, 3px 2.3%);
+}
+
 /* ---------- 2. Base ---------- */
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: calc(var(--header-h) + 1.25rem); }
@@ -162,7 +196,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: var(--c-bg) url("../images/background/starry-sky.jpg") center / cover no-repeat fixed;
+    background: var(--paper-edge) fixed, var(--paper-stain) 0 0 / 900px 900px, var(--paper-grain), var(--c-bg);
     color: var(--c-text);
     font-family: var(--font-body);
     font-size: var(--fs-base);
@@ -361,6 +395,9 @@ html[lang="ar"] .site-footer h2 { text-transform: none; letter-spacing: 0; font-
     padding-block: var(--sp-4) var(--sp-5); border-top: 1px solid var(--c-border);
 }
 .site-footer__bottom p { margin: 0; }
+.site-footer__credit { padding-block: 0 var(--sp-5); text-align: center; font-size: var(--fs-xs); color: var(--c-on-ink-muted); }
+.site-footer__credit p { margin: 0; }
+.site-footer__credit strong { color: var(--c-on-ink); font-weight: 700; letter-spacing: .08em; }
 @media (max-width: 860px) {
     .site-footer__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .site-footer__brand { grid-column: 1 / -1; }
