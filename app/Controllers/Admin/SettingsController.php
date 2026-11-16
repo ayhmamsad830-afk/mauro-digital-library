@@ -9,6 +9,7 @@ use App\Core\Request;
 use App\Core\Response;
 use App\Models\ActivityLog;
 use App\Models\Setting;
+use App\Services\GuestPreview;
 use App\Validators\ValidationResult;
 
 final class SettingsController extends AdminController
@@ -21,6 +22,7 @@ final class SettingsController extends AdminController
                 'catalog_per_page' => Setting::get('catalog.per_page', '24'),
                 'featured_book_id' => Setting::get('home.featured_book_id', ''),
                 'contact_email' => Setting::get('site.contact_email', ''),
+                'guest_preview_pages' => (string) GuestPreview::pages(),
             ],
             'perPageOptions' => config('ui.per_page_options', [12, 24, 36]),
             'books' => Database::all("SELECT id, title FROM books WHERE status = 'published' AND deleted_at IS NULL ORDER BY title LIMIT 500"),
@@ -42,13 +44,18 @@ final class SettingsController extends AdminController
         if ($email !== '' && (mb_strlen($email) > 190 || filter_var($email, FILTER_VALIDATE_EMAIL) === false)) {
             $errors['contact_email'] = __('validation.email');
         }
+        $preview = trim((string) $request->input('guest_preview_pages', (string) GuestPreview::DEFAULT_PAGES));
+        if (!ctype_digit($preview) || (int) $preview < 1 || (int) $preview > GuestPreview::MAX_PAGES) {
+            $errors['guest_preview_pages'] = __('validation.invalid');
+        }
         if ($errors) {
             return $this->backWithErrors(route('admin.settings'), new ValidationResult([], $errors), $request);
         }
-        Database::transaction(function () use ($perPage, $featured, $email, $request): void {
+        Database::transaction(function () use ($perPage, $featured, $email, $preview, $request): void {
             Setting::set('catalog.per_page', (string) (int) $perPage, $this->adminId());
             Setting::set('home.featured_book_id', $featured !== '' ? $featured : null, $this->adminId());
             Setting::set('site.contact_email', $email !== '' ? $email : null, $this->adminId());
+            Setting::set(GuestPreview::SETTING, (string) (int) $preview, $this->adminId());
             ActivityLog::record($this->adminId(), 'settings.updated', 'settings', null, null, $request->ip());
         });
         return $this->success(route('admin.settings'), __('admin.saved'));

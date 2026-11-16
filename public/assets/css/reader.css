@@ -164,3 +164,31 @@ kbd { display: inline-block; min-width: 1.7em; padding: 0 .4em; border: 1px soli
     .reader, .reader-body > * { display: none !important; }
     .reader-body::after { content: "—"; display: block; }
 }
+
+/* ---------- Free-preview wall (guests) ---------- */
+.reader-preview-badge { gap: .3rem; text-decoration: none; white-space: nowrap; }
+.reader-gate {
+    position: absolute; inset: 0; z-index: 20; display: grid; place-items: center; padding: 1rem;
+    background: color-mix(in srgb, var(--c-bg) 55%, transparent);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    animation: fade-in .2s var(--ease);
+}
+.reader-gate__card {
+    width: 100%; max-width: 440px; padding: clamp(1.4rem, 4vw, 2.2rem); text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: .7rem;
+}
+.reader-gate__mark { width: 58px; height: 58px; display: grid; place-items: center; border-radius: 16px; background: var(--c-primary); color: var(--c-on-primary); }
+.reader-gate__title { margin: .2rem 0 0; font-family: var(--font-display); font-size: var(--fs-xl); }
+.reader-gate__text { margin: 0; color: var(--c-muted); }
+.reader-gate__perks { list-style: none; margin: .2rem 0 .4rem; padding: 0; display: grid; gap: .35rem; text-align: start; font-size: var(--fs-sm); }
+.reader-gate__perks li { display: flex; align-items: center; gap: .45rem; }
+.reader-gate__perks .icon { color: var(--c-success); flex: none; }
+.reader-gate__login { margin: .1rem 0 0; }
+.reader.is-gated .reader-page__img { filter: blur(5px); }
+
+/* Locked thumbnails past the free preview. */
+.reader-thumb--locked { opacity: .7; }
+.reader-thumb__lock { width: 100%; aspect-ratio: 120 / 170; display: grid; place-items: center; font-size: 1.4rem; border-radius: 6px; background: var(--c-surface-2); border: 1px dashed var(--c-border-strong); }
+
+/* While shielded the page image itself is also hidden, not just covered. */
+.reader.is-shielded .reader-page__img, .reader.is-shielded .reader-thumbs img { visibility: hidden; }

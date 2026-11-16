@@ -32,8 +32,11 @@ $router->get('/authors', [CatalogController::class, 'authors'])->name('authors.i
 // Protected reader shell (page images only — never the PDF)
 $router->get('/read/{slug:[a-z0-9-]+}', [ReaderController::class, 'show'])->name('reader.show');
 
-// Accounts (Google Sign-In is wired in Phase 5)
+// Accounts: Google Sign-In or e-mail + password (free registration)
 $router->get('/login', [AuthController::class, 'login'])->name('login');
+$router->post('/login/email', [AuthController::class, 'emailLogin'])->name('login.email');
+$router->get('/register', [AuthController::class, 'showRegister'])->name('register');
+$router->post('/register', [AuthController::class, 'register'])->name('register.submit');
 $router->post('/api/auth/google', [AuthController::class, 'google'])->name('api.auth.google');
 $router->post('/logout', [AuthController::class, 'logout'])->name('logout');
 

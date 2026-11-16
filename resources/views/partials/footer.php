@@ -35,4 +35,7 @@
         <p class="muted small">© <?= e(date('Y')) ?> <?= e($appName) ?>. <?= e(__('footer.rights')) ?></p>
         <p class="muted small"><?= e(__('footer.website_only')) ?></p>
     </div>
+    <div class="container site-footer__credit">
+        <p><?= e(__('footer.made_by')) ?> <strong><bdi>RAVYX TECHNOLOGY</bdi></strong> © <?= e(date('Y')) ?></p>
+    </div>
 </footer>

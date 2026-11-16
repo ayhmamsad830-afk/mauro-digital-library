@@ -25,6 +25,10 @@ return [
         // Administrator username/password sign-in (brute-force protection).
         'admin_login_user' => ['max' => 5, 'window' => 900],
         'admin_login_ip' => ['max' => 20, 'window' => 900],
+        // Reader e-mail + password accounts.
+        'member_register' => ['max' => 10, 'window' => 3600],
+        'member_login_ip' => ['max' => 30, 'window' => 900],
+        'member_login_email' => ['max' => 8, 'window' => 900],
     ],
 
     // Password-based administrator sessions end after this many seconds even if active.

@@ -48,6 +48,10 @@ final class DemoPageImageController extends Controller
         if ($book === null || !\App\Services\BookAccessPolicy::canView($book) || $n < 1 || $n > $max) {
             throw HttpException::notFound();
         }
+        // Same free-preview rule as real books: guests get only the first pages.
+        if (!\App\Services\GuestPreview::allows($n)) {
+            throw new HttpException(403, __('reader.preview_locked'));
+        }
         return [$book, $n];
     }
 

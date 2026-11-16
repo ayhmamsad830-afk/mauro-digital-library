@@ -15,7 +15,10 @@ $manifest['i18n'] = [
     'thumbLabel' => __('reader.thumb_label'),
     'bookmarkSaved' => __('member.bookmark_added'),
     'captureNotice' => __('reader.capture_notice'),
+    'captureBlocked' => __('reader.capture_blocked'),
+    'lockedThumb' => __('reader.locked_thumb'),
 ];
+$previewPages = $manifest['previewPages'] ?? null;
 ?>
 <div class="reader" data-reader data-manifest="<?= e(json_encode($manifest, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) ?>">
     <header class="reader-bar reader-bar--top" data-reader-toolbar>
@@ -23,6 +26,9 @@ $manifest['i18n'] = [
             <a class="btn btn--plain btn--icon btn--sm" href="<?= e(route('books.show', ['slug' => $book['slug']])) ?>" aria-label="<?= e(__('reader.back')) ?>" title="<?= e(__('reader.back')) ?>"><?= icon('arrow-prev', 'icon--dir') ?></a>
             <button type="button" class="btn btn--plain btn--icon btn--sm" data-action="thumbs" aria-controls="reader-thumbs" aria-expanded="false" aria-label="<?= e(__('reader.thumbnails')) ?>" title="<?= e(__('reader.thumbnails')) ?>"><?= icon('grid') ?></button>
             <?php if (!empty($manifest['demo'])): ?><span class="badge badge--warning"><?= e(__('demo.short')) ?></span><?php endif; ?>
+            <?php if ($previewPages !== null): ?>
+                <a class="badge badge--solid reader-preview-badge hide-sm" href="<?= e($manifest['registerUrl']) ?>"><?= icon('lock', 'icon--sm') ?><?= e(__('reader.preview_badge', ['n' => $previewPages])) ?></a>
+            <?php endif; ?>
         </div>
         <div class="reader-bar__center">
             <h1 class="reader-bar__title" lang="<?= e($book['language']) ?>" dir="auto"><?= e($book['title']) ?></h1>
@@ -64,6 +70,26 @@ $manifest['i18n'] = [
                 </div>
             </div>
         </div>
+
+        <?php if ($previewPages !== null): ?>
+        <!-- Free-preview wall for guests (the server refuses later pages as well). -->
+        <div class="reader-gate" data-gate hidden>
+            <section class="reader-gate__card card" role="dialog" aria-modal="false" aria-labelledby="reader-gate-title">
+                <span class="reader-gate__mark"><?= icon('book', 'icon--lg') ?></span>
+                <h2 class="reader-gate__title" id="reader-gate-title"><?= e(__('reader.gate_title')) ?></h2>
+                <p class="reader-gate__text"><?= e(__('reader.gate_text', ['n' => $previewPages])) ?></p>
+                <ul class="reader-gate__perks" role="list">
+                    <li><?= icon('check', 'icon--sm') ?><?= e(__('reader.gate_free')) ?></li>
+                    <li><?= icon('check', 'icon--sm') ?><?= e(__('reader.gate_fast')) ?></li>
+                    <li><?= icon('check', 'icon--sm') ?><?= e(__('reader.gate_sync')) ?></li>
+                </ul>
+                <a class="btn btn--primary btn--lg btn--block" href="<?= e($manifest['registerUrl']) ?>"><?= icon('user', 'icon--sm') ?><?= e(__('reader.gate_register')) ?></a>
+                <a class="btn btn--ghost btn--block" href="<?= e($manifest['loginUrl']) ?>"><?= e(__('reader.gate_google')) ?></a>
+                <p class="small reader-gate__login"><?= e(__('reader.gate_have_account')) ?> <a href="<?= e($manifest['loginUrl']) ?>"><?= e(__('reader.gate_login')) ?></a></p>
+                <button type="button" class="btn btn--plain btn--sm" data-action="gate-back"><?= e(__('reader.gate_back', ['n' => $previewPages])) ?></button>
+            </section>
+        </div>
+        <?php endif; ?>
 
         <!-- Shown while the reader is in the background (tab hidden / window not focused).
              Deterrence only: it cannot stop operating-system screenshots. -->

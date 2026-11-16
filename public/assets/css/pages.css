@@ -602,3 +602,10 @@ html[lang="ar"] .category-grid--lg .category-card__name { font-weight: 600; line
 .password-field__off { display: none; }
 .password-field__toggle[aria-pressed="true"] .password-field__on { display: none; }
 .password-field__toggle[aria-pressed="true"] .password-field__off { display: inline-flex; }
+
+/* ---------------- Reader sign-in / free registration ---------------- */
+.auth__divider { display: flex; align-items: center; gap: .75rem; margin: var(--sp-2) 0 0; color: var(--c-muted); font-size: var(--fs-sm); }
+.auth__divider::before, .auth__divider::after { content: ""; flex: 1; height: 1px; background: var(--c-border-strong); }
+.auth__free { display: inline-flex; align-items: center; gap: .35rem; margin: 0 auto; padding: .25rem .8rem; border-radius: var(--radius-pill); background: var(--c-success-soft); color: var(--c-success); font-weight: 700; font-size: var(--fs-sm); }
+.auth__switch { margin: 0; font-size: var(--fs-sm); }
+.auth__switch a { font-weight: 700; }

@@ -10,7 +10,7 @@ use App\Core\Database;
 final class Setting
 {
     /** Allowed keys and their validators. Anything else is refused. */
-    public const KEYS = ['catalog.per_page', 'home.featured_book_id', 'site.contact_email'];
+    public const KEYS = ['catalog.per_page', 'home.featured_book_id', 'site.contact_email', 'reader.guest_preview_pages'];
 
     private static ?array $cache = null;
 

@@ -12,7 +12,7 @@ php bin/console env:check
 
 Mandatory: PHP ≥ 8.3 (8.4+ target), required extensions, writable storage outside the docroot, `proc_open` enabled, `pdftoppm` + `pdfinfo` present, and a passing **PDF → image round-trip**. If rendering fails, do not work around it with client-side PDF viewing — see `IMPLEMENTATION_PLAN.md` "Hosting fallback".
 
-Recommended `php.ini` / panel values: `upload_max_filesize=12M`, `post_max_size=16M`, `memory_limit=256M`, `max_execution_time=120`, `display_errors=Off`, `expose_php=Off`.
+Recommended `php.ini` / panel values: `upload_max_filesize=510M`, `post_max_size=520M`, `max_input_time=1800`, `memory_limit=256M`, `max_execution_time=120`, `display_errors=Off`, `expose_php=Off`.
 
 ## 2. Folder layout
 
@@ -36,7 +36,7 @@ Ready-made files in `deploy/`:
 
 | File | Use |
 |---|---|
-| `deploy/nginx.conf` | Nginx server block: HTTPS redirect, docroot `public/`, only `index.php` executes, 16 MB body limit |
+| `deploy/nginx.conf` | Nginx server block: HTTPS redirect, docroot `public/`, only `index.php` executes, 520 MB body limit |
 | `deploy/apache-vhost.conf` | Apache 2.4 vhost (docroot `public/`, everything else denied) |
 | `public/.htaccess` | Front-controller rewrite, hidden/sensitive files denied (Apache, `AllowOverride All`) |
 | `.htaccess` (project root) | Safety net if the whole project was uploaded into the web root by mistake: serves only `public/`, denies `app/`, `storage/`, `.env`… |

@@ -118,6 +118,12 @@ final class PdfPipelineTest extends TestCase
 
     public function testCorruptAndEncryptedPdfsAreRejected(): void
     {
+        if (\App\Services\ProcessRunner::which((string) Config::get('rendering.binaries.pdfinfo', 'pdfinfo')) === null) {
+            // Without Poppler every upload is refused as a server problem, not as a damaged file.
+            $bad = PdfFactory::write($this->work, 'bad.pdf', PdfFactory::corrupt());
+            $this->assertSame([__('pdf.tools_missing')], PdfValidator::validate($bad, 'bad.pdf')['errors']);
+            $this->markSkipped('pdfinfo (Poppler) not installed: damaged-file detection not exercised');
+        }
         $bad = PdfFactory::write($this->work, 'bad.pdf', PdfFactory::corrupt());
         $this->assertSame([__('pdf.unreadable')], PdfValidator::validate($bad, 'bad.pdf')['errors']);
         $truncated = PdfFactory::write($this->work, 'trunc.pdf', substr(PdfFactory::make(3), 0, 300));
