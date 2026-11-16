@@ -12,6 +12,8 @@ use RuntimeException;
 final class PdfInspector
 {
     public const ENCRYPTED = 2;
+    /** Server problem (Poppler not installed), not a problem with the uploaded file. */
+    public const TOOLS_MISSING = 3;
 
     /**
      * @return array{pages:int, encrypted:bool, width_pt:float|null, height_pt:float|null}
@@ -21,7 +23,7 @@ final class PdfInspector
     {
         $bin = ProcessRunner::which((string) Config::get('rendering.binaries.pdfinfo', 'pdfinfo'));
         if ($bin === null) {
-            throw new RuntimeException('pdfinfo is not available on this server.');
+            throw new RuntimeException('pdfinfo is not available on this server.', self::TOOLS_MISSING);
         }
         $res = ProcessRunner::run([$bin, '--', $absPath], 30);
         if (!$res['timed_out'] && $res['exit'] !== 0 && stripos($res['stderr'], 'password') !== false) {

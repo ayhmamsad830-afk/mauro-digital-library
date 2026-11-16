@@ -63,7 +63,11 @@ final class PdfValidator
         try {
             $info = PdfInspector::inspect($tmpPath);
         } catch (Throwable $e) {
-            return $fail($e->getCode() === PdfInspector::ENCRYPTED ? __('pdf.encrypted') : __('pdf.unreadable'));
+            return $fail(match ($e->getCode()) {
+                PdfInspector::ENCRYPTED => __('pdf.encrypted'),
+                PdfInspector::TOOLS_MISSING => __('pdf.tools_missing'),
+                default => __('pdf.unreadable'),
+            });
         }
         if ($info['encrypted']) {
             return $fail(__('pdf.encrypted'));

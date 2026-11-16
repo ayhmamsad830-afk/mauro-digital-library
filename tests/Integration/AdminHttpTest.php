@@ -166,7 +166,7 @@ final class AdminHttpTest extends TestCase
         $this->assertContains('Book created as a draft.', $edit->body(), 'flash message survives the redirect');
         $this->assertNotContains('<script>alert(1)</script>', $edit->body());
         $this->assertContains('&lt;script&gt;', $edit->body());
-        $this->assertContains('No PDF file attached', $edit->body(), 'publish blockers listed');
+        $this->assertContains('No ready PDF yet', $edit->body(), 'publish blockers listed');
 
         $upd = $this->send('PUT', "/admin/books/$id", [
             'title' => 'Renamed via PUT', 'slug' => 'renamed-via-put', 'language' => 'en', 'visibility' => 'members',
