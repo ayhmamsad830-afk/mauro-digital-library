@@ -24,7 +24,11 @@ final class HttpServer
         if (!isset(self::$servers[$key])) {
             $port = random_int(20000, 40000);
             $cmd = [PHP_BINARY, '-S', '127.0.0.1:' . $port, '-t', BASE_PATH . '/public', BASE_PATH . '/public/index.php'];
-            $env = array_merge(getenv(), self::$env);
+            // An empty value does not survive proc_open on Windows (the child's getenv()
+            // returns false), so the developer's .env would win over the override.
+            // App\Core\Env reads "(empty)" as '', on every platform.
+            $overrides = array_map(static fn ($v) => $v === '' ? '(empty)' : $v, self::$env);
+            $env = array_merge(getenv(), $overrides);
             $process = proc_open($cmd, [1 => ['file', PHP_OS_FAMILY === 'Windows' ? 'NUL' : '/dev/null', 'w'], 2 => ['file', PHP_OS_FAMILY === 'Windows' ? 'NUL' : '/dev/null', 'w']], $pipes, null, $env);
             $deadline = microtime(true) + 5;
             while (true) {

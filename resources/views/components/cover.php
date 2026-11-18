@@ -16,6 +16,7 @@ $tone = (int) ($book['cover_tone'] ?? 1);
         <span class="cover__text" aria-hidden="true" lang="<?= e($book['language'] ?? 'ar') ?>" dir="<?= ($book['language'] ?? 'ar') === 'ar' ? 'rtl' : 'ltr' ?>">
             <span class="cover__title"><?= e($book['title']) ?></span>
             <span class="cover__author"><?= e(book_authors($book)) ?></span>
-        </span>
+        </span>  
+        
     <?php endif; ?>
 </div>

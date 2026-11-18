@@ -9,7 +9,6 @@
 html[lang="en"] .prose { line-height: 1.75; }
 .prose h2 { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-lg); margin-top: var(--sp-6); }
 .prose .lead { font-size: var(--fs-md); }
-.hide-sm { }
 @media (max-width: 640px) { .hide-sm { display: none !important; } }
 
 /* ---------- Page head ---------- */

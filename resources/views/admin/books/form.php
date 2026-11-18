@@ -5,6 +5,9 @@ $inv = static fn (string $k) => field_error($k) ? ' aria-invalid="true" aria-des
 $selAuthors = array_map('intval', (array) old('author_ids', $book['author_ids'] ?? []));
 $selCats = array_map('intval', (array) old('category_ids', $book['category_ids'] ?? []));
 $action = $book ? route('admin.books.update', ['id' => $book['id']]) : route('admin.books.store');
+$versions = $versions ?? [];
+$maxUploadMb = $maxUploadMb ?? (int) max(1, round((int) config('storage.pdf_max_bytes', config('app.max_upload_mb', 50)) / 1048576));
+$syncMaxPages = $syncMaxPages ?? (int) config('pdf.sync_max_pages', config('app.sync_max_pages', 200));
 $field = static fn (array $d) => \App\Core\View::partial('admin/_field', $d);
 ?>
 <div class="admin-form-layout">
@@ -155,7 +158,7 @@ $field = static fn (array $d) => \App\Core\View::partial('admin/_field', $d);
         <form class="upload-form" data-uploading="<?= e(__('upload.in_progress')) ?>" method="post" action="<?= e(route('admin.books.upload', ['id' => $book['id']])) ?>" enctype="multipart/form-data">
             <?= csrf_field() ?>
             <label class="label" for="f-pdf"><?= e($book['current_file'] ? __('pdf.replace') : __('pdf.upload')) ?></label>
-            <input class="input" id="f-pdf" type="file" name="pdf" accept="application/pdf,.pdf" required>
+            <input class="input" id="f-pdf" type="file" name="pdf" accept=".pdf,application/pdf" required>
             <p class="help"><?= e(__('pdf.upload_help', ['max' => $maxUploadMb])) ?></p>
             <button class="btn btn--primary btn--sm" type="submit" data-loading-on-submit><?= icon('upload', 'icon--sm') ?><?= e(__('pdf.upload_button')) ?></button>
         </form>
@@ -181,7 +184,8 @@ $field = static fn (array $d) => \App\Core\View::partial('admin/_field', $d);
                 <?php if ($ver['job_status'] === 'queued'): ?>
                     <?php if ((int) $ver['page_count'] <= $syncMaxPages): ?>
                         <form method="post" action="<?= e(route('admin.books.files.process', ['id' => $book['id'], 'fileId' => $ver['id']])) ?>"><?= csrf_field() ?><button class="btn btn--secondary btn--sm" type="submit" data-loading-on-submit><?= e(__('pdf.process_now')) ?></button></form>
-                    <?php else: ?><p class="help"><?= e(__('pdf.use_worker', ['max' => $syncMaxPages])) ?></p><?php endif; ?>
+                    <?php else: ?><p class="help"><?= e(__('pdf.use_worker', ['max' => $syncMaxPages]
+                    )) ?></p><?php endif; ?>
                 <?php elseif ($ver['job_status'] === 'failed'): ?>
                     <form method="post" action="<?= e(route('admin.books.files.retry', ['id' => $book['id'], 'fileId' => $ver['id']])) ?>"><?= csrf_field() ?><button class="btn btn--ghost btn--sm" type="submit"><?= e(__('pdf.retry')) ?></button></form>
                 <?php endif; ?>

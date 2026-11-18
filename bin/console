@@ -73,10 +73,13 @@ try {
                     'host' => env('DB_TEST_HOST'), 'port' => env('DB_TEST_PORT'), 'database' => env('DB_TEST_DATABASE'),
                     'username' => env('DB_TEST_USERNAME'), 'password' => env('DB_TEST_PASSWORD'), 'socket' => env('DB_TEST_SOCKET'),
                 ], static fn ($v) => $v !== null && $v !== ''));
-                $c['driver'] = 'mysql';
-                Config::set('database', $c);
-                Database::setConnection(null);
             }
+            // db:check always verifies the MySQL settings, even while DB_DRIVER=sqlite
+            // keeps the dev site on SQLite: that is how MySQL is proven ready before
+            // switching. Without this, the SQLite connection received "SELECT VERSION()".
+            $c['driver'] = 'mysql';
+            Config::set('database', $c);
+            Database::setConnection(null);
             $line(sprintf('Connecting to mysql://%s@%s:%s/%s …', $c['username'] ?: '(no user)', $c['socket'] ?: $c['host'], $c['port'], $c['database']));
             $res = Database::check();
             if ($res['ok']) {
