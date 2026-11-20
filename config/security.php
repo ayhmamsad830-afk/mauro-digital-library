@@ -29,6 +29,12 @@ return [
         'member_register' => ['max' => 10, 'window' => 3600],
         'member_login_ip' => ['max' => 30, 'window' => 900],
         'member_login_email' => ['max' => 8, 'window' => 900],
+        'member_password_change' => ['max' => 6, 'window' => 900],
+        // Password recovery: per IP and per address (one hour windows).
+        'password_reset_ip' => ['max' => 10, 'window' => 3600],
+        'password_reset_email' => ['max' => 3, 'window' => 3600],
+        // Public contact form.
+        'contact' => ['max' => 5, 'window' => 3600],
     ],
 
     // Password-based administrator sessions end after this many seconds even if active.

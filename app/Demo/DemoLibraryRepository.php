@@ -94,6 +94,31 @@ final class DemoLibraryRepository implements LibraryRepository
         }, DemoData::authors());
     }
 
+    public function publishers(): array
+    {
+        $out = [];
+        foreach ($this->visibleBooks() as $b) {
+            $name = \App\Support\Publisher::normalize((string) ($b['publisher'] ?? ''));
+            if ($name === '') {
+                continue;
+            }
+            $slug = \App\Support\Publisher::slug($name);
+            $out[$slug] ??= ['name' => $name, 'slug' => $slug, 'books_count' => 0];
+            $out[$slug]['books_count']++;
+        }
+        return array_values($out);
+    }
+
+    public function findPublisherBySlug(string $slug): ?array
+    {
+        foreach ($this->publishers() as $p) {
+            if ($p['slug'] === $slug) {
+                return $p;
+            }
+        }
+        return null;
+    }
+
     public function languages(): array
     {
         $langs = array_values(array_unique(array_column($this->visibleBooks(), 'language')));
@@ -112,6 +137,9 @@ final class DemoLibraryRepository implements LibraryRepository
                 return false;
             }
             if ($query->language && $b['language'] !== $query->language) {
+                return false;
+            }
+            if ($query->publisher && \App\Support\Publisher::slug((string) ($b['publisher'] ?? '')) !== $query->publisher) {
                 return false;
             }
             if ($needle !== '') {

@@ -1,5 +1,7 @@
 # Pearl Cosmic Light Mode & Reader Protection
 
+> **HISTORICAL (2026-11-19):** the Cosmic design described here was replaced by Vintage Paper + teal/gold and its files (`cosmic.css`, `cosmic.js`, `cosmic-sky.jpg`) were deleted. Scroll reveal and the featured-book float now live in `motion.css` / `motion.js`. See `docs/DESIGN_SYSTEM.md`. Reader-protection notes below remain accurate.
+
 This builds on the cosmic redesign (`docs/COSMIC_ANIMATIONS_IMPLEMENTATION.md`). The architecture is unchanged; the existing PDF → WebP pipeline, server-side watermark, signed short-lived image URLs and access policy are all kept and extended.
 
 Priority followed: **security → reading comfort → performance → visual quality.**

@@ -107,6 +107,10 @@ final class HostCapabilityService
         $r[] = $this->item('Config', 'GOOGLE_CLIENT_ID', Config::get('google.client_id') ? self::OK : self::WARN,
             Config::get('google.client_id') ? 'set' : 'not configured — Google Sign-In unavailable');
         array_push($r, ...$this->googleConnectivity((bool) Config::get('google.client_id')));
+        $mail = \App\Services\Mail\Mailer::driver();
+        $r[] = $this->item('Config', 'E-mail delivery', $mail === 'smtp' ? self::OK : self::WARN,
+            $mail === 'smtp' ? 'smtp ' . Config::get('mail.host') . ':' . (int) Config::get('mail.port') . ' (' . Config::get('mail.encryption') . ')'
+                : 'not configured — password recovery unavailable; contact messages are stored for the admins only');
         $secure = Config::get('session.secure', 'auto');
         $r[] = $this->item('Config', 'SESSION_SECURE_COOKIE', $secure === true ? self::OK : ($prod ? self::WARN : self::OK),
             ($secure === 'auto' ? 'auto (Secure only on HTTPS requests)' : ($secure ? 'true' : 'false')) . ($prod && $secure !== true ? ' — set true in production' : ''));

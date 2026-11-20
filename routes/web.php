@@ -5,6 +5,9 @@ declare(strict_types=1);
 /** @var \App\Core\Router $router */
 
 use App\Controllers\AccountController;
+use App\Controllers\AccountSettingsController;
+use App\Controllers\ContactController;
+use App\Controllers\PasswordController;
 use App\Controllers\AuthController;
 use App\Controllers\BookController;
 use App\Controllers\CatalogController;
@@ -28,6 +31,8 @@ $router->get('/search', [CatalogController::class, 'search'])->name('search');
 $router->get('/categories', [CatalogController::class, 'categories'])->name('categories.index');
 $router->get('/categories/{slug:[a-z0-9-]+}', [CatalogController::class, 'category'])->name('categories.show');
 $router->get('/authors', [CatalogController::class, 'authors'])->name('authors.index');
+$router->get('/publishers', [CatalogController::class, 'publishers'])->name('publishers.index');
+$router->get('/publishers/{slug:[a-z0-9-]+}', [CatalogController::class, 'publisher'])->name('publishers.show');
 
 // Protected reader shell (page images only — never the PDF)
 $router->get('/read/{slug:[a-z0-9-]+}', [ReaderController::class, 'show'])->name('reader.show');
@@ -40,12 +45,21 @@ $router->post('/register', [AuthController::class, 'register'])->name('register.
 $router->post('/api/auth/google', [AuthController::class, 'google'])->name('api.auth.google');
 $router->post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Member password recovery (e-mail; honest notice while delivery is disabled)
+$router->get('/password/forgot', [PasswordController::class, 'showForgot'])->name('password.forgot');
+$router->post('/password/forgot', [PasswordController::class, 'sendLink'])->name('password.forgot.send');
+$router->get('/password/reset', [PasswordController::class, 'showReset'])->name('password.reset');
+$router->post('/password/reset', [PasswordController::class, 'reset'])->name('password.reset.submit');
+
 // Member area (Phase 5) — signed-in, active accounts only; CSRF on every write.
 $router->group(['middleware' => [AuthMiddleware::class]], function ($r): void {
     $r->get('/account', [AccountController::class, 'index'])->name('account');
     $r->get('/account/history', [AccountController::class, 'history'])->name('account.history');
     $r->get('/account/favorites', [AccountController::class, 'favorites'])->name('account.favorites');
     $r->get('/account/bookmarks', [AccountController::class, 'bookmarks'])->name('account.bookmarks');
+    $r->get('/account/settings', [AccountSettingsController::class, 'show'])->name('account.settings');
+    $r->post('/account/settings/profile', [AccountSettingsController::class, 'updateProfile'])->name('account.settings.profile');
+    $r->post('/account/settings/password', [AccountSettingsController::class, 'updatePassword'])->name('account.settings.password');
     $r->post('/account/favorites/{bookId:\d+}', [MemberController::class, 'toggleFavorite'])->name('member.favorite');
     $r->post('/account/bookmarks', [MemberController::class, 'addBookmark'])->name('member.bookmark.add');
     $r->post('/account/bookmarks/{id:\d+}/delete', [MemberController::class, 'deleteBookmark'])->name('member.bookmark.delete');
@@ -58,6 +72,9 @@ $router->group(['middleware' => [AuthMiddleware::class]], function ($r): void {
 $router->get('/privacy', [PageController::class, 'privacy'])->name('pages.privacy');
 $router->get('/terms', [PageController::class, 'terms'])->name('pages.terms');
 $router->get('/copyright', [PageController::class, 'copyright'])->name('pages.copyright');
+$router->get('/about', [ContactController::class, 'about'])->name('about');
+$router->get('/contact', [ContactController::class, 'show'])->name('contact');
+$router->post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
 
 // Preferences
 $router->post('/locale', [PreferenceController::class, 'setLocale'])->name('locale.update');

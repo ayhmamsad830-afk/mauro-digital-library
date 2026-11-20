@@ -13,7 +13,20 @@ $rightsLabels = ['owned' => __('book.rights_owned'), 'licensed' => __('book.righ
 <div class="container">
     <?= component('breadcrumbs', ['items' => $crumbs]) ?>
 
-    <div class="book-hero">
+    <div class="book-hero" itemscope itemtype="https://schema.org/Book">
+        <?php /* schema.org microdata from real data only (no inline script: strict CSP). */ $site = rtrim((string) config('app.url', ''), '/'); ?>
+        <meta itemprop="name" content="<?= e($book['title']) ?>">
+        <meta itemprop="inLanguage" content="<?= e($book['language']) ?>">
+        <?php if ($site !== ''): ?><link itemprop="url" href="<?= e($site . route('books.show', ['slug' => $book['slug']])) ?>"><?php endif; ?>
+        <?php if (!empty($book['description'])): ?><meta itemprop="description" content="<?= e(mb_substr((string) $book['description'], 0, 300)) ?>"><?php endif; ?>
+        <?php if (!empty($book['page_count'])): ?><meta itemprop="numberOfPages" content="<?= e((string) (int) $book['page_count']) ?>"><?php endif; ?>
+        <?php if (!empty($book['isbn'])): ?><meta itemprop="isbn" content="<?= e($book['isbn']) ?>"><?php endif; ?>
+        <?php if (!empty($book['publication_year'])): ?><meta itemprop="datePublished" content="<?= e((string) (int) $book['publication_year']) ?>"><?php endif; ?>
+        <?php if (!empty($book['edition'])): ?><meta itemprop="bookEdition" content="<?= e($book['edition']) ?>"><?php endif; ?>
+        <?php if ($site !== '' && !empty($book['cover_url'])): ?><link itemprop="image" href="<?= e($site . $book['cover_url']) ?>"><?php endif; ?>
+        <?php if (!empty($book['publisher'])): ?><span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization"><meta itemprop="name" content="<?= e($book['publisher']) ?>"></span><?php endif; ?>
+        <?php foreach ($book['authors'] ?? [] as $a): ?><span hidden itemprop="author" itemscope itemtype="https://schema.org/Person"><meta itemprop="name" content="<?= e($a['name']) ?>"></span><?php endforeach; ?>
+        <?php if ((int) ($book['rating_count'] ?? 0) > 0): ?><span hidden itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating"><meta itemprop="ratingValue" content="<?= e(number_format((float) $book['rating_avg'], 2, '.', '')) ?>"><meta itemprop="ratingCount" content="<?= e((string) (int) $book['rating_count']) ?>"><meta itemprop="bestRating" content="5"></span><?php endif; ?>
         <div class="book-hero__cover"><?= component('cover', ['book' => $book]) ?></div>
 
         <div class="book-hero__info">
@@ -51,7 +64,7 @@ $rightsLabels = ['owned' => __('book.rights_owned'), 'licensed' => __('book.righ
             <p class="small muted book-hero__note"><?= icon('shield', 'icon--sm') ?> <?= e(__('book.protected_note')) ?></p>
 
             <dl class="book-facts">
-                <?php if ($book['publisher']): ?><div><dt><?= e(__('book.publisher')) ?></dt><dd dir="auto"><?= e($book['publisher']) ?></dd></div><?php endif; ?>
+                <?php if ($book['publisher']): ?><div><dt><?= e(__('book.publisher')) ?></dt><dd dir="auto"><a href="<?= e(route('publishers.show', ['slug' => \App\Support\Publisher::slug((string) $book['publisher'])])) ?>"><?= e($book['publisher']) ?></a></dd></div><?php endif; ?>
                 <?php if ($book['publication_year']): ?><div><dt><?= e(__('book.year')) ?></dt><dd><?= e($book['publication_year']) ?></dd></div><?php endif; ?>
                 <?php if (!empty($book['edition'])): ?><div><dt><?= e(__('book.edition')) ?></dt><dd dir="auto"><?= e($book['edition']) ?></dd></div><?php endif; ?>
                 <?php if ($book['page_count']): ?><div><dt><?= e(__('book.pages')) ?></dt><dd><?= e(format_number((int) $book['page_count'])) ?></dd></div><?php endif; ?>

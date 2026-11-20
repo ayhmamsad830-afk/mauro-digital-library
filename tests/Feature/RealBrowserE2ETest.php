@@ -43,11 +43,8 @@ final class RealBrowserE2ETest extends TestCase
         try {
             $env = ['APP_ENV' => 'local', 'APP_DEMO_UI' => 'false', 'DB_DRIVER' => 'sqlite', 'DB_SQLITE_PATH' => $db, 'STORAGE_PATH' => "$dir/storage"];
             $console = static function (array $args) use ($env): array {
-                $cmd = ['env'];
-                foreach ($env as $k => $v) {
-                    $cmd[] = "$k=$v";
-                }
-                return ProcessRunner::run(array_merge($cmd, [PHP_BINARY, BASE_PATH . '/bin/console'], $args), 60);
+                // Environment passed through proc_open (portable; `env K=V` does not exist on Windows).
+                return ProcessRunner::run(array_merge([PHP_BINARY, BASE_PATH . '/bin/console'], $args), 60, null, $env);
             };
             $this->assertSame(0, $console(['dev:sqlite', $db])['exit']);
             $seed = $console(['db:seed-dev', '--yes']);

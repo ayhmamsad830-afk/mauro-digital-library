@@ -22,6 +22,8 @@ final class BookQuery
         public readonly string $sort,
         public readonly int $page,
         public readonly int $perPage,
+        /** publisher slug (Slug::from(books.publisher)), resolved by the repository */
+        public readonly ?string $publisher = null,
     ) {
     }
 
@@ -43,22 +45,28 @@ final class BookQuery
             sort: in_array($sort, self::SORTS, true) ? $sort : $defaultSort,
             page: max(1, min($page, 10000)),
             perPage: in_array($perPage, $perPageOptions, true) ? $perPage : $perPageDefault,
+            publisher: self::slug(self::str($input['publisher'] ?? '')),
         );
     }
 
     public function withPage(int $page): self
     {
-        return new self($this->q, $this->category, $this->author, $this->language, $this->sort, max(1, $page), $this->perPage);
+        return new self($this->q, $this->category, $this->author, $this->language, $this->sort, max(1, $page), $this->perPage, $this->publisher);
     }
 
     public function withCategory(?string $category): self
     {
-        return new self($this->q, $category, $this->author, $this->language, $this->sort, $this->page, $this->perPage);
+        return new self($this->q, $category, $this->author, $this->language, $this->sort, $this->page, $this->perPage, $this->publisher);
+    }
+
+    public function withPublisher(?string $publisher): self
+    {
+        return new self($this->q, $this->category, $this->author, $this->language, $this->sort, $this->page, $this->perPage, $publisher);
     }
 
     public function hasFilters(): bool
     {
-        return $this->q !== '' || $this->category !== null || $this->author !== null || $this->language !== null;
+        return $this->q !== '' || $this->category !== null || $this->author !== null || $this->language !== null || $this->publisher !== null;
     }
 
     /** Query-string parameters (defaults omitted) used to build links that keep filters. */
@@ -69,6 +77,7 @@ final class BookQuery
             'category' => $this->category,
             'author' => $this->author,
             'language' => $this->language,
+            'publisher' => $this->publisher,
             'sort' => $this->sort !== $defaultSort ? $this->sort : null,
             'per_page' => $this->perPage !== $perPageDefault ? $this->perPage : null,
             'page' => $this->page > 1 ? $this->page : null,

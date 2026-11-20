@@ -29,6 +29,15 @@ set_error_handler(static function (int $severity, string $message, string $file,
     throw new ErrorException($message, 0, $severity, $file, $line);
 });
 
+// Never the developer's real database (storage/mauro.sqlite, or mauro_library_dev once
+// .env has DB_DRIVER=mysql): the default in-process connection is an empty in-memory
+// SQLite. Tests that need a database get one from Tests\Support\TestDatabase; HTTP test
+// servers are isolated in Tests\Feature\HttpServer. The DB_* names stay as configured so
+// TestDatabaseConfig can still refuse a test database equal to the development one.
+App\Core\Config::set('database.driver', 'sqlite');
+App\Core\Config::set('database.sqlite_path', '');
+App\Core\Database::setConnection(null);
+
 $filter = $argv[1] ?? '';
 $files = array_merge(...array_map(
     static fn (string $dir) => glob(__DIR__ . "/$dir/*Test.php") ?: [],
@@ -52,6 +61,9 @@ foreach ($files as $file) {
             continue;
         }
         $test = new $class();
+        // Controllers may call set_time_limit() (PDF upload: 300 s); that limit must not
+        // carry over to the rest of the suite, which runs far longer on MySQL.
+        set_time_limit(0);
         try {
             $test->setUp();
             $test->$method();

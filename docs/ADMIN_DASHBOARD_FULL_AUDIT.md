@@ -6,6 +6,9 @@ Detailed results: `ADMIN_DASHBOARD_TEST_MATRIX.md`. Publishing walkthrough: `BOO
 
 **Verdict:** every module works; 383 browser checks passed, 0 failed. Four issues were found and fixed (below).
 MySQL behaviour remains **unverified** (blocked on credentials).
+*Update 2026-11-19:* MySQL is now verified — the admin integration tests (`AdminHttpTest`, `AdminCompletionTest`,
+`AdminPasswordLoginTest`) pass on MySQL 8.0.46 with `MAURO_HARNESS=mysql`; that run found and fixed two MySQL-only
+defects (`HY093`, e.g. an administrator could not change their password on MySQL). See `docs/MYSQL_VERIFICATION.md`.
 
 ## Modules
 
@@ -78,5 +81,7 @@ working; an owner uploading books one by one will not reach it.
 ## Not covered / limits
 
 - MySQL: 32 integration tests **blocked** (no valid credentials). All browser tests ran on SQLite.
+  *(Resolved 2026-11-19: MySQL tests pass — see the update above.)*
 - Live Google sign-in: not testable without a client ID and HTTPS domain.
+  *(2026-11-19: client ID configured, button renders on `http://localhost:8000`; a live sign-in by the owner is still pending.)*
 - Pagination of reviews and logs was exercised only at the sizes produced by the tests.

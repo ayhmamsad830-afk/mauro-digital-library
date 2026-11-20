@@ -6,6 +6,7 @@ namespace Tests\Support;
 
 use App\Core\Database;
 use App\Core\Migrator;
+use App\Support\TestDatabaseConfig;
 use PDO;
 use Throwable;
 
@@ -14,15 +15,25 @@ use Throwable;
  *
  *  sqlite() — in-memory SQLite with database/sqlite/schema.sql. Exercises the
  *             real repository/services SQL logic. NOT a substitute for MySQL.
- *  mysql()  — the real MySQL development TEST database, or null when it is
- *             unreachable (tests are then reported as SKIPPED, never passed).
- *             Destructive (drops all tables), so it only runs against a
- *             database whose name ends in "_test".
+ *  mysql()  — the real MySQL TEST database, or null when it is unreachable or
+ *             refused (tests are then reported as SKIPPED, never passed).
+ *             Destructive (drops all tables), so it only runs against the
+ *             dedicated local database `mauro_library_test`, with its own
+ *             account, and every DB_TEST_* setting must be present.
  */
 final class TestDatabase
 {
     public static function sqlite(): PDO
     {
+        // MAURO_HARNESS=mysql runs every harness-based test against a fresh, migrated
+        // MySQL TEST database instead (same guards as mysql()); skipped if unavailable.
+        if (getenv('MAURO_HARNESS') === 'mysql') {
+            [$pdo, $reason] = self::mysql();
+            if ($pdo === null) {
+                throw new \Tests\SkippedTest($reason);
+            }
+            return $pdo;
+        }
         $pdo = Database::connectSqlite('');
         $pdo->exec((string) file_get_contents(BASE_PATH . '/database/sqlite/schema.sql'));
         Database::setConnection($pdo);
@@ -32,39 +43,25 @@ final class TestDatabase
     /** @return array{0: ?PDO, 1: string} [connection|null, reason] */
     public static function mysql(): array
     {
-        $cfg = [
-            'driver' => 'mysql',
-            'host' => (string) (env('DB_TEST_HOST') ?: config('database.host')),
-            'port' => (int) (env('DB_TEST_PORT') ?: config('database.port')),
-            'database' => (string) (env('DB_TEST_DATABASE') ?: ''),
-            'username' => (string) (env('DB_TEST_USERNAME') ?: config('database.username')),
-            'password' => (string) (env('DB_TEST_PASSWORD') ?: config('database.password')),
-            'socket' => (string) (env('DB_TEST_SOCKET') ?: config('database.socket')),
-            'charset' => 'utf8mb4',
-            'collation' => 'utf8mb4_unicode_ci',
-            'timeout' => 3,
-        ];
-        // Hard guards: destructive tests never touch production or the development database.
-        if (config('app.env') === 'production') {
-            return [null, 'BLOCKED: destructive MySQL tests are refused when APP_ENV=production'];
-        }
-        if ($cfg['database'] !== '' && $cfg['database'] === (string) config('database.database')
-            && $cfg['host'] === (string) config('database.host') && $cfg['port'] === (int) config('database.port')) {
-            return [null, 'BLOCKED: DB_TEST_DATABASE must differ from the development DB_DATABASE'];
-        }
-        if ($cfg['database'] === '') {
-            return [null, 'BLOCKED: no MySQL test database configured (set DB_TEST_DATABASE=<name>_test and DB_TEST_* credentials)'];
-        }
-        if (!str_ends_with($cfg['database'], '_test')) {
-            return [null, "BLOCKED: DB_TEST_DATABASE must end in _test (got {$cfg['database']}); tests drop all tables"];
-        }
-        if ($cfg['username'] === '') {
-            return [null, 'BLOCKED: no MySQL username configured (DB_TEST_USERNAME)'];
+        // Every DB_TEST_* value is mandatory and the development credentials are never
+        // substituted; then hard guards (production, protected/development databases,
+        // shared account, remote server) — see App\Support\TestDatabaseConfig.
+        try {
+            $cfg = TestDatabaseConfig::resolve();
+            TestDatabaseConfig::assertSafeForDestructiveTests($cfg, (string) config('app.env'), (array) config('database', []));
+        } catch (Throwable $e) {
+            return [null, 'BLOCKED: ' . $e->getMessage()];
         }
         try {
             $pdo = Database::connect($cfg);
         } catch (Throwable $e) {
             return [null, 'BLOCKED: MySQL unreachable — ' . strtok($e->getMessage(), "\n")];
+        }
+        // Defence in depth: confirm the server really put us in the dedicated test schema
+        // before a single table is dropped.
+        $current = (string) $pdo->query('SELECT DATABASE()')->fetchColumn();
+        if ($current !== TestDatabaseConfig::ALLOWED_DATABASE) {
+            return [null, "BLOCKED: connected to '$current' instead of '" . TestDatabaseConfig::ALLOWED_DATABASE . "'; nothing was dropped"];
         }
 
         // Fresh schema from the real migrations.

@@ -76,7 +76,7 @@ final class AdminAuthController extends Controller
         if ($error !== null) {
             return $this->passwordView(__($error, ['min' => AdminPasswordAuth::MIN_LENGTH]), 422);
         }
-        Session::regenerate();
+        Auth::passwordChangedHere(); // keeps this session (new id), signs other devices out
         Session::put('auth_at', time());
         Session::flash('success', __('admin_auth.changed'));
         return $this->redirect(route('admin.dashboard'), 303);

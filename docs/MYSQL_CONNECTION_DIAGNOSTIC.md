@@ -207,6 +207,47 @@ one problem remains.
 
 ---
 
+## 6b. Account-Name Audit (added 2026-11-18, read-only)
+
+A follow-up audit found that the project names **three different** application database users in
+three different places. Only the *test* user is consistent.
+
+| Source | Username declared | Matches `.env`? |
+|---|---|---|
+| **`.env`** `DB_USERNAME` | **`AIHAM`** | — (this is the live value) |
+| [database/setup/mysql_create_databases.sql:12](../database/setup/mysql_create_databases.sql#L12) | `mauro_dev`@`localhost` | ❌ **no** |
+| [docs/LAUNCH_RUNBOOK.md:52](LAUNCH_RUNBOOK.md#L52) (production) | `mauro_app`@`localhost` | ❌ no (production only) |
+| **`.env`** `DB_TEST_USERNAME` | **`mauro_test`** | — (this is the live value) |
+| [database/setup/mysql_create_databases.sql:17](../database/setup/mysql_create_databases.sql#L17) | `mauro_test`@`localhost` | ✅ **yes** |
+
+`AIHAM` has the shape of a personal MySQL account rather than a project service account — it matches
+the server's own error-log name (`AYHM.err`) and the repository owner's handle. The most likely
+history is that the developer pointed `DB_USERNAME` at their personal MySQL login instead of running
+the project's setup script to create `mauro_dev`.
+
+This matters for the repair: **whichever account is chosen, it must exist on the server with a host
+spec of `@'localhost'`** (the host MySQL resolves `127.0.0.1` TCP connections to here — verified in
+§3). The recommended end state is to use the project's own scoped `mauro_dev` account rather than a
+personal login, so development access stays limited to one database.
+
+### E-mail associated with the database account
+
+**None exists.** One address, `admin@mauro.local`, appears at
+[docs/LAUNCH_RUNBOOK.md:97](LAUNCH_RUNBOOK.md#L97), but that document explicitly states it
+*"exists only in the local development SQLite file; it is never migrated and cannot sign in."* It is
+a seeded **application** user, not a MySQL account, and is unrelated to error 1045. There are no
+`MAIL_`, `EMAIL_` or `SMTP_` keys in `.env` (57 keys total, none matching), and MySQL accounts do not
+carry e-mail addresses. No e-mail address was invented for this report.
+
+### Stored MySQL client logins
+
+`C:\Users\DELL\AppData\Roaming\MySQL\.mylogin.cnf` exists but is **24 bytes — an empty header with
+no entries**, and `mysql_config_editor print --all` reports *"no login paths defined"*. Its contents
+were not decoded. **Conclusion: no stored credential exists that could provide a non-interactive
+administrator login.** An interactive root login is therefore required for the inspection in §7.
+
+---
+
 ## 7. Manual Actions Required (administrator)
 
 Everything below needs a MySQL **administrator** account, which this phase deliberately did not use

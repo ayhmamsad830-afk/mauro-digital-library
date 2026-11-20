@@ -55,7 +55,7 @@ if ($featured) {
                     <?php foreach ($shelf as $i => $b): ?>
                         <div class="showcase__back showcase__back--<?= e($i + 1) ?>"><?= component('cover', ['book' => $b]) ?></div>
                     <?php endforeach; ?>
-                    <a class="showcase__front" href="<?= e($featuredUrl) ?>" tabindex="-1"><?= component('cover', ['book' => $featured]) ?></a>
+                    <a class="showcase__front" href="<?= e($featuredUrl) ?>" tabindex="-1" aria-hidden="true"><?= component('cover', ['book' => $featured]) ?></a>
                 </div>
                 <span class="showcase__table"></span>
             </div>

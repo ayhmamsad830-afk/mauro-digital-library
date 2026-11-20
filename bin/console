@@ -69,10 +69,15 @@ try {
             $c = Config::get('database');
             if (in_array('--test', $args, true)) {
                 // Non-destructive connectivity check of the TEST database settings.
-                $c = array_merge($c, array_filter([
-                    'host' => env('DB_TEST_HOST'), 'port' => env('DB_TEST_PORT'), 'database' => env('DB_TEST_DATABASE'),
-                    'username' => env('DB_TEST_USERNAME'), 'password' => env('DB_TEST_PASSWORD'), 'socket' => env('DB_TEST_SOCKET'),
-                ], static fn ($v) => $v !== null && $v !== ''));
+                // Every DB_TEST_* value is mandatory: a missing one is an error and the
+                // development credentials are never substituted (a check must not report
+                // OK while silently testing the development account).
+                try {
+                    $c = \App\Support\TestDatabaseConfig::resolve();
+                } catch (\InvalidArgumentException $e) {
+                    $err('FAIL ' . $e->getMessage());
+                    exit(2);
+                }
             }
             // db:check always verifies the MySQL settings, even while DB_DRIVER=sqlite
             // keeps the dev site on SQLite: that is how MySQL is proven ready before

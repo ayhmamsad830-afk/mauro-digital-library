@@ -23,6 +23,8 @@ final class UnavailableLibraryRepository implements LibraryRepository
     public function findCategoryBySlug(string $slug): ?array { return null; }
     public function authors(): array { return []; }
     public function languages(): array { return []; }
+    public function publishers(): array { return []; }
+    public function findPublisherBySlug(string $slug): ?array { return null; }
     public function searchBooks(BookQuery $query): Paginator { return Paginator::empty($query->perPage); }
     public function findBookBySlug(string $slug): ?array { return null; }
     public function findBookById(int $id): ?array { return null; }

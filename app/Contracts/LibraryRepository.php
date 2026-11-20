@@ -43,6 +43,12 @@ interface LibraryRepository
     /** Language codes that have at least one published book. @return list<string> */
     public function languages(): array;
 
+    /** Publishers of visible books. @return list<array{name:string, slug:string, books_count:int}> */
+    public function publishers(): array;
+
+    /** @return array{name:string, slug:string, books_count:int}|null */
+    public function findPublisherBySlug(string $slug): ?array;
+
     public function searchBooks(BookQuery $query): Paginator;
 
     /** @return array<string,mixed>|null */

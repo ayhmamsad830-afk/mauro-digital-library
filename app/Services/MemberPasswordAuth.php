@@ -47,18 +47,29 @@ final class MemberPasswordAuth
             || str_ends_with($email, '.invalid')) {
             $errors['email'] = 'member_auth.email_invalid';
         }
-        $len = mb_strlen($password);
-        if ($len < self::MIN_LENGTH || $len > self::MAX_LENGTH || trim($password) === '') {
-            $errors['password'] = 'member_auth.password_length';
-        } elseif ($email !== '' && mb_strtolower($password) === $email) {
-            $errors['password'] = 'member_auth.password_is_email';
-        } elseif (count(array_unique(mb_str_split($password))) < 4) {
-            $errors['password'] = 'member_auth.password_weak';
+        if (($pw = self::passwordError($password, $email)) !== null) {
+            $errors['password'] = $pw;
         }
         if (!isset($errors['password']) && !hash_equals($password, $confirm)) {
             $errors['password_confirmation'] = 'member_auth.password_mismatch';
         }
         return $errors;
+    }
+
+    /** Member password policy (registration, reset, settings). @return string|null translation key */
+    public static function passwordError(string $password, string $email): ?string
+    {
+        $len = mb_strlen($password);
+        if ($len < self::MIN_LENGTH || $len > self::MAX_LENGTH || trim($password) === '') {
+            return 'member_auth.password_length';
+        }
+        if ($email !== '' && mb_strtolower($password) === mb_strtolower($email)) {
+            return 'member_auth.password_is_email';
+        }
+        if (count(array_unique(mb_str_split($password))) < 4) {
+            return 'member_auth.password_weak';
+        }
+        return null;
     }
 
     /**

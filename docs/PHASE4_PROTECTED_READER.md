@@ -77,6 +77,9 @@ Config (`.env`): `PDF_MAX_UPLOAD_MB`, `PDF_MAX_PAGES`, `PDF_PAGE_WIDTH`, `PDF_RE
 
 ## 5. Not verified / pending
 - MySQL: all Phase 4 tests ran on the SQLite harness; the MySQL suite (32 tests) is **BLOCKED** (no server/credentials).
+  *Update 2026-11-19: resolved — the reader tests (`ProtectedReaderTest`, `PdfPipelineTest`, …) pass on MySQL 8.0.46 with
+  `MAURO_HARNESS=mysql`, the 32 MySQL tests pass, and the reader was audited on MySQL with a disposable copy of the real
+  book (164 pages, visible per-reader watermark, token checks) — `docs/MYSQL_DATA_IMPORT.md`.*
 - Production host capabilities: unknown until `env:check` runs there.
 - Malware scanning of uploads (spec §13.3 "when a suitable tool exists"): no scanner (e.g. ClamAV) is installed; PDFs are only
   ever opened by Poppler on the server and never delivered to browsers.

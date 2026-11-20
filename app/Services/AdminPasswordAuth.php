@@ -133,8 +133,9 @@ final class AdminPasswordAuth
             return $err;
         }
         Database::query(
-            'UPDATE users SET password_hash = :h, password_must_change = 0, password_changed_at = :n, updated_at = :n WHERE id = :id',
-            ['h' => self::hash($new), 'n' => gmdate('Y-m-d H:i:s'), 'id' => $userId]
+            // Each placeholder used once: MySQL native prepares reject a repeated name (HY093).
+            'UPDATE users SET password_hash = :h, password_must_change = 0, password_changed_at = :n, updated_at = :n2 WHERE id = :id',
+            ['h' => self::hash($new), 'n' => $now = gmdate('Y-m-d H:i:s'), 'n2' => $now, 'id' => $userId]
         );
         ActivityLog::record($userId, 'admin.password_changed', 'user', $userId, 'administrator chose a new password', $ip);
         return null;
@@ -163,8 +164,8 @@ final class AdminPasswordAuth
         return Database::transaction(static function () use ($name, $username, $password, $email, $sub, $now): int {
             Database::query(
                 "INSERT INTO users (google_sub, email, username, password_hash, password_must_change, name, role, status, created_at, updated_at)
-                 VALUES (:s, :e, :u, :h, 1, :n, 'admin', 'active', :c, :c)",
-                ['s' => $sub, 'e' => $email, 'u' => $username, 'h' => self::hash($password), 'n' => $name, 'c' => $now]
+                 VALUES (:s, :e, :u, :h, 1, :n, 'admin', 'active', :c, :c2)",
+                ['s' => $sub, 'e' => $email, 'u' => $username, 'h' => self::hash($password), 'n' => $name, 'c' => $now, 'c2' => $now]
             );
             $id = Database::lastInsertId();
             ActivityLog::record($id, 'admin.created', 'user', $id, 'administrator account created from the CLI (temporary password)', null);

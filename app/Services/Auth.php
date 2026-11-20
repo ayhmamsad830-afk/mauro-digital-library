@@ -37,12 +37,24 @@ final class Auth
         if (!is_int($id) || $id < 1) {
             return null;
         }
-        $row = Database::first('SELECT id, name, email, avatar_url, role, status, password_must_change FROM users WHERE id = :id', ['id' => $id]);
+        $row = Database::first('SELECT id, name, email, avatar_url, role, status, password_must_change, password_changed_at FROM users WHERE id = :id', ['id' => $id]);
         if (!$row || $row['status'] !== 'active') {
             // Deleted or suspended account: end the session immediately.
             Session::invalidate();
             return null;
         }
+        // A password set after this session was opened (reset by e-mail, change on another
+        // device) signs this session out. Sessions from before this check existed adopt "now".
+        $seen = Session::get('pw_seen');
+        if (!is_int($seen)) {
+            Session::put('pw_seen', $seen = time());
+        }
+        $changed = $row['password_changed_at'] !== null ? strtotime($row['password_changed_at'] . ' UTC') : false;
+        if ($changed !== false && $changed > $seen) {
+            Session::invalidate();
+            return null;
+        }
+        unset($row['password_changed_at']);
         $row['id'] = (int) $row['id'];
         return self::$user = $row;
     }
@@ -62,6 +74,15 @@ final class Auth
     {
         Session::regenerate();
         Session::put('user_id', $userId);
+        Session::put('pw_seen', time());
+        self::reset();
+    }
+
+    /** The signed-in user changed their own password: keep THIS session, other devices are signed out. */
+    public static function passwordChangedHere(): void
+    {
+        Session::regenerate();
+        Session::put('pw_seen', time());
         self::reset();
     }
 

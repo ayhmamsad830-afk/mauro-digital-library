@@ -6,8 +6,8 @@
    serves RTL (Arabic, default) and LTR (English).
    Direction: "premium cosmic digital library" — deep-space navy and midnight
    blue, electric-blue accents, a whisper of cosmic violet, soft white type.
-   Dark (default) is the night sky; light is a bright, clean daylight version.
-   Motion and the animated sky live in cosmic.css / cosmic.js.
+   Vintage Paper (2026-11-19): parchment light theme and aged-paper dark theme, teal + gold accents.
+   Decorative motion (scroll reveal, hero entrance, featured-book float) lives in motion.css / motion.js.
    ========================================================================== */
 
 /* ---------- 0. Self-hosted fonts (OFL, /assets/fonts — no external requests) ----------
@@ -77,7 +77,7 @@
     --starlight: #e6ebf7;   /* soft white type */
     --white: #ffffff;
 
-    /* Colour roles — light: "Pearl Cosmic" — pearl white, icy blue, a breath of lavender */
+    /* Colour roles — base values; the Vintage Paper blocks below override them (parchment, teal, gold). */
     --c-bg: #f8f8fc;               /* pearl */
     --c-surface: var(--white);
     --c-surface-2: #f2f3f9;
@@ -113,10 +113,10 @@
     --radius-lg: 22px;
     --radius-pill: 999px;
     /* Soft ambient shadows, tinted towards indigo rather than grey. */
-    --shadow-sm: 0 1px 2px rgb(48 52 96 / 6%);
-    --shadow: 0 1px 2px rgb(48 52 96 / 5%), 0 12px 30px -10px rgb(48 52 96 / 12%);
-    --shadow-lg: 0 2px 6px rgb(48 52 96 / 6%), 0 30px 60px -18px rgb(48 52 96 / 22%);
-    --shadow-book: 0 1px 1px rgb(48 52 96 / 10%), 0 6px 14px -4px rgb(48 52 96 / 18%), 0 22px 40px -18px rgb(48 52 96 / 28%);
+    --shadow-sm: 0 1px 2px rgb(90 60 25 / 6%);
+    --shadow: 0 1px 2px rgb(90 60 25 / 5%), 0 12px 30px -10px rgb(90 60 25 / 12%);
+    --shadow-lg: 0 2px 6px rgb(90 60 25 / 6%), 0 30px 60px -18px rgb(90 60 25 / 22%);
+    --shadow-book: 0 1px 1px rgb(90 60 25 / 10%), 0 6px 14px -4px rgb(90 60 25 / 18%), 0 22px 40px -18px rgb(90 60 25 / 28%);
 
     --container: 1220px;
     --gutter: clamp(16px, 4vw, 36px);
@@ -127,17 +127,17 @@
     color-scheme: light;
 }
 
-/* Dark (default): the night sky — deep navy, soft white type, electric-blue light. */
+/* Dark: base values, overridden below by the Vintage Paper aged-paper theme. */
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
         --c-bg: #060a17; --c-surface: #0d1428; --c-surface-2: #131c36; --c-surface-3: #1a2545;
     --c-text: #e6ebf7; --c-muted: #9ba7c4; --c-border: #1e2944; --c-border-strong: #33416a;
     --c-primary: #7aa7ff; --c-primary-strong: #a9c6ff; --c-primary-soft: #14224a; --c-on-primary: #050b1d;
-    --c-accent: #a996f6; --c-accent-text: #bcadfb; --c-accent-soft: #221c45; --c-focus: #8fb4ff;
+    --c-accent: #a996f6; --c-accent-text: #bcadfb; --c-accent-soft: #221c45; --c-focus: var(--gold);
     --c-success: #6fd09a; --c-success-soft: #13301f; --c-warning: #e4be66; --c-warning-soft: #392f19;
     --c-danger: #f08c7a; --c-danger-soft: #3d221d; --c-star: #e7c06a; --c-overlay: rgb(2 4 12 / 66%);
     --c-ink: #040712; --c-on-ink: #e6ebf7; --c-on-ink-muted: #8f9bb8; --c-header: rgb(6 10 23 / 72%);
-    --c-glow: rgb(79 140 255 / 38%);
+    --c-glow: rgb(210 166 108 / 38%);
     --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
     --shadow: 0 1px 2px rgb(0 0 0 / 35%), 0 10px 28px -8px rgb(0 0 0 / 55%);
     --shadow-lg: 0 2px 6px rgb(0 0 0 / 40%), 0 28px 56px -16px rgb(0 0 0 / 70%);
@@ -149,11 +149,11 @@
     --c-bg: #060a17; --c-surface: #0d1428; --c-surface-2: #131c36; --c-surface-3: #1a2545;
     --c-text: #e6ebf7; --c-muted: #9ba7c4; --c-border: #1e2944; --c-border-strong: #33416a;
     --c-primary: #7aa7ff; --c-primary-strong: #a9c6ff; --c-primary-soft: #14224a; --c-on-primary: #050b1d;
-    --c-accent: #a996f6; --c-accent-text: #bcadfb; --c-accent-soft: #221c45; --c-focus: #8fb4ff;
+    --c-accent: #a996f6; --c-accent-text: #bcadfb; --c-accent-soft: #221c45; --c-focus: var(--gold);
     --c-success: #6fd09a; --c-success-soft: #13301f; --c-warning: #e4be66; --c-warning-soft: #392f19;
     --c-danger: #f08c7a; --c-danger-soft: #3d221d; --c-star: #e7c06a; --c-overlay: rgb(2 4 12 / 66%);
     --c-ink: #040712; --c-on-ink: #e6ebf7; --c-on-ink-muted: #8f9bb8; --c-header: rgb(6 10 23 / 72%);
-    --c-glow: rgb(79 140 255 / 38%);
+    --c-glow: rgb(210 166 108 / 38%);
     --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
     --shadow: 0 1px 2px rgb(0 0 0 / 35%), 0 10px 28px -8px rgb(0 0 0 / 55%);
     --shadow-lg: 0 2px 6px rgb(0 0 0 / 40%), 0 28px 56px -16px rgb(0 0 0 / 70%);
@@ -189,6 +189,37 @@
     --paper-burn: inset 0 0 0 1px rgb(0 0 0 / 40%), inset 0 0 18px 2px rgb(0 0 0 / 50%), inset 0 0 48px -8px rgb(0 0 0 / 38%);
 }
 
+/* Vintage Paper accents (owner decision 2026-11-19): teal + gold, values from commit 0a1ac0a.
+   --electric / --nebula (Cosmic primitives still used by a few gradients) now mean gold / teal. */
+:root {
+    --teal: #195f59; --gold: #b98a52;
+    --electric: var(--gold); --nebula: var(--teal);
+    --c-primary: #195f59; --c-primary-strong: #124843; --c-primary-soft: #dcebe6; --c-on-primary: #ffffff;
+    --c-accent: #b98a52; --c-accent-soft: #f1e5d3; --c-focus: #195f59;
+    --c-star: #b98a52; --c-glow: rgb(185 138 82 / 26%);
+    --c-ink: #242923; --c-on-ink: #f1ebdf; --c-on-ink-muted: #b9b6aa; /* charcoal band (footer, promise) */
+    /* Warm text instead of the Cosmic navy: charcoal (10.6:1 on parchment), muted 5.0:1 (AA). */
+    --c-text: #242923; --c-muted: #545b53; --c-overlay: rgb(36 41 35 / 48%);
+}
+:root[data-theme="dark"] {
+    --gold: #d2a66c; --teal: #79c2b6;
+    --c-primary: #79c2b6; --c-primary-strong: #a2d8ce; --c-primary-soft: #1b3531; --c-on-primary: #0d1916;
+    --c-accent: #d2a66c; --c-accent-text: #ddb684; --c-accent-soft: #352a1c; --c-focus: #d2a66c;
+    --c-star: #d6aa6e; --c-glow: rgb(210 166 108 / 30%);
+    --c-on-ink: #ece6da; --c-on-ink-muted: #9da59c;
+    --c-text: #ece6da; --c-muted: #b3aa9b; --c-overlay: rgb(0 0 0 / 62%);
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --gold: #d2a66c; --teal: #79c2b6;
+        --c-primary: #79c2b6; --c-primary-strong: #a2d8ce; --c-primary-soft: #1b3531; --c-on-primary: #0d1916;
+        --c-accent: #d2a66c; --c-accent-text: #ddb684; --c-accent-soft: #352a1c; --c-focus: #d2a66c;
+        --c-star: #d6aa6e; --c-glow: rgb(210 166 108 / 30%);
+        --c-on-ink: #ece6da; --c-on-ink-muted: #9da59c;
+        --c-text: #ece6da; --c-muted: #b3aa9b; --c-overlay: rgb(0 0 0 / 62%);
+    }
+}
+
 /* Generated torn-paper outlines (deckled edges); two variants for variety. */
 :root {
     --torn-a: polygon(0.0% 4px, 3.0% 1px, 5.1% 3px, 7.4% 6px, 10.3% 2px, 13.2% 3px, 15.9% 4px, 17.9% 2px, 20.5% 2px, 23.1% 3px, 26.0% 7px, 28.8% 0px, 31.2% 4px, 33.6% 1px, 35.2% 2px, 36.7% 4px, 39.2% 0px, 41.1% 1px, 43.5% 1px, 46.5% 1px, 48.6% 2px, 50.4% 0px, 52.4% 4px, 55.1% 2px, 58.0% 1px, 59.8% 5px, 62.0% 4px, 64.9% 5px, 66.5% 2px, 68.7% 5px, 71.6% 2px, 74.0% 0px, 75.5% 0px, 78.3% 2px, 81.1% 4px, 83.4% 2px, 86.1% 4px, 89.0% 1px, 90.7% 1px, 92.9% 0px, 94.4% 0px, 96.9% 0px, 98.9% 2px, calc(100% - 4px) 0.0%, calc(100% - 0px) 1.9%, calc(100% - 1px) 4.6%, calc(100% - 4px) 6.9%, calc(100% - 4px) 9.6%, calc(100% - 3px) 11.4%, calc(100% - 1px) 13.0%, calc(100% - 4px) 14.5%, calc(100% - 4px) 17.2%, calc(100% - 0px) 18.9%, calc(100% - 1px) 21.0%, calc(100% - 5px) 22.9%, calc(100% - 3px) 24.7%, calc(100% - 0px) 26.4%, calc(100% - 2px) 28.8%, calc(100% - 0px) 31.3%, calc(100% - 4px) 34.0%, calc(100% - 3px) 36.4%, calc(100% - 4px) 39.3%, calc(100% - 0px) 41.7%, calc(100% - 1px) 44.0%, calc(100% - 3px) 46.4%, calc(100% - 1px) 48.3%, calc(100% - 1px) 50.8%, calc(100% - 4px) 53.1%, calc(100% - 1px) 56.0%, calc(100% - 4px) 58.9%, calc(100% - 1px) 60.8%, calc(100% - 4px) 62.5%, calc(100% - 4px) 64.1%, calc(100% - 2px) 67.1%, calc(100% - 4px) 68.8%, calc(100% - 4px) 70.9%, calc(100% - 3px) 73.7%, calc(100% - 4px) 76.1%, calc(100% - 5px) 78.3%, calc(100% - 3px) 80.2%, calc(100% - 2px) 82.8%, calc(100% - 3px) 84.4%, calc(100% - 4px) 87.1%, calc(100% - 4px) 88.8%, calc(100% - 4px) 90.4%, calc(100% - 4px) 93.2%, calc(100% - 1px) 95.1%, calc(100% - 0px) 96.7%, calc(100% - 1px) 98.5%, 100.0% calc(100% - 1px), 97.0% calc(100% - 3px), 95.2% calc(100% - 0px), 92.8% calc(100% - 1px), 90.7% calc(100% - 3px), 89.1% calc(100% - 2px), 87.6% calc(100% - 1px), 84.8% calc(100% - 0px), 81.8% calc(100% - 2px), 79.3% calc(100% - 3px), 76.6% calc(100% - 1px), 75.1% calc(100% - 1px), 73.3% calc(100% - 1px), 70.3% calc(100% - 2px), 67.5% calc(100% - 2px), 64.5% calc(100% - 2px), 62.7% calc(100% - 0px), 60.7% calc(100% - 2px), 58.1% calc(100% - 3px), 56.0% calc(100% - 7px), 54.2% calc(100% - 4px), 51.8% calc(100% - 3px), 49.3% calc(100% - 2px), 46.3% calc(100% - 1px), 44.4% calc(100% - 3px), 41.9% calc(100% - 5px), 40.4% calc(100% - 3px), 38.4% calc(100% - 3px), 36.8% calc(100% - 0px), 34.2% calc(100% - 7px), 31.8% calc(100% - 1px), 29.0% calc(100% - 2px), 26.5% calc(100% - 1px), 24.1% calc(100% - 3px), 21.1% calc(100% - 0px), 18.5% calc(100% - 1px), 16.0% calc(100% - 4px), 13.0% calc(100% - 4px), 10.0% calc(100% - 0px), 8.2% calc(100% - 3px), 6.4% calc(100% - 4px), 4.6% calc(100% - 2px), 3.0% calc(100% - 2px), 0.5% calc(100% - 1px), 0px 100.0%, 1px 97.1%, 3px 94.7%, 3px 92.1%, 3px 90.0%, 2px 87.6%, 2px 86.0%, 3px 83.5%, 7px 80.8%, 1px 78.1%, 7px 75.3%, 4px 73.2%, 3px 71.2%, 1px 68.9%, 6px 66.6%, 4px 64.8%, 1px 62.6%, 3px 60.3%, 6px 58.5%, 7px 55.6%, 1px 52.6%, 3px 51.1%, 2px 48.3%, 2px 45.8%, 2px 44.2%, 3px 41.5%, 2px 40.0%, 3px 37.7%, 2px 34.9%, 0px 32.7%, 2px 30.6%, 2px 27.7%, 1px 26.0%, 4px 23.0%, 3px 20.9%, 0px 19.3%, 1px 16.3%, 0px 14.6%, 3px 11.6%, 4px 9.6%, 7px 7.7%, 3px 5.3%, 3px 3.8%, 3px 2.2%);
@@ -203,7 +234,8 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: var(--c-bg); /* the animated sky is the fixed .cosmos layer (cosmic.css) */
+    /* Vintage Paper: browned page edge, tea stains and grain over the parchment colour. */
+    background: var(--paper-edge) fixed, var(--paper-stain) 0 0 / 900px 900px, var(--paper-grain), var(--c-bg);
     color: var(--c-text);
     font-family: var(--font-body);
     font-size: var(--fs-base);
@@ -379,7 +411,7 @@ html[lang="ar"] .drawer__section-title { text-transform: none; letter-spacing: 0
     background: var(--c-ink); color: var(--c-on-ink);
     --c-muted: var(--c-on-ink-muted);
     --c-border: rgb(255 255 255 / 10%);
-    --c-focus: #8fb4ff;
+    --c-focus: var(--gold);
 }
 .site-footer::before { content: ""; display: block; height: 3px; background: linear-gradient(90deg, transparent, var(--electric) 25%, var(--nebula) 75%, transparent); opacity: .5; }
 .site-footer .brand, .site-footer .brand:hover { color: var(--c-on-ink); }
@@ -391,8 +423,8 @@ html[lang="ar"] .drawer__section-title { text-transform: none; letter-spacing: 0
 .site-footer__brand p { margin: 0; max-width: 30rem; }
 .site-footer__tagline { font-family: var(--font-display); font-size: var(--fs-md); color: var(--c-on-ink); }
 .site-footer__note { display: flex; gap: .45rem; align-items: flex-start; }
-.site-footer__note .icon { margin-top: .25em; color: #8fb4ff; }
-.site-footer h2 { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .1em; color: #a9c6ff; margin-bottom: .9rem; font-weight: 700; }
+.site-footer__note .icon { margin-top: .25em; color: var(--gold); }
+.site-footer h2 { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .1em; color: var(--gold); margin-bottom: .9rem; font-weight: 700; }
 html[lang="ar"] .site-footer h2 { text-transform: none; letter-spacing: 0; font-size: var(--fs-sm); }
 .site-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
 .site-footer a { color: var(--c-on-ink); text-decoration: none; opacity: .88; transition: opacity var(--dur), color var(--dur); }

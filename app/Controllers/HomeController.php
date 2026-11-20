@@ -45,13 +45,16 @@ final class HomeController extends Controller
     {
         $library = $this->library();
         $urls = [];
-        foreach (['home', 'books.index', 'books.latest', 'books.popular', 'categories.index', 'authors.index', 'pages.privacy', 'pages.terms', 'pages.copyright'] as $name) {
+        foreach (['home', 'books.index', 'books.latest', 'books.popular', 'categories.index', 'authors.index', 'publishers.index', 'about', 'contact', 'pages.privacy', 'pages.terms', 'pages.copyright'] as $name) {
             $urls[] = ['loc' => self::absolute(route($name)), 'lastmod' => null];
         }
         if ($library instanceof \App\Repositories\MySqlLibraryRepository) {
             $entries = $library->sitemapEntries();
             foreach ($entries['categories'] as $slug) {
                 $urls[] = ['loc' => self::absolute(route('categories.show', ['slug' => $slug])), 'lastmod' => null];
+            }
+            foreach ($library->publishers() as $p) {
+                $urls[] = ['loc' => self::absolute(route('publishers.show', ['slug' => $p['slug']])), 'lastmod' => null];
             }
             foreach ($entries['books'] as $b) {
                 $urls[] = ['loc' => self::absolute(route('books.show', ['slug' => $b['slug']])), 'lastmod' => substr((string) $b['updated_at'], 0, 10)];

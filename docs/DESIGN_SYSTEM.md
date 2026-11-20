@@ -1,5 +1,17 @@
 # Design System (Phase 2)
 
+> **Design baseline — 2026-11-19 (owner decision): Vintage Paper everywhere.**
+> Parchment `#ead8b0` (light) / aged dark paper `#1b1712` (dark) with the paper grain, tea-stain and
+> browned-edge textures (`public/assets/images/paper/*`, `--paper-*` tokens in `app.css`) on the page,
+> cards, admin and reader; torn edges, tape, photo corners and paper clips (`components.css`); the
+> featured book on a paper wall and wooden shelf (`pages.css`). All restored from commit `0a1ac0a`.
+> The Cosmic layer (sky photo, stars, shooting stars, cursor trail) was **deleted** on 2026-11-19 (Batch A2):
+> `cosmic.css`, `cosmic.js` and `cosmic-sky.jpg` are gone; the two effects kept live in `motion.css` / `motion.js`.
+> Accents (owner decision 2026-11-19): **teal and gold**, values from `0a1ac0a` — buttons/links teal
+> (`#195f59` light, `#79c2b6` dark), labels/underlines/stars gold (`#b98a52`, text `#7a5427`; dark `#d2a66c`,
+> text `#ddb684`), charcoal band `#242923` for footer/promise, warm text `#242923` / `#ece6da`. All text
+> pairs checked against WCAG AA (≥ 4.5:1) on parchment and dark paper.
+
 Live reference: `/styleguide` (demo mode only — `APP_DEMO_UI=true`, never in production).
 
 ## Principles
@@ -16,8 +28,8 @@ Live reference: `/styleguide` (demo mode only — `APP_DEMO_UI=true`, never in p
 | `public/assets/css/pages.css` | Home, catalogue, book details, auth, account, legal, styleguide, error pages |
 | `public/assets/css/reader.css` | Protected reader (page images only, `user-select: none`, hidden in print) |
 | `public/assets/css/admin.css` | Admin shell (sidebar → drawer on mobile) |
-| `public/assets/css/cosmic.css` | Cosmic sky layer, twinkling/shooting stars, scroll reveal, hero float, cursor trail (see `docs/COSMIC_ANIMATIONS_IMPLEMENTATION.md`) |
-| `public/assets/js/cosmic.js` | Decorative motion only: stars, shooting star, parallax, scroll reveal, cursor trail |
+| `public/assets/css/motion.css` | Scroll reveal, hero entrance and featured-book float with a warm contact shadow; all off under `prefers-reduced-motion` and in print |
+| `public/assets/js/motion.js` | Scroll reveal (IntersectionObserver, below-the-fold only) and pausing the float while the tab is hidden |
 | `public/assets/js/theme.js` | Applies saved theme before first paint |
 | `public/assets/js/app.js` | Theme toggle, drawers (focus trap, Esc), auto-submit selects, toasts, loading buttons |
 | `public/assets/js/reader.js` | Reader controller (navigation, zoom, fit, fullscreen, thumbnails, keyboard, swipe, guest progress, copy deterrence) |
@@ -25,7 +37,7 @@ Live reference: `/styleguide` (demo mode only — `APP_DEMO_UI=true`, never in p
 ## Tokens
 Colour: `--c-bg, --c-surface(-2/-3), --c-text, --c-muted, --c-border(-strong), --c-primary(-strong/-soft), --c-accent(-soft), --c-success/warning/danger(-soft), --c-star, --c-focus`.
 Dark values apply with `data-theme="dark"`, or by `prefers-color-scheme: dark` when the visitor has not chosen.
-Palette (cosmic, 2026-11): deep-space navy `#060a17`, midnight `#0d1428`, electric blue `#4f8cff`, cosmic violet `#8b7cf6`, soft white `#e6ebf7`; `--c-glow` is the blue light around hovered covers.
+Palette (since 2026-11-19, Vintage Paper): light `--c-bg #ead8b0`, `--c-surface #f4e6c6`, `--c-text #242923`, `--c-muted #545b53`, `--c-primary #195f59` (teal), `--c-accent #b98a52` (gold); dark `--c-bg #1b1712`, `--c-surface #231e18`, `--c-text #ece6da`, `--c-primary #79c2b6`, `--c-accent #d2a66c`. The old Cosmic primitives `--electric` / `--nebula` now resolve to gold / teal.
 Type scale `--fs-xs … --fs-3xl` (fluid `clamp`), spacing `--sp-1 … --sp-8`, radii, shadows, `--container`, `--gutter`, `--header-h`.
 
 ## Theme & language persistence

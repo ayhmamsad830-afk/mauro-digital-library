@@ -122,8 +122,10 @@ async function newPage(browser, vp, cookies = []) {
         const persisted = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
         ok(persisted === after, `theme: persisted after reload (${persisted})`);
         const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-        // Cosmic palette: deep-space navy (dark) / Pearl Cosmic white (light).
-        ok(after === 'dark' ? bg === 'rgb(6, 10, 23)' : bg === 'rgb(248, 248, 252)', `theme: body background matches (${bg})`);
+        // Design baseline (intentional change, approved 2026-11-19): Vintage Paper theme from
+        // commit 0a1ac0a (public/assets/css/app.css) — parchment #ead8b0 (light) and aged
+        // dark paper #1b1712 (dark). Replaces the retired Pearl Cosmic #f8f8fc / navy #060a17.
+        ok(after === 'dark' ? bg === 'rgb(27, 23, 18)' : bg === 'rgb(234, 216, 176)', `theme: body background matches Vintage Paper (${bg})`);
         await ctx.close();
     }
 
@@ -181,20 +183,24 @@ async function newPage(browser, vp, cookies = []) {
         await ctx.close();
     }
 
-    // 6. Cosmic atmosphere: decorative only, never hides content, honours reduced motion
+    // 6. Atmosphere: decorative only, never hides content, honours reduced motion.
+    // Design baseline (owner decision 2026-11-19): Vintage Paper everywhere — the Cosmic sky,
+    // stars and cursor trail are gone; the page shows the paper grain/stain textures instead.
     {
         const { ctx, page } = await newPage(browser, VIEWPORTS.desktop);
         await page.goto(BASE + '/');
         const sky = await page.evaluate(() => ({
-            layer: !!document.querySelector('.cosmos[aria-hidden="true"]'),
-            stars: document.querySelectorAll('.cosmos .star').length,
+            cosmos: !!document.querySelector('.cosmos'),
+            stars: document.querySelectorAll('.star').length,
+            trail: document.body.hasAttribute('data-cursor-trail'),
+            paper: /paper-(light|dark)\.webp/.test(getComputedStyle(document.body).backgroundImage),
         }));
-        ok(sky.layer && sky.stars > 0, `cosmic: sky layer + twinkling stars (${JSON.stringify(sky)})`);
+        ok(!sky.cosmos && sky.stars === 0 && !sky.trail && sky.paper, `vintage paper: no Cosmic sky/stars/trail, paper texture on the page (${JSON.stringify(sky)})`);
         for (let i = 0; i < 14; i++) { await page.mouse.wheel(0, 600); await page.waitForTimeout(120); }
         await page.waitForTimeout(1200);
         const hidden = await page.evaluate(() => [...document.querySelectorAll('.reveal')].filter(e => getComputedStyle(e).opacity < 0.99).length);
-        ok(hidden === 0, `cosmic: all scroll-reveal content visible after scrolling (${hidden} hidden)`);
-        ok(page._errors.length === 0, `cosmic: JS errors ${page._errors.join(' | ')}`);
+        ok(hidden === 0, `effects: all scroll-reveal content visible after scrolling (${hidden} hidden)`);
+        ok(page._errors.length === 0, `effects: JS errors ${page._errors.join(' | ')}`);
         await ctx.close();
 
         const rm = await browser.newContext({ viewport: VIEWPORTS.desktop, reducedMotion: 'reduce' });
@@ -205,7 +211,7 @@ async function newPage(browser, vp, cookies = []) {
             reveal: document.querySelectorAll('.reveal').length,
             trail: !!document.querySelector('.cursor-trail'),
         }));
-        ok(still.stars === 0 && still.reveal === 0 && !still.trail, `cosmic: reduced motion disables decorative effects (${JSON.stringify(still)})`);
+        ok(still.stars === 0 && still.reveal === 0 && !still.trail, `effects: reduced motion disables decorative effects (${JSON.stringify(still)})`);
         await rm.close();
     }
 

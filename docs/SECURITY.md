@@ -36,5 +36,6 @@ What protects what, and which automated test proves it. Honest limits are at the
 
 ## Limits (stated honestly)
 - **Screenshots, screen recording, photos of the screen and OCR cannot be prevented by any website.** The design deters and traces (watermark, short-lived tokens, rate limits); it is not DRM.
-- MySQL-specific behaviour is verified on the SQLite harness only until a MySQL test database is provided (`docs/MYSQL_VERIFICATION.md`).
-- Live Google sign-in is untested until a real `GOOGLE_CLIENT_ID` and authorised origin exist.
+- MySQL-specific behaviour is verified on MySQL 8.0.46 since 2026-11-19 (32 MySQL tests, and the whole suite with `MAURO_HARNESS=mysql`; `docs/MYSQL_VERIFICATION.md`). It must be re-checked on the production host.
+- Live Google sign-in: `GOOGLE_CLIENT_ID` is configured and the button renders on the authorised origin `http://localhost:8000`, but a real end-to-end sign-in is still to be done by the owner; the production HTTPS origin must be added before launch.
+- Known accepted exception KI-1: Google Identity Services injects inline styles that the CSP blocks on `/login`; the CSP is deliberately not weakened (`docs/KNOWN_ISSUES.md`).

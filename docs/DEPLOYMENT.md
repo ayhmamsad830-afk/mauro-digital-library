@@ -91,6 +91,32 @@ Permissions: directories `0750`, files `0640`, owned by the PHP user. `storage/.
 
 Google Sign-In is **not operational** until steps 1–5 are done on a real domain with HTTPS.
 
+## 6b. E-mail (password recovery, contact notifications)
+
+E-mail is **disabled by default** (`MAIL_DRIVER=disabled`). While it is disabled the site stays honest:
+`/password/forgot` says recovery is unavailable, and `/contact` messages are only stored for the
+administrators (`/admin/messages`). Nothing is ever claimed as "sent".
+
+Owner decision (2026-11-20): use the **hosting provider's SMTP**. When choosing the host, confirm it offers
+SMTP mailboxes on your domain, allows outbound 587/465 from PHP, and lets you publish SPF and DKIM records.
+
+To enable it:
+
+1. Verify the sender domain at the provider: **SPF**, **DKIM** (and a **DMARC** record, `p=none` to start).
+2. Server-side `.env` only: `MAIL_DRIVER=smtp`, `MAIL_HOST`, `MAIL_PORT` (587 with `MAIL_ENCRYPTION=tls` =
+   STARTTLS, or 465 with `ssl`), `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS` (an address of the
+   verified domain), `MAIL_FROM_NAME`. Plain-text SMTP is never used; certificates are verified.
+3. `php bin/console env:check` → the `E-mail delivery` line shows `smtp host:port (tls)`.
+4. Optional: admin → Settings → `site.contact_email` to receive a copy of each contact message.
+5. Test once: request a reset for your own account; the `mail_log` table records only
+   kind/status/error (never the body or the token).
+
+Related limits (`config/security.php`): password reset 10/h per IP and 3/h per address, contact 5/h per IP,
+member password change 6 per 15 min. Reset links expire after 60 minutes, are single-use, stored only as a
+SHA-256 hash, and every other session of the account is signed out after the change.
+
+Migration `0012` creates `password_resets`, `contact_messages` and `mail_log` (run `php bin/console migrate`).
+
 ## 7. Cron
 
 See `deploy/crontab.example`:
@@ -126,7 +152,7 @@ php bin/console render:work --max=50    # or let the cron worker render them
 
 Restoring overwrites data: never run it against production without a fresh backup and explicit approval. A backup that has never been restored is not proven — test a restore monthly.
 
-> Status in this build: the files backup and its verification are tested with both GNU tar and Windows tar; the **MySQL dump is BLOCKED** (no working MySQL credentials) and must be verified on staging before launch. Launch steps: `docs/LAUNCH_RUNBOOK.md`.
+> Status in this build (2026-11-19): the files backup and its verification are tested with both GNU tar and Windows tar. MySQL 8.0.46 is now available locally and manual `mysqldump` backups of `mauro_library_dev` have been made and checksummed, but **`backup:run` (the application's MySQL dump) has not yet been run against MySQL** — planned for the switch to MySQL, and to be verified again on staging/production (including a test restore) before launch. Launch steps: `docs/LAUNCH_RUNBOOK.md`.
 
 ## 9. Production checklist
 
@@ -139,4 +165,5 @@ Restoring overwrites data: never run it against production without a fresh backu
 7. Cron from `deploy/crontab.example` installed; check `storage/logs/cron.log` after a few minutes.
 8. Upload one real (licensed) PDF, process it, open the reader as guest and as member; confirm watermark and that `/admin/files` shows it "Ready".
 9. Run `php bin/console backup:run`, copy the archive off the server, and test a restore on staging.
-10. HTTPS with HSTS (sent automatically on HTTPS); staging stays `noindex` (automatic when `APP_ENV != production`); submit `https://<domain>/sitemap.xml` to search engines when ready.
+10. E-mail: leave `MAIL_DRIVER=disabled` until the provider is approved and its domain verified (§6b).
+11. HTTPS with HSTS (sent automatically on HTTPS); staging stays `noindex` (automatic when `APP_ENV != production`); submit `https://<domain>/sitemap.xml` to search engines when ready.

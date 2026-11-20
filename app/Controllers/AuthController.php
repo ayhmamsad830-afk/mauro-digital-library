@@ -61,7 +61,8 @@ final class AuthController extends Controller
         }
         Auth::login((int) $result['user_id']); // regenerates the session id
         Session::put('auth_method', 'email');
-        return $this->redirect($redirect, 303);
+        // Saved language and theme follow the member to any device.
+        return \App\Services\MemberPreferences::applyFromDatabase($this->redirect($redirect, 303), (int) $result['user_id'], $request);
     }
 
     /** GET /register — free account with e-mail + password (or Google). */
@@ -138,12 +139,8 @@ final class AuthController extends Controller
         }
         $redirect = safe_redirect_path((string) $request->input('redirect', '/account'), '/account');
         $response = $this->json(['ok' => true, 'redirect' => $redirect, 'csrf' => \App\Core\Csrf::token()]);
-        // Apply the language the member chose on a previous visit/device.
-        $pref = \App\Core\Database::scalar('SELECT preferred_locale FROM users WHERE id = :id', ['id' => $result['user_id']]);
-        if (is_string($pref) && \App\Core\Translator::isSupported($pref)) {
-            $response->cookie(\App\Core\Translator::COOKIE, $pref, ['expires' => time() + 31536000, 'path' => '/', 'secure' => $request->isSecure(), 'httponly' => true, 'samesite' => 'Lax']);
-        }
-        return $response;
+        // Apply the language and theme the member chose on a previous visit/device.
+        return \App\Services\MemberPreferences::applyFromDatabase($response, (int) $result['user_id'], $request);
     }
 
     public function logout(Request $request): Response

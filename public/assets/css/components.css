@@ -280,13 +280,13 @@ html[lang="ar"] .book-card__title { line-height: 1.55; min-height: calc(2 * 1.55
 [dir="rtl"] .book-card__read:hover .icon { transform: scaleX(-1) translateX(2px); }
 
 /* Dark: a translucent midnight card over the sky, hairline starlight border. */
-:root[data-theme="dark"] .book-card { background: color-mix(in srgb, var(--c-surface) 84%, transparent); box-shadow: 0 0 0 1px rgb(122 167 255 / 9%), 0 14px 32px -18px rgb(0 0 0 / 80%); }
-:root[data-theme="dark"] .book-card:hover, :root[data-theme="dark"] .book-card:focus-within { background: color-mix(in srgb, var(--c-surface-2) 90%, transparent); box-shadow: 0 0 0 1px rgb(122 167 255 / 28%), 0 28px 54px -24px rgb(0 0 0 / 85%), 0 0 46px -12px var(--c-glow); }
+:root[data-theme="dark"] .book-card { background: color-mix(in srgb, var(--c-surface) 84%, transparent); box-shadow: 0 0 0 1px rgb(210 166 108 / 9%), 0 14px 32px -18px rgb(0 0 0 / 80%); }
+:root[data-theme="dark"] .book-card:hover, :root[data-theme="dark"] .book-card:focus-within { background: color-mix(in srgb, var(--c-surface-2) 90%, transparent); box-shadow: 0 0 0 1px rgb(210 166 108 / 28%), 0 28px 54px -24px rgb(0 0 0 / 85%), 0 0 46px -12px var(--c-glow); }
 :root[data-theme="dark"] .cover { box-shadow: 0 0 0 1px rgb(255 255 255 / 6%), 0 4px 10px -6px rgb(0 0 0 / 50%); }
 :root[data-theme="dark"] .rail__btn { box-shadow: none; }
 @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .book-card { background: color-mix(in srgb, var(--c-surface) 84%, transparent); box-shadow: 0 0 0 1px rgb(122 167 255 / 9%), 0 14px 32px -18px rgb(0 0 0 / 80%); }
-    :root:not([data-theme="light"]) .book-card:hover, :root:not([data-theme="light"]) .book-card:focus-within { background: color-mix(in srgb, var(--c-surface-2) 90%, transparent); box-shadow: 0 0 0 1px rgb(122 167 255 / 28%), 0 28px 54px -24px rgb(0 0 0 / 85%), 0 0 46px -12px var(--c-glow); }
+    :root:not([data-theme="light"]) .book-card { background: color-mix(in srgb, var(--c-surface) 84%, transparent); box-shadow: 0 0 0 1px rgb(210 166 108 / 9%), 0 14px 32px -18px rgb(0 0 0 / 80%); }
+    :root:not([data-theme="light"]) .book-card:hover, :root:not([data-theme="light"]) .book-card:focus-within { background: color-mix(in srgb, var(--c-surface-2) 90%, transparent); box-shadow: 0 0 0 1px rgb(210 166 108 / 28%), 0 28px 54px -24px rgb(0 0 0 / 85%), 0 0 46px -12px var(--c-glow); }
     :root:not([data-theme="light"]) .cover { box-shadow: 0 0 0 1px rgb(255 255 255 / 6%), 0 4px 10px -6px rgb(0 0 0 / 50%); }
     :root:not([data-theme="light"]) .rail__btn { box-shadow: none; }
 }
@@ -504,7 +504,7 @@ html[lang="ar"] .table th { text-transform: none; letter-spacing: 0; font-size: 
     box-shadow: var(--shadow-lg), 0 0 0 1px rgb(255 255 255 / 3%) inset;
     animation: rise-in .18s var(--ease);
 }
-:root[data-theme="dark"] .account-menu__panel { background: color-mix(in srgb, var(--c-surface) 94%, transparent); border-color: rgb(122 167 255 / 16%); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+:root[data-theme="dark"] .account-menu__panel { background: color-mix(in srgb, var(--c-surface) 94%, transparent); border-color: rgb(210 166 108 / 16%); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
 .account-menu__who { display: flex; align-items: center; gap: .75rem; padding: .6rem .6rem .8rem; margin-bottom: .35rem; border-bottom: 1px solid var(--c-border); }
 .account-menu__avatar { width: 40px; height: 40px; flex: none; border-radius: 50%; object-fit: cover; }
 .account-menu__avatar--initial { display: grid; place-items: center; font-weight: 700; font-size: 1.05rem; color: var(--c-on-primary); background: linear-gradient(135deg, var(--c-primary), var(--c-accent)); }
@@ -532,3 +532,60 @@ html[lang="ar"] .table th { text-transform: none; letter-spacing: 0; font-size: 
 @media (prefers-reduced-motion: reduce) { .account-menu__panel { animation: none; } .account-menu__chevron { transition: none; } }
 /* A Latin name/e-mail inside an Arabic page still lines up with the Arabic label. */
 html[dir="rtl"] :is(.account-menu__name, .account-menu__email) { text-align: right; }
+
+/* Restored from commit 0a1ac0a (Vintage Paper everywhere, owner decision 2026-11-19). *//* ==========================================================================
+   Vintage paper sheets — torn edges, burnt rims, tea stains, tape, photo
+   corners and a paper clip. Tokens (--paper-*, --torn-*) live in app.css.
+   ========================================================================== */
+:root[data-theme] :is(.drawer__panel, .pagination a, .chip) { background-image: var(--paper-grain); }
+
+/* Every sheet: stained, grained paper with a browned edge. */
+:root[data-theme] :is(.card, .book-card, .category-card, .filter-group, .table-wrap, .empty-state) {
+    background-image: var(--paper-card-edge), var(--paper-stain), var(--paper-grain);
+    background-size: auto, 620px 620px, auto;
+    background-position: 0 0, var(--stain-x, 0) var(--stain-y, 0), 0 0;
+    box-shadow: var(--paper-burn) !important;
+}
+:root[data-theme] :is(:is(.card, .book-card, .category-card):nth-child(3n+2), li:nth-child(3n+2) > :is(.card, .book-card, .category-card)) { --stain-x: -230px; --stain-y: -140px; }
+:root[data-theme] :is(:is(.card, .book-card, .category-card):nth-child(3n), li:nth-child(3n) > :is(.card, .book-card, .category-card)) { --stain-x: -410px; --stain-y: -300px; }
+
+/* Torn, deckled outline (the inset burn follows it). */
+:root[data-theme] :is(.book-card, .category-card, .author-card, .filter-group, .empty-state, .stat, .auth__card) {
+    clip-path: var(--torn-a);
+    border-color: transparent;
+    border-radius: 0;
+}
+:root[data-theme] :is(:is(.book-card, .category-card, .author-card, .filter-group, .stat):nth-child(even), li:nth-child(even) > :is(.book-card, .category-card, .author-card)) { clip-path: var(--torn-b); }
+
+/* Tape across the top of category cards. */
+.category-card::after {
+    content: ""; position: absolute; z-index: 2; top: 8px; left: 50%; width: 88px; height: 22px;
+    transform: translateX(-50%) rotate(-3deg); pointer-events: none;
+    background: linear-gradient(180deg, rgb(255 250 232 / 72%), rgb(240 228 196 / 62%));
+    box-shadow: 0 1px 2px rgb(90 58 20 / 18%);
+    clip-path: polygon(0 12%, 3% 0, 97% 5%, 100% 18%, 98% 50%, 100% 84%, 97% 100%, 2% 95%, 0 70%, 3% 44%);
+}
+li:nth-child(even) > .category-card::after { left: 30%; transform: translateX(-50%) rotate(4deg); }
+li:nth-child(3n) > .category-card::after { left: 68%; transform: translateX(-50%) rotate(-6deg); width: 70px; }
+:root[data-theme="dark"] .category-card::after { background: rgb(214 192 150 / 20%); box-shadow: none; }
+
+/* Photo corners holding the featured picture and the book-page cover. */
+.showcase__stage::after, .book-hero__cover::after {
+    content: ""; position: absolute; z-index: 6; inset: 0; pointer-events: none;
+    --pc: rgb(58 38 20 / 90%); --pc-size: 38px;
+    background:
+        linear-gradient(135deg, var(--pc) 50%, transparent 50%) top left / var(--pc-size) var(--pc-size) no-repeat,
+        linear-gradient(225deg, var(--pc) 50%, transparent 50%) top right / var(--pc-size) var(--pc-size) no-repeat,
+        linear-gradient(45deg, var(--pc) 50%, transparent 50%) bottom left / var(--pc-size) var(--pc-size) no-repeat,
+        linear-gradient(315deg, var(--pc) 50%, transparent 50%) bottom right / var(--pc-size) var(--pc-size) no-repeat;
+    filter: drop-shadow(0 1px 1px rgb(0 0 0 / 30%));
+}
+.book-hero__cover::after { --pc-size: 30px; inset: -6px; }
+
+/* Brass paper clip on author cards. */
+.author-card::after {
+    content: ""; position: absolute; z-index: 2; top: 4px; inset-inline-start: 22px; width: 16px; height: 40px;
+    transform: rotate(8deg); pointer-events: none;
+    background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 20 44'><path d='M11 9v21a4 4 0 0 1-8 0V6a5 5 0 0 1 10 0v26a6.5 6.5 0 0 1-13 0V10' fill='none' stroke='%23a07a3c' stroke-width='1.8' stroke-linecap='round'/></svg>") center / contain no-repeat;
+    filter: drop-shadow(0 1px 1px rgb(60 40 15 / 35%));
+}

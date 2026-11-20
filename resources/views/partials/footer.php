@@ -11,6 +11,7 @@
             <ul>
                 <li><a href="<?= e(route('books.index')) ?>"><?= e(__('nav.library')) ?></a></li>
                 <li><a href="<?= e(route('categories.index')) ?>"><?= e(__('nav.categories')) ?></a></li>
+                <li><a href="<?= e(route('publishers.index')) ?>"><?= e(__('nav.publishers')) ?></a></li>
                 <li><a href="<?= e(route('books.latest')) ?>"><?= e(__('nav.latest')) ?></a></li>
                 <li><a href="<?= e(route('books.popular')) ?>"><?= e(__('nav.popular')) ?></a></li>
             </ul>
@@ -25,6 +26,8 @@
         <div>
             <h2><?= e(__('footer.about')) ?></h2>
             <ul>
+                <li><a href="<?= e(route('about')) ?>"><?= e(__('nav.about')) ?></a></li>
+                <li><a href="<?= e(route('contact')) ?>"><?= e(__('nav.contact')) ?></a></li>
                 <li><a href="<?= e(route('pages.privacy')) ?>"><?= e(__('pages.privacy.title')) ?></a></li>
                 <li><a href="<?= e(route('pages.terms')) ?>"><?= e(__('pages.terms.title')) ?></a></li>
                 <li><a href="<?= e(route('pages.copyright')) ?>"><?= e(__('pages.copyright.title')) ?></a></li>

@@ -1,5 +1,7 @@
 # Cosmic Animations — Implementation Notes
 
+> **HISTORICAL (2026-11-19):** the Cosmic design described here was replaced by Vintage Paper + teal/gold and its files (`cosmic.css`, `cosmic.js`, `cosmic-sky.jpg`) were deleted. Scroll reveal and the featured-book float now live in `motion.css` / `motion.js`. See `docs/DESIGN_SYSTEM.md`. Reader-protection notes below remain accurate.
+
 This is an enhancement of the existing MAURO site, not a rebuild. The PHP MVC structure, routes, controllers, database, authentication, Google Sign-In, admin and the protected reader pipeline are unchanged. The work touches only the front-end styles and scripts, two view templates, one config key and the browser test.
 
 ## 1. What was implemented

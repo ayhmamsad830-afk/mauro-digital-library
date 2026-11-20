@@ -63,64 +63,34 @@ html[lang="ar"] .hero__title { font-weight: 600; line-height: 1.32; letter-spaci
 .hero__stack span { position: absolute; inset: 0; border-radius: 3px 8px 8px 3px; box-shadow: var(--shadow-book); }
 .hero__stack span:nth-child(1) { background: #7a3b2e; transform: rotate(-9deg) translateX(-30%); }
 .hero__stack span:nth-child(2) { background: #2c4770; transform: rotate(7deg) translateX(28%); }
-.hero__stack span:nth-child(3) { background: #2b55c9; }
+.hero__stack span:nth-child(3) { background: var(--teal); }
 
-/* Featured book: the real cover floating in a small pocket of night sky,
-   lit from behind by a soft blue/violet halo (motion lives in cosmic.css). */
+/* Featured book: the real cover on a paper wall and wooden shelf (motion lives in motion.css). */
 .showcase { position: relative; display: grid; gap: 1.1rem; animation: rise-in .6s .08s var(--ease) both; }
+/* Vintage Paper showcase (restored from 0a1ac0a, owner decision 2026-11-19): paper wall, window light, wooden shelf. */
 .showcase__stage {
     position: relative; overflow: hidden; isolation: isolate;
     aspect-ratio: 1 / 1; max-height: 620px; width: 100%;
     display: grid; place-items: center;
-    border-radius: 20px;
-    border: 1px solid rgb(122 167 255 / 14%);
+    border-radius: 4px;
     background:
-        radial-gradient(42% 36% at 50% 46%, rgb(79 140 255 / 24%), transparent 72%),
-        radial-gradient(55% 45% at 78% 16%, rgb(139 124 246 / 18%), transparent 70%),
-        radial-gradient(50% 40% at 18% 88%, rgb(56 98 210 / 14%), transparent 70%),
-        linear-gradient(180deg, rgb(13 20 40 / 78%), rgb(6 10 23 / 90%));
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 5%), 0 40px 80px -40px rgb(0 0 0 / 80%);
+        radial-gradient(60% 50% at 70% 18%, rgb(255 247 230 / 55%), transparent 70%),
+        linear-gradient(180deg, #d9cbb4 0%, #cdbb9f 58%, #8a6a4a 58.2%, #6f5338 100%);
 }
-:root[data-theme="light"] .showcase__stage {
-    border-color: rgb(214 220 240);
-    background:
-        radial-gradient(40% 34% at 50% 46%, rgb(186 208 255 / 42%), transparent 72%),
-        radial-gradient(55% 45% at 82% 14%, rgb(226 214 255 / 36%), transparent 70%),
-        radial-gradient(50% 40% at 14% 90%, rgb(206 224 255 / 30%), transparent 70%),
-        linear-gradient(180deg, #fdfdff, #f2f4fb);
-    box-shadow: inset 0 1px 0 #fff, 0 1px 2px rgb(48 52 96 / 4%), 0 30px 60px -38px rgb(48 52 96 / 30%);
-}
-/* A faint field of fixed stars inside the stage (pure CSS, no images). */
-.showcase__stage::before {
-    content: ""; position: absolute; inset: 0; z-index: -1; opacity: .55;
-    background-image:
-        radial-gradient(1px 1px at 12% 18%, #fff, transparent),
-        radial-gradient(1px 1px at 28% 72%, #dbe7ff, transparent),
-        radial-gradient(1.5px 1.5px at 44% 12%, #fff, transparent),
-        radial-gradient(1px 1px at 63% 84%, #fff, transparent),
-        radial-gradient(1.5px 1.5px at 82% 30%, #e3dcff, transparent),
-        radial-gradient(1px 1px at 90% 66%, #fff, transparent),
-        radial-gradient(1px 1px at 8% 52%, #dbe7ff, transparent),
-        radial-gradient(1px 1px at 72% 8%, #fff, transparent);
-}
-:root[data-theme="light"] .showcase__stage::before { display: none; }
-/* Halo behind the featured book */
-.showcase__light {
-    position: absolute; inset: 16% 20%; z-index: -1; border-radius: 50%;
-    background: radial-gradient(closest-side, rgb(110 160 255 / 42%), rgb(139 124 246 / 16%) 60%, transparent);
-    filter: blur(18px);
-}
-:root[data-theme="light"] .showcase__light { background: radial-gradient(closest-side, rgb(79 140 255 / 30%), rgb(139 124 246 / 12%) 60%, transparent); }
-.showcase__table { display: none; }
-.showcase__covers { position: relative; width: clamp(150px, 19vw, 230px); }
+:root[data-theme="dark"] .showcase__stage { background: radial-gradient(60% 50% at 70% 18%, rgb(210 166 108 / 18%), transparent 70%), linear-gradient(180deg, #1d2a25 0%, #17221e 58%, #3a2c1f 58.2%, #241a12 100%); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .showcase__stage { background: radial-gradient(60% 50% at 70% 18%, rgb(210 166 108 / 18%), transparent 70%), linear-gradient(180deg, #1d2a25 0%, #17221e 58%, #3a2c1f 58.2%, #241a12 100%); } }
+/* window light falling across the wall */
+.showcase__light { position: absolute; inset: -10% -10% auto auto; width: 70%; height: 80%; z-index: -1; background: linear-gradient(115deg, transparent 30%, rgb(255 250 238 / 35%) 45%, transparent 60%); transform: skewX(-12deg); }
+[dir="rtl"] .showcase__light { inset: -10% auto auto -10%; transform: scaleX(-1) skewX(-12deg); }
+/* table edge highlight */
+.showcase__table { position: absolute; inset-inline: 0; top: 58%; height: 3px; background: linear-gradient(90deg, transparent, rgb(255 236 205 / 45%), transparent); }
+.showcase__covers { position: relative; width: clamp(150px, 19vw, 230px); margin-top: 6%; }
 .showcase__front { position: relative; z-index: 2; display: block; transition: transform .4s var(--ease); }
-.showcase__front .cover { box-shadow: 0 0 0 1px rgb(255 255 255 / 8%), 0 18px 40px -16px rgb(0 0 0 / 70%), 0 0 60px -10px rgb(79 140 255 / 40%); }
-:root[data-theme="light"] .showcase__front .cover { box-shadow: 0 0 0 1px rgb(20 27 51 / 6%), 0 18px 36px -18px rgb(20 27 51 / 45%), 0 0 50px -12px rgb(43 85 201 / 30%); }
+.showcase__front .cover { box-shadow: 0 0 0 1px rgb(0 0 0 / 6%), 0 2px 4px rgb(40 26 12 / 12%), 0 12px 24px -14px rgb(40 26 12 / 35%); }
 
-.showcase:hover .showcase__front { transform: translateY(-3px); }
+.showcase:hover .showcase__front { transform: translateY(-2px); }
 .showcase__back { position: absolute; inset: 0; z-index: 1; transition: transform .45s var(--ease); }
-.showcase__back .cover { box-shadow: 0 0 0 1px rgb(255 255 255 / 5%), 0 10px 24px -14px rgb(0 0 0 / 60%); filter: saturate(.85) brightness(.82); }
-:root[data-theme="light"] .showcase__back .cover { filter: saturate(.9) brightness(.96); box-shadow: 0 0 0 1px rgb(20 27 51 / 6%), 0 10px 22px -14px rgb(20 27 51 / 35%); }
+.showcase__back .cover { box-shadow: 0 0 0 1px rgb(0 0 0 / 6%), 0 8px 18px -12px rgb(40 26 12 / 30%); filter: saturate(.92) brightness(.94); }
 .showcase__back--1 { transform: translateX(-56%) translateY(5%) scale(.86); }
 .showcase__back--2 { transform: translateX(56%) translateY(5%) scale(.86); }
 
@@ -174,12 +144,12 @@ html[lang="ar"] .section-head__title { font-weight: 600; line-height: 1.45; }
     border-radius: var(--radius-lg);
     background: var(--c-ink); color: var(--c-on-ink);
 }
-.promise::before { content: ""; position: absolute; inset: 12px; border: 1px solid rgb(122 167 255 / 18%); border-radius: calc(var(--radius-lg) - 6px); pointer-events: none; }
+.promise::before { content: ""; position: absolute; inset: 12px; border: 1px solid rgb(210 166 108 / 18%); border-radius: calc(var(--radius-lg) - 6px); pointer-events: none; }
 .promise__title { font-size: var(--fs-xl); margin: 0; color: var(--c-on-ink); }
 .promise__title::after { content: ""; display: block; width: 2.25rem; height: 2px; margin-top: .9rem; background: linear-gradient(90deg, var(--electric), var(--nebula)); }
 .promise__list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1.25rem, 3vw, 2.25rem); }
 .promise__item { position: relative; display: flex; flex-direction: column; gap: .5rem; }
-.promise__icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; border: 1px solid rgb(122 167 255 / 40%); color: #a9c6ff; box-shadow: 0 0 22px -6px rgb(79 140 255 / 45%); }
+.promise__icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; border: 1px solid rgb(210 166 108 / 40%); color: var(--gold); box-shadow: 0 0 22px -6px rgb(210 166 108 / 45%); }
 .promise__num { position: absolute; top: 0; inset-inline-end: 0; font-family: var(--font-display); font-size: 1.7rem; line-height: 1; color: rgb(169 150 246 / 55%); font-variant-numeric: lining-nums; }
 .promise__item-title { font-size: 1.08rem; margin: .4rem 0 0; color: var(--c-on-ink); }
 .promise__item p { margin: 0; color: var(--c-on-ink-muted); font-size: var(--fs-sm); line-height: 1.75; }
@@ -316,7 +286,7 @@ html[lang="ar"] .section-head__title { font-weight: 600; line-height: 1.45; }
 .book-hero { display: grid; grid-template-columns: minmax(200px, 300px) minmax(0, 1fr); gap: clamp(1.75rem, 5vw, 4rem); margin-top: var(--sp-5); align-items: start; }
 .book-hero__cover { position: relative; }
 .book-hero__cover .cover { border-radius: 10px; box-shadow: 0 0 0 1px rgb(255 255 255 / 6%), 0 26px 50px -22px rgb(0 0 0 / 70%), 0 0 70px -24px var(--c-glow); }
-:root[data-theme="light"] .book-hero__cover .cover { box-shadow: 0 0 0 1px rgb(48 52 96 / 8%), 0 24px 46px -24px rgb(48 52 96 / 40%), 0 0 60px -24px var(--c-glow); }
+:root[data-theme="light"] .book-hero__cover .cover { box-shadow: 0 0 0 1px rgb(90 60 25 / 8%), 0 24px 46px -24px rgb(90 60 25 / 40%), 0 0 60px -24px var(--c-glow); }
 
 .book-hero__info { padding-top: .25rem; }
 .book-hero__info > * + * { margin-top: var(--sp-3); }
@@ -467,8 +437,8 @@ html[lang="ar"] .book-facts dt { text-transform: none; letter-spacing: 0; font-s
 .my-review { border-color: var(--c-primary); }
 
 /* ==========================================================================
-   Cosmic dark — content sits on translucent midnight panels over the night
-   sky (the .cosmos layer, cosmic.css), with hairline starlight borders.
+   Paper panels — shelves, the book stage and the filter drawer sit on warm paper
+   sheets with a hairline gold edge (Vintage Paper, 2026-11-19; formerly Cosmic).
    Rules are duplicated for the explicit toggle and the system preference.
    ========================================================================== */
 :root .page-head,
@@ -481,16 +451,16 @@ html[lang="ar"] .book-facts dt { text-transform: none; letter-spacing: 0; font-s
 :root[data-theme="dark"] .book-stage .book-hero,
 :root[data-theme="dark"] .drawer--filters .drawer__panel.filters {
     padding: clamp(1.25rem, 3vw, 2.25rem);
-    background: linear-gradient(180deg, rgb(19 28 54 / 70%), rgb(10 16 34 / 80%));
-    border: 1px solid rgb(122 167 255 / 11%); border-radius: 20px;
+    background: linear-gradient(180deg, rgb(43 37 30 / 78%), rgb(30 26 20 / 86%));
+    border: 1px solid rgb(210 166 108 / 11%); border-radius: 20px;
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 5%), 0 30px 60px -30px rgb(0 0 0 / 75%);
 }
 :root[data-theme="dark"] .book-stage { border-bottom: 0; }
 :root[data-theme="dark"] .filter-group { background: var(--c-surface); border-color: var(--c-border-strong); }
 :root[data-theme="dark"] .filter-group__head { background: color-mix(in srgb, var(--c-primary) 12%, var(--c-surface-2)); }
 :root[data-theme="dark"] .select--box, :root[data-theme="dark"] .select-box { border-color: var(--c-border-strong); }
-:root[data-theme="dark"] .site-header { border-bottom-color: rgb(122 167 255 / 12%); }
-:root[data-theme="dark"] .promise { background: linear-gradient(160deg, rgb(13 20 40 / 92%), rgb(4 7 18 / 94%)); border: 1px solid rgb(122 167 255 / 12%); }
+:root[data-theme="dark"] .site-header { border-bottom-color: rgb(210 166 108 / 12%); }
+:root[data-theme="dark"] .promise { background: linear-gradient(160deg, rgb(35 30 24 / 92%), rgb(27 23 18 / 94%)); border: 1px solid rgb(210 166 108 / 12%); }
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) .section--paper,
     :root:not([data-theme="light"]) .section--tint { border-block: 0; }
@@ -498,30 +468,29 @@ html[lang="ar"] .book-facts dt { text-transform: none; letter-spacing: 0; font-s
     :root:not([data-theme="light"]) .book-stage .book-hero,
     :root:not([data-theme="light"]) .drawer--filters .drawer__panel.filters {
         padding: clamp(1.25rem, 3vw, 2.25rem);
-        background: linear-gradient(180deg, rgb(19 28 54 / 70%), rgb(10 16 34 / 80%));
-        border: 1px solid rgb(122 167 255 / 11%); border-radius: 20px;
+        background: linear-gradient(180deg, rgb(43 37 30 / 78%), rgb(30 26 20 / 86%));
+        border: 1px solid rgb(210 166 108 / 11%); border-radius: 20px;
         box-shadow: inset 0 1px 0 rgb(255 255 255 / 5%), 0 30px 60px -30px rgb(0 0 0 / 75%);
     }
     :root:not([data-theme="light"]) .book-stage { border-bottom: 0; }
     :root:not([data-theme="light"]) .filter-group { background: var(--c-surface); border-color: var(--c-border-strong); }
     :root:not([data-theme="light"]) .filter-group__head { background: color-mix(in srgb, var(--c-primary) 12%, var(--c-surface-2)); }
     :root:not([data-theme="light"]) .select--box, :root:not([data-theme="light"]) .select-box { border-color: var(--c-border-strong); }
-    :root:not([data-theme="light"]) .site-header { border-bottom-color: rgb(122 167 255 / 12%); }
-    :root:not([data-theme="light"]) .promise { background: linear-gradient(160deg, rgb(13 20 40 / 92%), rgb(4 7 18 / 94%)); border: 1px solid rgb(122 167 255 / 12%); }
+    :root:not([data-theme="light"]) .site-header { border-bottom-color: rgb(210 166 108 / 12%); }
+    :root:not([data-theme="light"]) .promise { background: linear-gradient(160deg, rgb(35 30 24 / 92%), rgb(27 23 18 / 94%)); border: 1px solid rgb(210 166 108 / 12%); }
 }
-/* Pearl Cosmic (light): shelves are pearl panels — near-white with a faint icy
-   top sheen, a hairline border and a soft indigo-tinted ambient shadow. */
+/* Light paper panels: a slightly lighter sheet with a warm hairline and a soft brown ambient shadow. */
 :root[data-theme="light"] .shelf {
     padding: clamp(1.25rem, 3vw, 2.25rem);
-    background: linear-gradient(180deg, rgb(255 255 255 / 88%), rgb(251 251 254 / 76%));
-    border: 1px solid rgb(226 228 242); border-radius: 20px;
-    box-shadow: inset 0 1px 0 #fff, 0 1px 2px rgb(48 52 96 / 4%), 0 26px 52px -36px rgb(48 52 96 / 26%);
+    background: linear-gradient(180deg, rgb(248 239 217 / 82%), rgb(244 230 198 / 72%));
+    border: 1px solid var(--c-border); border-radius: 20px;
+    box-shadow: inset 0 1px 0 rgb(255 250 238 / 70%), 0 1px 2px rgb(90 60 25 / 6%), 0 26px 52px -36px rgb(90 60 25 / 30%);
 }
-:root[data-theme="light"] .site-header { border-bottom-color: rgb(226 228 242 / 90%); box-shadow: 0 1px 0 rgb(255 255 255 / 70%) inset; }
-:root[data-theme="light"] .filter-group { background: rgb(255 255 255 / 88%); }
-:root[data-theme="light"] .book-card { box-shadow: 0 0 0 1px rgb(228 230 242), 0 1px 2px rgb(48 52 96 / 4%), 0 14px 30px -20px rgb(48 52 96 / 22%); }
+:root[data-theme="light"] .site-header { border-bottom-color: var(--c-border); box-shadow: 0 1px 0 rgb(255 250 238 / 60%) inset; }
+:root[data-theme="light"] .filter-group { background-color: var(--c-surface); }
+:root[data-theme="light"] .book-card { box-shadow: 0 0 0 1px var(--c-border), 0 1px 2px rgb(90 60 25 / 6%), 0 14px 30px -20px rgb(90 60 25 / 26%); }
 :root[data-theme="light"] .book-card:hover,
-:root[data-theme="light"] .book-card:focus-within { box-shadow: 0 0 0 1px rgb(186 200 240), 0 26px 50px -26px rgb(48 52 96 / 30%), 0 0 44px -16px var(--c-glow); }
+:root[data-theme="light"] .book-card:focus-within { box-shadow: 0 0 0 1px var(--c-border-strong), 0 26px 50px -26px rgb(90 60 25 / 34%), 0 0 44px -16px var(--c-glow); }
 @media (max-width: 900px) {
     :root[data-theme="dark"] .drawer--filters .drawer__panel.filters { border-radius: 0; border: 0; background: var(--c-surface); }
 }
@@ -608,3 +577,116 @@ html[lang="ar"] .category-grid--lg .category-card__name { font-weight: 600; line
 .auth__free { display: inline-flex; align-items: center; gap: .35rem; margin: 0 auto; padding: .25rem .8rem; border-radius: var(--radius-pill); background: var(--c-success-soft); color: var(--c-success); font-weight: 700; font-size: var(--fs-sm); }
 .auth__switch { margin: 0; font-size: var(--fs-sm); }
 .auth__switch a { font-weight: 700; }
+
+/* Restored from commit 0a1ac0a (Vintage Paper everywhere, owner decision 2026-11-19). */
+/* ==========================================================================
+   Vintage paper — the site reads like the inside of an old book. The grain and
+   page-edge shading come from --paper-grain / --paper-edge in app.css.
+   ========================================================================== */
+:root[data-theme] body,
+:root:not([data-theme]) body {
+    background: var(--paper-edge) fixed, var(--paper-stain) 0 0 / 900px 900px, var(--paper-grain), var(--c-bg);
+}
+:root .page-head,
+:root .book-stage { background: transparent; }
+.section--paper, .section--tint { background-image: var(--paper-grain); }
+:root[data-theme="dark"] :is(.shelf, .book-stage .book-hero, .drawer--filters .drawer__panel.filters) {
+    background: var(--paper-card-edge), var(--paper-grain), linear-gradient(180deg, color-mix(in srgb, var(--c-surface) 92%, #3a2c1f), var(--c-surface));
+}
+
+/* ==========================================================================
+   Batch A/B pages (2026-11-19) — contact, about, settings, publishers,
+   password recovery. Vintage Paper sheets, teal actions, gold details.
+   ========================================================================== */
+.page-head__lead { max-width: 60ch; margin: .2rem 0 0; color: var(--c-muted); font-size: var(--fs-md); }
+.field__error { margin: .35rem 0 0; color: var(--c-danger); font-size: var(--fs-sm); animation: field-error-in .25s var(--ease) both; }
+.input[aria-invalid="true"] { border-color: var(--c-danger); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-danger) 14%, transparent); }
+@keyframes field-error-in { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
+
+/* Success stamp (contact, password recovery) */
+.contact__success, .auth__success { display: grid; justify-items: center; gap: .75rem; text-align: center; padding: var(--sp-4) 0; }
+.contact__success-mark, .auth__success-mark {
+    width: 64px; height: 64px; display: grid; place-items: center; border-radius: 50%;
+    background: var(--c-primary); color: var(--c-on-primary);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--c-accent) 28%, transparent);
+    animation: stamp-in .5s var(--ease) both;
+}
+@keyframes stamp-in { 0% { opacity: 0; transform: scale(.6) rotate(-8deg); } 70% { transform: scale(1.06) rotate(1deg); } 100% { opacity: 1; transform: none; } }
+.auth__forgot { margin: .25rem 0 0; text-align: center; font-size: var(--fs-sm); }
+
+/* Contact: a note card beside the letter */
+.contact__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: clamp(1rem, 3vw, 2rem); align-items: start; }
+.contact__aside { padding: var(--sp-5); display: grid; gap: .75rem; }
+.contact__aside-mark { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 14px; background: var(--c-accent-soft); color: var(--c-accent-text); }
+.contact__topics { list-style: none; margin: .25rem 0 0; padding: 0; display: grid; gap: .5rem; font-size: var(--fs-sm); }
+.contact__topics li { display: flex; align-items: center; gap: .5rem; }
+.contact__topics .icon { color: var(--c-accent-text); }
+.contact__main { padding: clamp(1.25rem, 4vw, 2.25rem); }
+.contact__form { display: grid; gap: var(--sp-4); }
+.contact__row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-4); }
+.contact__form .textarea { min-height: 10rem; resize: vertical; }
+.contact__form .btn { justify-self: start; }
+/* Honeypot: off-screen for people, still present for bots (never display:none). */
+.contact__hp { position: absolute; inset-inline-start: -10000px; width: 1px; height: 1px; overflow: hidden; }
+@media (max-width: 760px) { .contact__grid, .contact__row { grid-template-columns: minmax(0, 1fr); } }
+
+/* About: editorial pages of a small book */
+.page-head--about .page-head__title { font-size: var(--fs-3xl); }
+.about { display: grid; gap: clamp(1.25rem, 3vw, 2rem); }
+.about__pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1rem, 3vw, 1.75rem); }
+.about-block { padding: clamp(1.25rem, 3.5vw, 2rem); }
+.about-block.card { transition: transform .35s var(--ease), box-shadow .35s var(--ease); }
+.about-block.card:hover { transform: translateY(-3px); }
+.about-block__mark { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; margin-bottom: .75rem; background: var(--c-primary-soft); color: var(--c-primary); }
+.about-block p { margin: .4rem 0 0; line-height: 1.85; }
+.about__features { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 1.5rem; }
+.about__features li { display: grid; grid-template-columns: auto 1fr; gap: .75rem; align-items: start; line-height: 1.7; }
+.about__feature-icon { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--c-accent) 45%, transparent); color: var(--c-accent-text); }
+.about__values { margin: 1rem 0 0; display: grid; gap: .9rem; }
+.about__values div { display: grid; grid-template-columns: auto 1fr; gap: .75rem; align-items: start; }
+.about__values dt { color: var(--c-primary); padding-top: .2rem; }
+.about__values dd { margin: 0; line-height: 1.8; }
+.about__cta { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: center; padding-block: var(--sp-4); }
+@media (max-width: 760px) { .about__pair, .about__features { grid-template-columns: minmax(0, 1fr); } }
+
+/* Member settings */
+.settings__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1rem, 3vw, 1.75rem); align-items: start; }
+.settings__card { padding: clamp(1.25rem, 3.5vw, 2rem); display: grid; gap: var(--sp-3); }
+.settings__card h2 { display: flex; align-items: center; gap: .5rem; margin: 0; }
+.settings__card form { display: grid; gap: var(--sp-4); }
+.settings__card .btn { justify-self: start; }
+.settings__info { grid-column: 1 / -1; }
+.settings__choice { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .5rem; }
+.settings__choice legend { width: 100%; margin-bottom: .4rem; }
+.settings__choice .check { padding: .45rem .95rem; border: 1px solid var(--c-border-strong); border-radius: 999px; background: var(--c-surface); transition: border-color var(--dur), background var(--dur), box-shadow var(--dur); }
+.settings__choice .check span { display: inline-flex; align-items: center; gap: .4rem; }
+.settings__choice .check:has(input:checked) { border-color: var(--c-primary); background: var(--c-primary-soft); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-primary) 14%, transparent); }
+.settings__choice .check:has(input:focus-visible) { outline: 2px solid var(--c-focus); outline-offset: 2px; }
+.settings__choice input { accent-color: var(--c-primary); }
+.settings__facts { margin: 0 !important; grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr)); }
+/* An e-mail address is one long word: let it wrap inside its tile instead of spilling into the next. */
+.settings__facts dd.ltr { white-space: normal; overflow-wrap: anywhere; }
+@media (max-width: 860px) { .settings__grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* Publishers: spine-edged cards */
+.publisher-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: clamp(.9rem, 2vw, 1.25rem); }
+.publisher-card {
+    position: relative; display: grid; grid-template-columns: auto 1fr auto; gap: .9rem; align-items: center;
+    padding: 1.1rem 1.25rem; text-decoration: none; color: inherit; overflow: hidden;
+    transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+}
+.publisher-card::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 5px; background: linear-gradient(180deg, var(--c-accent), color-mix(in srgb, var(--c-accent) 55%, var(--c-primary))); }
+.publisher-card:hover, .publisher-card:focus-visible { transform: translateY(-3px); }
+.publisher-card__mark { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; background: var(--c-primary-soft); color: var(--c-primary); }
+.publisher-card__text { display: grid; gap: .15rem; min-width: 0; }
+.publisher-card__name { font-family: var(--font-display); font-size: var(--fs-md); overflow-wrap: anywhere; }
+.publisher-card__count { color: var(--c-muted); font-size: var(--fs-sm); }
+.publisher-card__arrow { color: var(--c-accent-text); transition: transform .3s var(--ease); }
+.publisher-card:hover .publisher-card__arrow { transform: translateX(4px); }
+[dir="rtl"] .publisher-card:hover .publisher-card__arrow { transform: translateX(-4px); }
+
+@media (prefers-reduced-motion: reduce) {
+    .field__error, .contact__success-mark, .auth__success-mark { animation: none; }
+    .about-block.card, .publisher-card, .publisher-card__arrow { transition: none; }
+    .about-block.card:hover, .publisher-card:hover, .publisher-card:focus-visible, .publisher-card:hover .publisher-card__arrow { transform: none; }
+}

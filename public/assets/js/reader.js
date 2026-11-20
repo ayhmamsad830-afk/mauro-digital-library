@@ -31,7 +31,9 @@
     var thumbsList = root.querySelector('[data-thumbs-list]');
     var info = root.querySelector('[data-info]');
     var gate = root.querySelector('[data-gate]');
-    var shield = root.querySelector('[data-shield]');
+    // Not named "shield": that name is the function of the background shield below,
+    // and a var with the same name overwrote it (TypeError: shield is not a function).
+    var shieldNode = root.querySelector('[data-shield]');
 
     var total = Math.max(1, M.pageCount | 0); // updated by boot() once the session manifest arrives
     // Guests: free preview of the first N pages (the server refuses later pages too). null = member.
@@ -387,15 +389,15 @@
      * still identifies the reading session if a capture leaks anyway. */
     var shieldTimer = null;
     function shieldOn(ms) {
-        if (!shield) return;
-        shield.hidden = false;
+        if (!shieldNode) return;
+        shieldNode.hidden = false;
         root.classList.add('is-shielded');
         clearTimeout(shieldTimer);
         if (ms) shieldTimer = setTimeout(shieldOff, ms);
     }
     function shieldOff() {
-        if (!shield || document.hidden || !document.hasFocus()) return;
-        shield.hidden = true;
+        if (!shieldNode || document.hidden || !document.hasFocus()) return;
+        shieldNode.hidden = true;
         root.classList.remove('is-shielded');
     }
     window.addEventListener('blur', function () { shieldOn(); });
@@ -508,7 +510,9 @@
             loadingEl.hidden = true;
             errorEl.hidden = false;
             var p = errorEl.querySelector('p');
-            if (p && e && e.message) p.textContent = e.message;
+            // Server errors carry a translated message; a network failure is a TypeError
+            // with the browser's raw English text ("Failed to fetch") — show ours instead.
+            if (p) p.textContent = (e && e.message && !(e instanceof TypeError)) ? e.message : M.i18n.loadError;
         });
     } else {
         boot();

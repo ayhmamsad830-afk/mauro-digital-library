@@ -109,8 +109,8 @@ final class AdminCompletionTest extends TestCase
     public function testSuspendingAMemberTakesEffectImmediatelyAndIsLogged(): void
     {
         Database::query('DELETE FROM reviews');
-        Database::query("INSERT INTO reviews (user_id, book_id, rating, status) VALUES (:u, :b, 5, 'published'), (:a, :b, 3, 'published')",
-            ['u' => $this->ids['u_member'], 'a' => $this->admin(), 'b' => $this->ids['b1']]);
+        Database::query("INSERT INTO reviews (user_id, book_id, rating, status) VALUES (:u, :b, 5, 'published'), (:a, :b2, 3, 'published')",
+            ['u' => $this->ids['u_member'], 'a' => $this->admin(), 'b' => $this->ids['b1'], 'b2' => $this->ids['b1']]);
         \App\Services\Member\MemberLibrary::recomputeRating($this->ids['b1']);
         $this->assertSame(200, $this->send('GET', '/account', [], $this->ids['u_member'])->status());
 
@@ -170,8 +170,8 @@ final class AdminCompletionTest extends TestCase
     public function testReviewModerationHidesPubliclyAndRecomputes(): void
     {
         Database::query('DELETE FROM reviews');
-        Database::query("INSERT INTO reviews (user_id, book_id, rating, comment, status) VALUES (:u, :b, 1, 'Spam spam <b>bold</b>', 'published'), (:a, :b, 5, 'Lovely book', 'published')",
-            ['u' => $this->ids['u_member'], 'a' => $this->admin(), 'b' => $this->ids['b1']]);
+        Database::query("INSERT INTO reviews (user_id, book_id, rating, comment, status) VALUES (:u, :b, 1, 'Spam spam <b>bold</b>', 'published'), (:a, :b2, 5, 'Lovely book', 'published')",
+            ['u' => $this->ids['u_member'], 'a' => $this->admin(), 'b' => $this->ids['b1'], 'b2' => $this->ids['b1']]);
         \App\Services\Member\MemberLibrary::recomputeRating($this->ids['b1']);
         $id = (int) Database::scalar('SELECT id FROM reviews WHERE user_id = :u', ['u' => $this->ids['u_member']]);
         $list = $this->send('GET', '/admin/reviews', [], $this->admin())->body();

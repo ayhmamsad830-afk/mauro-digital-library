@@ -6,6 +6,8 @@ declare(strict_types=1);
 
 use App\Controllers\Admin\AdminAuthController;
 use App\Controllers\Admin\AuthorController;
+use App\Controllers\Admin\BackupController;
+use App\Controllers\Admin\MessageController;
 use App\Controllers\Admin\BookController;
 use App\Controllers\Admin\BookFileController;
 use App\Controllers\Admin\CategoryController;
@@ -72,6 +74,11 @@ $router->group(['prefix' => '/admin', 'middleware' => [AuthMiddleware::class, Ad
     $r->post('/users/{id:\d+}/role', [UserController::class, 'role'])->name('admin.users.role');
     $r->get('/reviews', [ReviewController::class, 'index'])->name('admin.reviews.index');
     $r->post('/reviews/{id:\d+}/moderate', [ReviewController::class, 'moderate'])->name('admin.reviews.moderate');
+    // Contact requests (read / archive; never deleted from the web)
+    $r->get('/messages', [MessageController::class, 'index'])->name('admin.messages.index');
+    $r->post('/messages/{id:\d+}/status', [MessageController::class, 'status'])->name('admin.messages.status');
+    // Backups: read-only status (backup:run stays a CLI/cron task)
+    $r->get('/backups', [BackupController::class, 'index'])->name('admin.backups');
     $r->get('/analytics', [AnalyticsController::class, 'index'])->name('admin.analytics');
     $r->get('/logs', [LogController::class, 'index'])->name('admin.logs.index');
     $r->get('/settings', [SettingsController::class, 'edit'])->name('admin.settings');

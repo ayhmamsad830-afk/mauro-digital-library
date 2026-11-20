@@ -1,0 +1,63 @@
+/* ==========================================================================
+   MAURO — motion (loaded last on public pages)
+   --------------------------------------------------------------------------
+   Theme-neutral, purely decorative motion for the Vintage Paper design:
+   - .reveal            scroll entrance, applied by motion.js to below-the-fold content
+   - home hero          staged entrance of the copy and the featured shelf
+   - featured book      a gentle float with a contact shadow on the wooden shelf
+   Content never depends on anything here. Only transform and opacity are
+   animated (compositor-friendly); everything stops with prefers-reduced-motion
+   and while the tab is hidden. (Replaces cosmic.css, 2026-11-19.)
+   ========================================================================== */
+
+:root { --ease-out: cubic-bezier(.16, 1, .3, 1); }
+
+/* Hidden tab: freeze every decorative loop (motion.js toggles the class). */
+.motion-paused .showcase__front .cover,
+.motion-paused .showcase__covers::after { animation-play-state: paused; }
+
+/* ---------- Scroll reveal ---------- */
+.reveal {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+    transition: opacity .7s var(--ease-out), transform .7s var(--ease-out);
+    transition-delay: var(--reveal-delay, 0ms);
+}
+.reveal.is-revealed { opacity: 1; transform: none; }
+
+/* ---------- Home hero: staged entrance and the floating featured book ---------- */
+.hero__copy { animation: none; }
+.hero__copy > * { animation: rise-in .8s var(--ease-out) both; }
+.hero__copy > :nth-child(2) { animation-delay: .06s; }
+.hero__copy > :nth-child(3) { animation-delay: .12s; }
+.hero__copy > :nth-child(4) { animation-delay: .18s; }
+.hero__copy > :nth-child(5) { animation-delay: .24s; }
+.hero__copy > :nth-child(n+6) { animation-delay: .3s; }
+.showcase { animation: rise-in .9s .2s var(--ease-out) both; }
+
+.showcase__front .cover { animation: float-book 7s ease-in-out infinite; }
+@keyframes float-book {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-10px); }
+}
+/* Contact shadow on the shelf under the floating book (breathes with the float). */
+.showcase__covers::after {
+    content: ""; position: absolute; z-index: 0;
+    inset-inline: 12%; bottom: -30px; height: 22px; border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(30 18 8 / 50%), transparent);
+    animation: float-shadow 7s ease-in-out infinite;
+}
+:root[data-theme="light"] .showcase__covers::after { background: radial-gradient(closest-side, rgb(60 38 18 / 32%), transparent); }
+@keyframes float-shadow {
+    0%, 100% { transform: scaleX(1); opacity: 1; }
+    50%      { transform: scaleX(.86); opacity: .7; }
+}
+
+/* ---------- Accessibility and print ---------- */
+@media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1 !important; transform: none !important; }
+    .showcase__front .cover, .showcase__covers::after { animation: none !important; }
+}
+@media print {
+    .reveal { opacity: 1 !important; transform: none !important; }
+}

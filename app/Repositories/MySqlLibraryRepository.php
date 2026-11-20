@@ -10,6 +10,7 @@ use App\Services\ArabicNormalizer;
 use App\Services\Media\ImageUploadService;
 use App\Support\BookQuery;
 use App\Support\Paginator;
+use App\Support\Publisher;
 
 /**
  * Public, read-only catalogue backed by MySQL (InnoDB, utf8mb4).
@@ -198,6 +199,44 @@ final class MySqlLibraryRepository implements LibraryRepository
         return array_map('strval', Database::query("SELECT DISTINCT b.language FROM books b WHERE $vis ORDER BY b.language", $params)->fetchAll(\PDO::FETCH_COLUMN));
     }
 
+    public function publishers(): array
+    {
+        [$vis, $params] = $this->visible();
+        $rows = Database::all(
+            "SELECT b.publisher, COUNT(*) AS books_count FROM books b
+              WHERE $vis AND b.publisher IS NOT NULL AND b.publisher <> ''
+              GROUP BY b.publisher ORDER BY b.publisher ASC",
+            $params
+        );
+        // Names that differ only by spacing are one publisher (counts merged).
+        $out = [];
+        foreach ($rows as $r) {
+            $name = Publisher::normalize((string) $r['publisher']);
+            $slug = Publisher::slug($name);
+            $out[$slug] ??= ['name' => $name, 'slug' => $slug, 'books_count' => 0];
+            $out[$slug]['books_count'] += (int) $r['books_count'];
+        }
+        return array_values($out);
+    }
+
+    public function findPublisherBySlug(string $slug): ?array
+    {
+        foreach ($this->publishers() as $p) {
+            if ($p['slug'] === $slug) {
+                return $p;
+            }
+        }
+        return null;
+    }
+
+    /** @return list<string> the exact stored publisher values behind a slug */
+    private function publisherNames(string $slug): array
+    {
+        [$vis, $params] = $this->visible();
+        $names = Database::query("SELECT DISTINCT b.publisher FROM books b WHERE $vis AND b.publisher IS NOT NULL AND b.publisher <> ''", $params)->fetchAll(\PDO::FETCH_COLUMN);
+        return array_values(array_filter(array_map('strval', $names), static fn (string $n) => Publisher::slug($n) === $slug));
+    }
+
     // ----------------------------------------------------------------- search
 
     public function searchBooks(BookQuery $query): Paginator
@@ -228,6 +267,15 @@ final class MySqlLibraryRepository implements LibraryRepository
         if ($query->language !== null) {
             $conditions[] = 'b.language = :f_lang';
             $params['f_lang'] = $query->language;
+        }
+        if ($query->publisher !== null) {
+            $names = $this->publisherNames($query->publisher);
+            if ($names === []) {
+                return new Paginator([], 0, 1, $query->perPage);
+            }
+            [$in, $inParams] = self::inListStrings($names, 'f_pub');
+            $conditions[] = "b.publisher IN ($in)";
+            $params += $inParams;
         }
 
         $whereSql = implode(' AND ', $conditions);
@@ -409,6 +457,18 @@ final class MySqlLibraryRepository implements LibraryRepository
      * @param list<int> $values
      * @return array{0:string, 1:array<string,int>}
      */
+    /** Like inList() but for string values. @return array{0:string, 1:array<string,string>} */
+    private static function inListStrings(array $values, string $prefix): array
+    {
+        $names = [];
+        $params = [];
+        foreach (array_values($values) as $i => $v) {
+            $names[] = ":{$prefix}{$i}";
+            $params["{$prefix}{$i}"] = (string) $v;
+        }
+        return [implode(', ', $names), $params];
+    }
+
     public static function inList(array $values, string $prefix): array
     {
         $names = [];

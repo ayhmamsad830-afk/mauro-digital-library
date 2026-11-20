@@ -8,7 +8,9 @@
  */
 $sortLabels = ['newest' => __('sort.newest'), 'popular' => __('sort.popular'), 'rating' => __('sort.rating'), 'title' => __('sort.title')];
 $crumbs = [[__('nav.home'), route('home')], [__('nav.library'), route('books.index')]];
+$lockedPublisher = $lockedPublisher ?? null;
 if ($lockedCategory) { $crumbs[] = [__('nav.categories'), route('categories.index')]; }
+if ($lockedPublisher) { $crumbs[] = [__('publishers.title'), route('publishers.index')]; }
 $crumbs[] = [$heading, null];
 $activeFilters = [];
 if ($query->q !== '') { $activeFilters[] = [__('filter.search_term', ['q' => $query->q]), $urlFor(['q' => null])]; }
@@ -107,7 +109,7 @@ if ($query->language) { $activeFilters[] = [language_name($query->language), $ur
             </p>
             <form class="toolbar__controls" method="get" action="<?= e($formAction) ?>">
                 <?php foreach ($query->toQuery(['sort' => null, 'per_page' => null, 'page' => null], 0, '') as $k => $v): ?>
-                    <?php if (!($lockedCategory && $k === 'category')): ?><input type="hidden" name="<?= e($k) ?>" value="<?= e($v) ?>"><?php endif; ?>
+                    <?php if (!($lockedCategory && $k === 'category') && !($lockedPublisher && $k === 'publisher')): ?><input type="hidden" name="<?= e($k) ?>" value="<?= e($v) ?>"><?php endif; ?>
                 <?php endforeach; ?>
                 <button type="button" class="btn btn--ghost btn--sm toolbar__filter-btn" data-drawer-open="filters-drawer" aria-controls="filters-drawer" aria-expanded="false">
                     <?= icon('filter', 'icon--sm') ?><?= e(__('filter.title')) ?><?php if ($activeFilters): ?> <span class="badge badge--primary"><?= e(count($activeFilters)) ?></span><?php endif; ?>

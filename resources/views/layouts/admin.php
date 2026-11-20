@@ -19,8 +19,10 @@ $items = $preview ? [
     ['upload', __('admin.files'), route('admin.files.index'), is_current_path('/admin/files', true)],
     ['users', __('admin.users'), route('admin.users.index'), is_current_path('/admin/users', true)],
     ['star', __('admin.reviews'), route('admin.reviews.index'), is_current_path('/admin/reviews', true)],
+    ['mail', __('admin.messages'), route('admin.messages.index'), is_current_path('/admin/messages', true)],
     ['chart', __('admin.analytics'), route('admin.analytics'), is_current_path('/admin/analytics', true)],
     ['list', __('admin.logs'), route('admin.logs.index'), is_current_path('/admin/logs', true)],
+    ['layers', __('admin.backups'), route('admin.backups'), is_current_path('/admin/backups', true)],
     ['settings', __('admin.settings'), route('admin.settings'), is_current_path('/admin/settings', true)],
 ];
 ?>

@@ -29,6 +29,7 @@
                 </div>
             </div>
             <button class="btn btn--primary btn--lg btn--block" type="submit" data-loading-on-submit><?= icon('mail', 'icon--sm') ?><?= e(__('member_auth.login_submit')) ?></button>
+            <p class="auth__forgot"><a href="<?= e(route('password.forgot')) ?>"><?= e(__('reset.forgot_link')) ?></a></p>
         </form>
 
         <p class="auth__switch"><?= e(__('member_auth.no_account')) ?> <a href="<?= e(route('register', [], ['redirect' => $redirectTo])) ?>"><?= e(__('member_auth.create_free')) ?></a></p>

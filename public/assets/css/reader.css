@@ -10,18 +10,18 @@
 .plain-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
 .h4 { font-size: var(--fs-md); margin: 0; }
 
-/* Light = Pearl Cosmic desk: pearl centre, icy-lavender edge, calm for long reading. */
-:root { --desk: #f9f9fc; --desk-edge: #eceef6; --bar: rgb(250 250 253 / 86%); --bezel: #20263a; --bezel-edge: #151a29; --track: #dcdfec; --sky: none; }
-:root[data-theme="dark"] { --desk: #0a1124; --desk-edge: #03060f; --bar: rgb(7 12 28 / 78%); --bezel: #02040a; --bezel-edge: #1d2a4a; --track: #1b2645; --sky: url("../images/background/cosmic-sky.jpg"); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --desk: #0a1124; --desk-edge: #03060f; --bar: rgb(7 12 28 / 78%); --bezel: #02040a; --bezel-edge: #1d2a4a; --track: #1b2645; --sky: url("../images/background/cosmic-sky.jpg"); } }
+/* Vintage Paper desk (restored from 0a1ac0a, owner decision 2026-11-19): warm paper, no sky. */
+:root { --desk: #efe9df; --desk-edge: #e6dfd2; --bar: rgb(239 233 223 / 88%); --bezel: #3b3d3c; --bezel-edge: #2c2e2d; --track: #d8d0c1; }
+:root[data-theme="dark"] { --desk: #1b1712; --desk-edge: #14110d; --bar: rgb(27 23 18 / 88%); --bezel: #050706; --bezel-edge: #2a332e; --track: #2b3530; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --desk: #1b1712; --desk-edge: #14110d; --bar: rgb(27 23 18 / 88%); --bezel: #050706; --bezel-edge: #2a332e; --track: #2b3530; } }
 
-.reader-body { height: 100vh; height: 100dvh; overflow: hidden; background: var(--desk-edge); }
+.reader-body { height: 100vh; height: 100dvh; overflow: hidden; background: var(--paper-grain), var(--desk); }
 .reader {
     display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto;
     height: 100vh; height: 100dvh;
     background:
         radial-gradient(90% 70% at 50% 40%, color-mix(in srgb, var(--desk) 86%, transparent), color-mix(in srgb, var(--desk-edge) 94%, transparent)),
-        var(--sky) center / cover no-repeat,
+        var(--paper-grain),
         var(--desk-edge);
 }
 .reader:fullscreen { background: var(--desk); }
@@ -51,9 +51,9 @@
 /* Hairline progress (as in a reading device) */
 .reader-progress { width: 100%; height: 3px; border-radius: 3px; background: var(--track); border: 0; -webkit-appearance: none; appearance: none; overflow: hidden; }
 .reader-progress::-webkit-progress-bar { background: var(--track); border-radius: 3px; }
-.reader-progress::-webkit-progress-value { background: linear-gradient(90deg, #4f8cff, #8b7cf6); border-radius: 3px; box-shadow: 0 0 8px rgb(79 140 255 / 60%); transition: width .35s var(--ease); }
-.reader-progress::-moz-progress-bar { background: linear-gradient(90deg, #4f8cff, #8b7cf6); border-radius: 3px; }
-[dir="rtl"] .reader-progress::-webkit-progress-value { background: linear-gradient(270deg, #4f8cff, #8b7cf6); }
+.reader-progress::-webkit-progress-value { background: linear-gradient(90deg, var(--c-primary), var(--c-accent)); border-radius: 3px; box-shadow: 0 0 8px rgb(210 166 108 / 60%); transition: width .35s var(--ease); }
+.reader-progress::-moz-progress-bar { background: linear-gradient(90deg, var(--c-primary), var(--c-accent)); border-radius: 3px; }
+[dir="rtl"] .reader-progress::-webkit-progress-value { background: linear-gradient(270deg, var(--c-primary), var(--c-accent)); }
 
 /* Bottom controls float as one quiet pill under the page. */
 .reader-bar--bottom {
@@ -95,7 +95,7 @@
     -webkit-user-drag: none; user-select: none; pointer-events: none;
     transition: opacity .25s var(--ease);
 }
-:root[data-theme="dark"] .reader-page__img { box-shadow: 0 0 0 12px var(--bezel), 0 0 0 13px var(--bezel-edge), 0 24px 50px -14px rgb(0 0 0 / 60%), 0 0 80px -30px rgb(79 140 255 / 35%); }
+:root[data-theme="dark"] .reader-page__img { box-shadow: 0 0 0 12px var(--bezel), 0 0 0 13px var(--bezel-edge), 0 24px 50px -14px rgb(0 0 0 / 60%), 0 0 80px -30px rgb(210 166 108 / 35%); }
 /* While the next page loads the current one dims; reader.js fades/slides the new page in. */
 .reader-page__img.is-loading { opacity: .35; }
 /* Loading: a soft shimmer instead of a bare spinner (the spinner stays for screen readers). */
@@ -107,6 +107,9 @@
 @keyframes reader-shimmer { from { background-position: 125% 0; } to { background-position: -125% 0; } }
 .reader-page__state { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: .75rem; text-align: center; padding: 1rem; }
 .reader-page__state--error { background: var(--c-surface); border: 1px dashed var(--c-border-strong); border-radius: var(--radius); }
+/* Before any page has loaded the frame is only min-width wide: give the error message room
+   (layout fix only — the message used to wrap in 120 px and spill over its own box). */
+.reader-page:has(> .reader-page__state--error:not([hidden])) { min-width: min(22rem, 86vw); min-height: 11rem; }
 
 /* ---------- Thumbnails ---------- */
 .reader-thumbs { width: 168px; flex: none; overflow-y: auto; background: var(--bar); border-inline-end: 1px solid var(--c-border); padding: .85rem; -webkit-user-select: none; user-select: none; scrollbar-width: thin; animation: fade-in .2s var(--ease); }

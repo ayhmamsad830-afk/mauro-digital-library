@@ -5,12 +5,9 @@
 @media (max-width: 640px) { .hide-sm { display: none !important; } }
 .h4 { font-size: var(--fs-md); margin: 0; display: flex; align-items: center; gap: .45rem; }
 
-/* Admin is a work tool: a calm, static version of the sky (no animation). */
-.admin-body { background: radial-gradient(60rem 40rem at 100% 0%, rgb(79 140 255 / 7%), transparent 65%), var(--c-bg); }
-:root[data-theme="dark"] .admin-body { background: linear-gradient(rgb(6 10 23 / 80%), rgb(6 10 23 / 92%)), #060a17 url("../images/background/cosmic-sky.jpg") center / cover no-repeat fixed; }
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .admin-body { background: linear-gradient(rgb(6 10 23 / 80%), rgb(6 10 23 / 92%)), #060a17 url("../images/background/cosmic-sky.jpg") center / cover no-repeat fixed; }
-}
+/* Vintage Paper in the admin too (restored from 0a1ac0a, owner decision 2026-11-19): static paper, no sky. */
+.admin-body { background: var(--paper-edge) fixed, var(--paper-stain) 0 0 / 900px 900px, var(--paper-grain), var(--c-bg); }
+.admin-sidebar { background-image: var(--paper-grain) !important; }
 .admin { display: grid; grid-template-columns: 268px minmax(0, 1fr); min-height: 100vh; }
 .admin-sidebar-wrap { display: block; position: sticky; top: 0; height: 100vh; }
 .admin-sidebar-wrap .drawer__backdrop { display: none; }
@@ -195,3 +192,16 @@ html[lang="ar"] .admin-sidebar__label { text-transform: none; letter-spacing: 0;
 .admin-topbar__title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .admin-topbar .site-tools { flex: none; }
 @media (max-width: 480px) { .admin-topbar .avatar { display: none; } }
+
+/* Messages and backups (2026-11-19) */
+.review-mod__actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.admin-note { margin-top: var(--sp-5); padding: var(--sp-5); display: grid; gap: .5rem; }
+.admin-note h2 { display: flex; align-items: center; gap: .4rem; margin: 0; }
+.admin-note code { padding: .35rem .6rem; border-radius: var(--radius-sm); background: var(--c-surface-2); justify-self: start; }
+
+/* Backups: long file names wrap so every column fits at desktop widths. */
+.backups-table__name { white-space: normal; word-break: break-all; min-width: 10rem; width: 30%; }
+.backups-table td, .backups-table th { padding-inline: .6rem; }
+.backups-table th { white-space: normal; }
+@media (max-width: 640px) { .backups-table__name { max-width: none; font-weight: 600; } }
+

@@ -247,6 +247,42 @@ CREATE TABLE rate_limits (
     reset_at TEXT NOT NULL
 );
 
+
+-- 0012: password recovery, contact requests, outgoing e-mail log
+CREATE TABLE password_resets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    token_hash TEXT NOT NULL UNIQUE,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at TEXT NOT NULL,
+    used_at TEXT NULL,
+    ip_hash TEXT NULL
+);
+
+CREATE TABLE contact_messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    message TEXT NOT NULL,
+    locale TEXT NOT NULL DEFAULT 'ar',
+    user_id INTEGER NULL REFERENCES users (id) ON DELETE SET NULL,
+    ip_hash TEXT NULL,
+    status TEXT NOT NULL DEFAULT 'new',
+    notify_status TEXT NOT NULL DEFAULT 'not_configured',
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    read_at TEXT NULL,
+    read_by INTEGER NULL REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE TABLE mail_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    kind TEXT NOT NULL,
+    status TEXT NOT NULL,
+    error TEXT NULL,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 INSERT INTO settings (setting_key, setting_value) VALUES
     ('catalog.per_page', '24'),
     ('home.featured_book_id', NULL),

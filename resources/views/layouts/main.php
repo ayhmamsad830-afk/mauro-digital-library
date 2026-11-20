@@ -11,6 +11,12 @@
  */
 $appName = brand_name();
 $title = isset($pageTitle) && $pageTitle !== '' ? $pageTitle . ' — ' . $appName : $appName;
+// SEO / social previews from real data only (APP_URL is the public origin).
+$siteUrl = rtrim((string) config('app.url', ''), '/');
+$canonical = $siteUrl . (string) ($currentPath ?? '/');
+$description = !empty($metaDescription) ? (string) $metaDescription : __('app.tagline');
+$absolute = static fn (?string $u): ?string => $u === null || $u === '' ? null : (preg_match('#^https?://#', $u) ? $u : $siteUrl . '/' . ltrim($u, '/'));
+$shareImage = $absolute($ogImage ?? null) ?? $absolute(brand_logo() !== null ? asset('assets/images/brand/logo.png') : null);
 ?>
 <!doctype html>
 <html lang="<?= e(locale()) ?>" dir="<?= e(text_direction()) ?>"<?= !empty($currentTheme) ? ' data-theme="' . e($currentTheme) . '"' : '' ?>>
@@ -24,10 +30,28 @@ $title = isset($pageTitle) && $pageTitle !== '' ? $pageTitle . ' — ' . $appNam
     <?php if (!config('app.indexable', false) || !empty($noindex)): ?>
     <meta name="robots" content="noindex, nofollow">
     <?php endif; ?>
+    <?php if ($siteUrl !== ''): ?>
+    <link rel="canonical" href="<?= e($canonical) ?>">
+    <meta property="og:url" content="<?= e($canonical) ?>">
+    <?php endif; ?>
+    <meta property="og:site_name" content="<?= e($appName) ?>">
+    <meta property="og:title" content="<?= e($title) ?>">
+    <meta property="og:description" content="<?= e($description) ?>">
+    <meta property="og:type" content="<?= e((string) ($ogType ?? 'website')) ?>">
+    <meta property="og:locale" content="<?= e(locale() === 'ar' ? 'ar_AR' : 'en_US') ?>">
+    <?php if ($shareImage !== null): ?>
+    <meta property="og:image" content="<?= e($shareImage) ?>">
+    <meta name="twitter:card" content="<?= e(!empty($ogImage) ? 'summary_large_image' : 'summary') ?>">
+    <meta name="twitter:image" content="<?= e($shareImage) ?>">
+    <?php else: ?>
+    <meta name="twitter:card" content="summary">
+    <?php endif; ?>
+    <meta name="twitter:title" content="<?= e($title) ?>">
+    <meta name="twitter:description" content="<?= e($description) ?>">
     <meta name="color-scheme" content="light dark">
     <meta name="csrf-token" content="<?= e(csrf_token()) ?>">
-    <meta name="theme-color" content="#060a17" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#060a17" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#ead8b0" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1b1712" media="(prefers-color-scheme: dark)">
     <link rel="preload" href="<?= e(locale() === 'ar' ? '/assets/fonts/plex-arabic-400.woff2' : '/assets/fonts/inter-latin.woff2') ?>" as="font" type="font/woff2" crossorigin>
     <link rel="icon" href="<?= e(asset('assets/images/brand/favicon-32.png')) ?>" sizes="32x32" type="image/png">
     <link rel="icon" href="<?= e(asset('assets/images/brand/favicon-192.png')) ?>" sizes="192x192" type="image/png">
@@ -38,11 +62,12 @@ $title = isset($pageTitle) && $pageTitle !== '' ? $pageTitle . ' — ' . $appNam
     <?php foreach ($styles ?? [] as $style): ?>
     <link rel="stylesheet" href="<?= e(asset('assets/css/' . $style)) ?>">
     <?php endforeach; ?>
-    <link rel="stylesheet" href="<?= e(asset('assets/css/cosmic.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('assets/css/motion.css')) ?>">
     <script src="<?= e(asset('assets/js/theme.js')) ?>"></script>
 </head>
-<body class="<?= e($bodyClass ?? '') ?>"<?= config('ui.cursor_trail', true) ? ' data-cursor-trail' : '' ?>>
-    <div class="cosmos" aria-hidden="true" data-cosmos><div class="cosmos__sky" data-cosmos-sky></div><div class="cosmos__stars" data-cosmos-stars></div></div>
+<?php /* Vintage Paper everywhere (owner decision 2026-11-19): no Cosmic sky/stars layer and no
+   star cursor trail; motion.css/motion.js keep the theme-neutral scroll reveal and featured-book float. */ ?>
+<body class="<?= e($bodyClass ?? '') ?>">
     <a class="skip-link" href="#main"><?= e(__('app.skip_to_content')) ?></a>
     <?php if (!empty($demoMode)): ?><?= \App\Core\View::partial('partials/demo-banner') ?><?php endif; ?>
     <?= \App\Core\View::partial('partials/header') ?>
@@ -53,7 +78,7 @@ $title = isset($pageTitle) && $pageTitle !== '' ? $pageTitle . ' — ' . $appNam
     <?= \App\Core\View::partial('partials/footer') ?>
     <div class="toast-region" aria-live="polite" data-toast-region></div>
     <script src="<?= e(asset('assets/js/app.js')) ?>" defer></script>
-    <script src="<?= e(asset('assets/js/cosmic.js')) ?>" defer></script>
+    <script src="<?= e(asset('assets/js/motion.js')) ?>" defer></script>
     <?php foreach ($scripts ?? [] as $script): ?>
     <script src="<?= e(asset('assets/js/' . $script)) ?>" defer></script>
     <?php endforeach; ?>

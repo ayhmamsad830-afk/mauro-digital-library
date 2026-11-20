@@ -23,6 +23,9 @@ final class BookController extends Controller
         return $this->view('library/book', [
             'pageTitle' => $book['title'],
             'metaDescription' => mb_substr((string) $book['description'], 0, 160),
+            // Social previews: the real cover (served by /media/covers, public books only).
+            'ogType' => 'book',
+            'ogImage' => !empty($book['cover_url']) ? (string) $book['cover_url'] : null,
             'book' => $book,
             'related' => $library->relatedBooks($book, 6),
             'reviews' => $library->bookReviews((int) $book['id'], 5),

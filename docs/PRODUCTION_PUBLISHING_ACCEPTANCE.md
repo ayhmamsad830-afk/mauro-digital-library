@@ -3,7 +3,8 @@
 **Acceptance requirement:** a website owner can add a new book from the admin dashboard, upload its PDF, process every
 page, publish it, find it on the public website and read it — without developer intervention or manual database work.
 
-**Status: ACCEPTED on staging (SQLite).** Production acceptance additionally requires the BLOCKED items below.
+**Status: ACCEPTED on staging (SQLite).** Production acceptance additionally requires the BLOCKED item below (#17);
+#16 (MySQL) was verified on 2026-11-19.
 
 | # | Criterion | Status | Evidence |
 |---|---|---|---|
@@ -22,7 +23,7 @@ page, publish it, find it on the public website and read it — without develope
 | 13 | Every admin screen works in AR/EN, RTL/LTR, light/dark, mobile/desktop | ✅ | `ADMIN_DASHBOARD_TEST_MATRIX.md` (136/136) |
 | 14 | Guests and members cannot reach any admin page or action | ✅ | 39/39 authorization checks |
 | 15 | The owner has written instructions | ✅ | `CLIENT_HANDOVER_GUIDE.md` |
-| 16 | Behaviour on MySQL (production database) | ⛔ BLOCKED | 32 MySQL integration tests not executed — no valid MySQL test credentials |
+| 16 | Behaviour on MySQL (production database) | ✅ (2026-11-19) | MySQL 8.0.46: 32/32 MySQL integration tests; whole suite with `MAURO_HARNESS=mysql` 261 passed, 1 known issue (KI-1), 0 skipped — `docs/MYSQL_VERIFICATION.md`. To repeat on the production host before launch |
 | 17 | Behaviour on the production host (Poppler, cron worker, HTTPS, disk) | ⛔ BLOCKED | no host yet; run `docs/LAUNCH_RUNBOOK.md` §8 go/no-go checklist |
 
 ## The real library was not used for testing

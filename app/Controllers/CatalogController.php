@@ -68,8 +68,27 @@ final class CatalogController extends Controller
         ]);
     }
 
+    public function publishers(Request $request): Response
+    {
+        return $this->view('library/publishers', [
+            'pageTitle' => __('publishers.title'),
+            'metaDescription' => __('publishers.meta'),
+            'publishers' => $this->library()->publishers(),
+        ]);
+    }
+
+    public function publisher(Request $request): Response
+    {
+        $publisher = $this->library()->findPublisherBySlug((string) $request->param('slug'));
+        if ($publisher === null) {
+            throw HttpException::notFound();
+        }
+        return $this->listing($request, 'publishers.show', ['slug' => $publisher['slug']], $publisher['name'],
+            __('publishers.subtitle', ['count' => $publisher['books_count']]), 'newest', null, $publisher);
+    }
+
     private function listing(Request $request, string $routeName, array $routeParams, string $title, ?string $subtitle,
-        string $defaultSort = 'newest', ?array $category = null): Response
+        string $defaultSort = 'newest', ?array $category = null, ?array $publisher = null): Response
     {
         $perPageDefault = (int) Config::get('ui.per_page_default', 24);
         if (!$this->library()->isDemo()) { // admin setting catalog.per_page (must be one of the offered options)
@@ -80,15 +99,21 @@ final class CatalogController extends Controller
         if ($category !== null) {
             $query = $query->withCategory($category['slug']);
         }
+        if ($publisher !== null) {
+            $query = $query->withPublisher($publisher['slug']);
+        }
 
         $library = $this->library();
         $results = $library->searchBooks($query);
 
         $baseUrl = route($routeName, $routeParams);
-        $urlFor = static function (array $override = []) use ($query, $baseUrl, $perPageDefault, $defaultSort, $category): string {
+        $urlFor = static function (array $override = []) use ($query, $baseUrl, $perPageDefault, $defaultSort, $category, $publisher): string {
             $params = $query->toQuery($override + ['page' => null], $perPageDefault, $defaultSort);
             if ($category !== null) {
                 unset($params['category']); // implied by the URL
+            }
+            if ($publisher !== null) {
+                unset($params['publisher']); // implied by the URL
             }
             return $baseUrl . ($params ? '?' . http_build_query($params) : '');
         };
@@ -104,6 +129,7 @@ final class CatalogController extends Controller
             'results' => $results,
             'defaultSort' => $defaultSort,
             'lockedCategory' => $category,
+            'lockedPublisher' => $publisher,
             'categories' => $library->categories(),
             'authors' => $library->authors(),
             'languages' => $library->languages(),
